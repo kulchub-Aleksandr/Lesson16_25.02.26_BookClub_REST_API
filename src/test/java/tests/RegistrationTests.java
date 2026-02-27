@@ -1,33 +1,54 @@
 package tests;
 
 import io.restassured.http.ContentType;
+import models.registration.*;
 import net.datafaker.Faker;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.notNullValue;
+import static specs.registration.RegistrationSpec.*;
 
-public class RegistrationTests {
+public class RegistrationTests extends TestBase {
+
+    String username;
+    String password;
+
+    @BeforeEach
+    public void prepareTestData() {
+        Faker faker = new Faker();
+        username = faker.name().firstName();
+        password = faker.name().firstName();
+    }
+
     @Test
     public void successfulRegistrationTest() {
 
-        Faker faker = new Faker();
-        String username = faker.name().firstName();
-        String password = faker.name().firstName();
-        String data = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
+        RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        given()
-                .log().all()
-                .contentType(JSON)
-                .body(data)
+        SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
+                .body(registrationData)
                 .when()
-                .post("http://bookclub.qa.guru:8000/api/v1/users/register/")
+                .post("/users/register/")
                 .then()
-                .log().all()
-                .statusCode(201)
-                .body("username", is(username))
-                .body("id", notNullValue());
+                .spec(successfulRegistrationResponseSpec)
+                .extract()
+                .as(SuccessfulRegistrationResponseModel.class);
+
+        assertThat(registrationResponse.id()).isGreaterThan(0);
+        assertThat(registrationResponse.username()).isEqualTo(username);
+        assertThat(registrationResponse.firstName()).isEqualTo("");
+        assertThat(registrationResponse.lastName()).isEqualTo("");
+        assertThat(registrationResponse.email()).isEqualTo("");
+
+        String ipAddrRegexp = "^((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.){3}"
+                + "(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)$";
+        assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
 
     }
 
@@ -54,80 +75,79 @@ public class RegistrationTests {
     }
 
     @Test
-    public void existingUser400Test() {
+    public void existingUserRegistrationTest() {
 
-        Faker faker = new Faker();
-        String username = faker.name().firstName();
-        String password = faker.name().firstName();
-        String data = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
+        RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        given()
-                .log().all()
-                .contentType(JSON)
-                .body(data)
+        SuccessfulRegistrationResponseModel registrationResponse_1 = given(registrationRequestSpec)
+                .body(registrationData)
                 .when()
-                .post("http://bookclub.qa.guru:8000/api/v1/users/register/")
+                .post("/users/register/")
                 .then()
-                .log().all()
-                .statusCode(201)
-                .body("username", is(username))
-                .body("id", notNullValue());
+                .spec(successfulRegistrationResponseSpec)
+                .extract()
+                .as(SuccessfulRegistrationResponseModel.class);
 
-        given()
-                .log().all()
-                .contentType(JSON)
-                .body(data)
+        assertThat(registrationResponse_1.username()).isEqualTo(username);
+
+        ExistingUserResponseModel registrationResponse_2 = given(registrationRequestSpec)
+                .body(registrationData)
                 .when()
-                .post("http://bookclub.qa.guru:8000/api/v1/users/register/")
+                .post("/users/register/")
                 .then()
-                .log().all()
-                .statusCode(400)
-                //.body("username", is("A user with that username already exists."))
-                .body(containsString("A user with that username already exists."));
+                .spec(existingUserRegistrationResponseSpec)
+                .extract()
+                .as(ExistingUserResponseModel.class);
 
+        String expectedError = "A user with that username already exists.";
+        String actualError = registrationResponse_2.username().getFirst();
+        assertThat(actualError).isEqualTo(expectedError);
 
     }
 
     @Test
-    public void invalidUserName400Test() {
+    public void invalidUserNameRegistrationTest() {
 
         Faker faker = new Faker();
         String username = faker.name().fullName();
         String password = faker.name().firstName();
-        String data = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
 
-        given()
-                .log().all()
-                .contentType(JSON)
-                .body(data)
+        RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+
+        InvalidUserNameResponseModel registrationResponse = given(registrationRequestSpec)
+                .body(registrationData)
                 .when()
-                .post("http://bookclub.qa.guru:8000/api/v1/users/register/")
+                .post("/users/register/")
                 .then()
-                .log().all()
-                .statusCode(201)
-                .body("username", is(username))
-                .body("id", notNullValue());
+                .spec(invalidUserNameRegistrationResponseSpec)
+                .extract()
+                .as(InvalidUserNameResponseModel.class);
+
+        String expectedError = "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.";
+        String actualError = registrationResponse.username().getFirst();
+        assertThat(actualError).isEqualTo(expectedError);
 
     }
 
     @Test
-    public void unsupportedMediaType415Test() {
+    public void unsupportedMediaTypeRegistrationTest() {
 
-        Faker faker = new Faker();
-        String username = faker.name().fullName();
-        String password = faker.name().firstName();
-        String data = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
+        RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        given()
+        UnsupportedMediaTypeResponseModel registrationResponse = given()
                 .log().all()
-                .body(data)
+                .body(registrationData)
                 .when()
-                .post("http://bookclub.qa.guru:8000/api/v1/users/register/")
+                .post("/users/register/")
                 .then()
-                .log().all()
-                .statusCode(201)
-                .body("username", is(username))
-                .body("id", notNullValue());
+                .spec(unsupportedMediaTypeResponseSpec)
+                .extract()
+                .as(UnsupportedMediaTypeResponseModel.class);
+
+        String expectedError = "Unsupported media type \"text/plain; charset=ISO-8859-1\" in request.";
+        String actualError = registrationResponse.detail();
+        assertThat(actualError).isEqualTo(expectedError);
 
     }
+
 }

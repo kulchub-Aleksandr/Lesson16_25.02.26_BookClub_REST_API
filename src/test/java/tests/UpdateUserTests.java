@@ -4,6 +4,7 @@ import models.login.LoginBodyModel;
 import models.login.SuccessfulLoginResponseModel;
 import models.registration.RegistrationBodyModel;
 import models.registration.SuccessfulRegistrationResponseModel;
+import models.update.NotProvidedAuthenticationCredentialsResponseModel;
 import models.update.SuccessfulUpdateUserResponseModel;
 import models.update.UpdateBodyModel;
 import net.datafaker.Faker;
@@ -16,8 +17,7 @@ import static specs.login.LoginSpec.loginRequestSpec;
 import static specs.login.LoginSpec.successfulLoginResponseSpec;
 import static specs.registration.RegistrationSpec.registrationRequestSpec;
 import static specs.registration.RegistrationSpec.successfulRegistrationResponseSpec;
-import static specs.update.UpdateSpec.successfulUpdateResponseSpec;
-import static specs.update.UpdateSpec.updateRequestSpec;
+import static specs.update.UpdateSpec.*;
 
 public class UpdateUserTests extends TestBase {
 
@@ -87,27 +87,42 @@ public class UpdateUserTests extends TestBase {
                 .header("Authorization", "Bearer " + actualAccessToken)
                 .body(updateData)
                 .when()
-                .patch("/users/me/")
+                .put("/users/me/")
                 .then()
                 .spec(successfulUpdateResponseSpec)
                 .extract()
                 .as(SuccessfulUpdateUserResponseModel.class);
 
-        assertThat(updateResponse.id()).isGreaterThan(0);
+        assertThat(updateResponse.id()).isEqualTo(registrationResponse.id());
         assertThat(updateResponse.username()).isEqualTo(username);
         assertThat(updateResponse.firstName()).isEqualTo(firstName);
         assertThat(updateResponse.lastName()).isEqualTo(lastName);
         assertThat(updateResponse.email()).isEqualTo(email);
         assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
+
         String updateIpAddress = updateResponse.remoteAddr();
         assertThat(registrationIpAddress).isEqualTo(updateIpAddress);
 
+        SuccessfulUpdateUserResponseModel updatedUserData  =  given()
+                .header("Authorization", "Bearer " + actualAccessToken)
+                .when()
+                .get("/users/me/")
+                .then()
+                .log().all()
+                .statusCode(200)
+                .extract()
+                .as(SuccessfulUpdateUserResponseModel.class);
 
+        assertThat(updatedUserData.id()).isEqualTo(registrationResponse.id());
+        assertThat(updatedUserData.username()).isEqualTo(username);
+        assertThat(updatedUserData.firstName()).isEqualTo(firstName);
+        assertThat(updatedUserData.lastName()).isEqualTo(lastName);
+        assertThat(updatedUserData.email()).isEqualTo(email);
     }
 
 
     @Test
-    public void UpdateUser401Test() {
+    public void notProvidedAuthenticationCredentialsUpdateUserNegativeTest() {
 
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
@@ -133,15 +148,18 @@ public class UpdateUserTests extends TestBase {
         UpdateBodyModel updateData = new UpdateBodyModel(username,
                 firstName, lastName, email);
 
-        given(updateRequestSpec)
+        NotProvidedAuthenticationCredentialsResponseModel updateResponse = given(updateRequestSpec)
                 .body(updateData)
                 .when()
                 .put("/users/me/")
                 .then()
-                .spec(successfulUpdateResponseSpec)
+                .spec(notProvidedAuthenticationCredentialsResponseSpec)
                 .extract()
-                .as(UpdateBodyModel.class);
+                .as(NotProvidedAuthenticationCredentialsResponseModel.class);
 
+        String actualDetail = updateResponse.detail();
+        String expectedDetail = "Authentication credentials were not provided.";
+        assertThat(actualDetail).isEqualTo(expectedDetail);
     }
 
 

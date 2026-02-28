@@ -39,7 +39,7 @@ public class LoginTests extends TestBase {
     }
 
     @Test
-    public void wrongPasswordLoginTest(){
+    public void wrongPasswordLoginNegativeTest(){
         LoginBodyModel loginData = new LoginBodyModel(username, wrongPassword);
 
         WrongCredentialsLoginResponseModel loginResponse = given(loginRequestSpec)
@@ -58,7 +58,7 @@ public class LoginTests extends TestBase {
     }
 
     @Test
-    public void emptyPasswordLoginTest(){
+    public void emptyPasswordLoginNegativeTest(){
         LoginBodyModel loginData = new LoginBodyModel(username, emptyPassword);
 
         EmptyPasswordResponseModel loginResponse = given(loginRequestSpec)
@@ -77,7 +77,7 @@ public class LoginTests extends TestBase {
     }
 
     @Test
-    public void wrongUserNameLoginTest(){
+    public void wrongUserNameLoginNegativeTest(){
         LoginBodyModel loginData = new LoginBodyModel(wrongUsername, password);
 
         WrongCredentialsLoginResponseModel loginResponse = given(loginRequestSpec)
@@ -96,7 +96,7 @@ public class LoginTests extends TestBase {
     }
 
     @Test
-    public void emptyUserNameLoginTest(){
+    public void emptyUserNameLoginNegativeTest(){
         LoginBodyModel loginData = new LoginBodyModel(emptyUsername, password);
 
         EmptyUserResponseModel loginResponse = given(loginRequestSpec)
@@ -115,7 +115,7 @@ public class LoginTests extends TestBase {
     }
 
     @Test
-    public void emptyUserNameEmptyPasswordLoginTest(){
+    public void emptyUserNameEmptyPasswordLoginNegativeTest(){
         LoginBodyModel loginData = new LoginBodyModel(emptyUsername, emptyPassword);
 
         EmptyUserEmptyPasswordResponseModel loginResponse = given(loginRequestSpec)

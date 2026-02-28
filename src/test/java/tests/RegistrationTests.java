@@ -75,7 +75,7 @@ public class RegistrationTests extends TestBase {
     }
 
     @Test
-    public void existingUserRegistrationTest() {
+    public void existingUserRegistrationNegativeTest() {
 
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
@@ -106,7 +106,7 @@ public class RegistrationTests extends TestBase {
     }
 
     @Test
-    public void invalidUserNameRegistrationTest() {
+    public void invalidUserNameRegistrationNegativeTest() {
 
         Faker faker = new Faker();
         String username = faker.name().fullName();
@@ -130,7 +130,7 @@ public class RegistrationTests extends TestBase {
     }
 
     @Test
-    public void unsupportedMediaTypeRegistrationTest() {
+    public void unsupportedMediaTypeRegistrationNegativeTest() {
 
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 

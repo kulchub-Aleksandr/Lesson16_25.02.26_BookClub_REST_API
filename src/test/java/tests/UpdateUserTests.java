@@ -4,9 +4,7 @@ import models.login.LoginBodyModel;
 import models.login.SuccessfulLoginResponseModel;
 import models.registration.RegistrationBodyModel;
 import models.registration.SuccessfulRegistrationResponseModel;
-import models.update.NotProvidedAuthenticationCredentialsResponseModel;
-import models.update.SuccessfulUpdateUserResponseModel;
-import models.update.UpdateBodyModel;
+import models.update.*;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +34,6 @@ public class UpdateUserTests extends TestBase {
         lastName = faker.name().lastName();
         email = faker.internet().emailAddress();
     }
-
 
     @Test
     public void successfulUpdateUserTest() {
@@ -74,7 +71,6 @@ public class UpdateUserTests extends TestBase {
                 .extract()
                 .as(SuccessfulLoginResponseModel.class);
 
-
         String actualAccessToken = loginResponse.access();
         String actualRefreshToken = loginResponse.refresh();
 
@@ -103,13 +99,12 @@ public class UpdateUserTests extends TestBase {
         String updateIpAddress = updateResponse.remoteAddr();
         assertThat(registrationIpAddress).isEqualTo(updateIpAddress);
 
-        SuccessfulUpdateUserResponseModel updatedUserData  =  given()
+        SuccessfulUpdateUserResponseModel updatedUserData = given()
                 .header("Authorization", "Bearer " + actualAccessToken)
                 .when()
                 .get("/users/me/")
                 .then()
-                .log().all()
-                .statusCode(200)
+                .spec(updatedUserDataResponseSpec)
                 .extract()
                 .as(SuccessfulUpdateUserResponseModel.class);
 
@@ -119,7 +114,6 @@ public class UpdateUserTests extends TestBase {
         assertThat(updatedUserData.lastName()).isEqualTo(lastName);
         assertThat(updatedUserData.email()).isEqualTo(email);
     }
-
 
     @Test
     public void notProvidedAuthenticationCredentialsUpdateUserNegativeTest() {
@@ -161,6 +155,148 @@ public class UpdateUserTests extends TestBase {
         String expectedDetail = "Authentication credentials were not provided.";
         assertThat(actualDetail).isEqualTo(expectedDetail);
     }
+
+    @Test
+    public void partialUpdateUserTest() {
+
+        RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+
+        SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
+                .body(registrationData)
+                .when()
+                .post("/users/register/")
+                .then()
+                .spec(successfulRegistrationResponseSpec)
+                .extract()
+                .as(SuccessfulRegistrationResponseModel.class);
+
+        assertThat(registrationResponse.id()).isGreaterThan(0);
+        assertThat(registrationResponse.username()).isEqualTo(username);
+        assertThat(registrationResponse.firstName()).isEqualTo("");
+        assertThat(registrationResponse.lastName()).isEqualTo("");
+        assertThat(registrationResponse.email()).isEqualTo("");
+
+        String ipAddrRegexp = "^((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.){3}"
+                + "(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)$";
+        assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
+
+        String registrationIpAddress = registrationResponse.remoteAddr();
+
+        LoginBodyModel loginData = new LoginBodyModel(username, password);
+        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+                .body(loginData)
+                .when()
+                .post("/auth/token/")
+                .then()
+                .spec(successfulLoginResponseSpec)
+                .extract()
+                .as(SuccessfulLoginResponseModel.class);
+
+        String actualAccessToken = loginResponse.access();
+        String actualRefreshToken = loginResponse.refresh();
+
+        assertThat(actualAccessToken).isNotEqualTo(actualRefreshToken);
+
+        PartialUpdateBodyModel updateData = new PartialUpdateBodyModel(firstName, lastName);
+
+        SuccessfulUpdateUserResponseModel updateResponse = given(updateRequestSpec)
+                .header("Authorization", "Bearer " + actualAccessToken)
+                .body(updateData)
+                .when()
+                .patch("/users/me/")
+                .then()
+                .spec(successfulUpdateResponseSpec)
+                .extract()
+                .as(SuccessfulUpdateUserResponseModel.class);
+
+        assertThat(updateResponse.id()).isEqualTo(registrationResponse.id());
+        assertThat(updateResponse.username()).isEqualTo(username);
+        assertThat(updateResponse.firstName()).isEqualTo(firstName);
+        assertThat(updateResponse.lastName()).isEqualTo(lastName);
+        assertThat(updateResponse.email()).isEqualTo(registrationResponse.email());
+        assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
+
+        String updateIpAddress = updateResponse.remoteAddr();
+        assertThat(registrationIpAddress).isEqualTo(updateIpAddress);
+
+        SuccessfulUpdateUserResponseModel updatedUserData = given()
+                .header("Authorization", "Bearer " + actualAccessToken)
+                .when()
+                .get("/users/me/")
+                .then()
+                .spec(updatedUserDataResponseSpec)
+                .extract()
+                .as(SuccessfulUpdateUserResponseModel.class);
+
+        assertThat(updatedUserData.id()).isEqualTo(registrationResponse.id());
+        assertThat(updatedUserData.username()).isEqualTo(username);
+        assertThat(updatedUserData.firstName()).isEqualTo(firstName);
+        assertThat(updatedUserData.lastName()).isEqualTo(lastName);
+        assertThat(updatedUserData.email()).isEqualTo(updateResponse.email());
+    }
+    @Test
+    public void partialUpdateUserWithPutMethodNegativeTest() {
+
+        RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+
+        SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
+                .body(registrationData)
+                .when()
+                .post("/users/register/")
+                .then()
+                .spec(successfulRegistrationResponseSpec)
+                .extract()
+                .as(SuccessfulRegistrationResponseModel.class);
+
+        assertThat(registrationResponse.id()).isGreaterThan(0);
+        assertThat(registrationResponse.username()).isEqualTo(username);
+        assertThat(registrationResponse.firstName()).isEqualTo("");
+        assertThat(registrationResponse.lastName()).isEqualTo("");
+        assertThat(registrationResponse.email()).isEqualTo("");
+
+        String ipAddrRegexp = "^((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.){3}"
+                + "(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)$";
+        assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
+
+        String registrationIpAddress = registrationResponse.remoteAddr();
+
+        LoginBodyModel loginData = new LoginBodyModel(username, password);
+        SuccessfulLoginResponseModel loginResponse = given(loginRequestSpec)
+                .body(loginData)
+                .when()
+                .post("/auth/token/")
+                .then()
+                .spec(successfulLoginResponseSpec)
+                .extract()
+                .as(SuccessfulLoginResponseModel.class);
+
+        String actualAccessToken = loginResponse.access();
+        String actualRefreshToken = loginResponse.refresh();
+
+        assertThat(actualAccessToken).isNotEqualTo(actualRefreshToken);
+
+        PartialUpdateBodyModel updateData = new PartialUpdateBodyModel(firstName, lastName);
+
+        PartialWithPutMethodUpdateUserResponseModel updateResponse = given(updateRequestSpec)
+                .header("Authorization", "Bearer " + actualAccessToken)
+                .body(updateData)
+                .when()
+                .put("/users/me/")
+                .then()
+                .spec(partialWithPutMethodUpdateResponseSpec)
+                .extract()
+                .as(PartialWithPutMethodUpdateUserResponseModel.class);
+
+        String actualUsername = updateResponse.username().getFirst();
+        String expectedUsername = "This field is required.";
+        String actualEmail = updateResponse.email().getFirst();
+        String expectedEmail = "This field is required.";
+
+        assertThat(actualUsername).isEqualTo(expectedUsername);
+        assertThat(actualEmail).isEqualTo(expectedEmail);
+    }
+
+
 
 
     // todo add update user tests

@@ -36,30 +36,27 @@ public class UpdateSpec {
             .expectHeader("WWW-Authenticate", Matchers.containsString("Bearer realm=\"api\""))
             .build();
 
-    public static ResponseSpecification emptyTokenLogoutResponseSpec = new ResponseSpecBuilder()
+    public static ResponseSpecification updatedUserDataResponseSpec = new ResponseSpecBuilder()
             .log(ALL)
-            .expectStatusCode(400)
+            .expectStatusCode(200)
             .expectBody(matchesJsonSchemaInClasspath(
-                    "schemas/logout/empty_token_logout_response_schema.json"))
-            .expectBody("refresh", notNullValue())
-            .build();
-
-
-    public static ResponseSpecification emptyRequestBodyLogoutResponseSpec = new ResponseSpecBuilder()
-            .log(ALL)
-            .expectStatusCode(400)
-            .expectBody(matchesJsonSchemaInClasspath(
-                    "schemas/logout/empty_request_body_response_schema.json"))
-            .expectBody("refresh", notNullValue())
-            .build();
-
-    public static ResponseSpecification emptyUserEmptyPasswordLoginResponseSpec = new ResponseSpecBuilder()
-            .log(ALL)
-            .expectStatusCode(400)
-            .expectBody(matchesJsonSchemaInClasspath(
-                    "schemas/login/empty_user_empty_password_login_response_schema.json"))
+                    "schemas/update/update_user_data_response_schema.json"))
+            .expectBody("id", notNullValue())
             .expectBody("username", notNullValue())
-            .expectBody("password", notNullValue())
+            .expectBody("firstName", notNullValue())
+            .expectBody("lastName", notNullValue())
+            .expectBody("email", notNullValue())
+            .expectBody("remoteAddr", notNullValue())
+            .build();
+
+
+    public static ResponseSpecification partialWithPutMethodUpdateResponseSpec = new ResponseSpecBuilder()
+            .log(ALL)
+            .expectStatusCode(400)
+            .expectBody(matchesJsonSchemaInClasspath(
+                    "schemas/update/partial_put_method_update_response_schema.json"))
+            .expectBody("username", notNullValue())
+            .expectBody("email", notNullValue())
             .build();
 
 

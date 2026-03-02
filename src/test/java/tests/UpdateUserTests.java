@@ -234,6 +234,7 @@ public class UpdateUserTests extends TestBase {
         assertThat(updatedUserData.lastName()).isEqualTo(lastName);
         assertThat(updatedUserData.email()).isEqualTo(updateResponse.email());
     }
+
     @Test
     public void partialUpdateUserWithPutMethodNegativeTest() {
 
@@ -296,8 +297,4 @@ public class UpdateUserTests extends TestBase {
         assertThat(actualEmail).isEqualTo(expectedEmail);
     }
 
-
-
-
-    // todo add update user tests
 }

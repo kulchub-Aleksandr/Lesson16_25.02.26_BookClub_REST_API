@@ -60,9 +60,9 @@ public class LogoutTests extends TestBase {
                 .spec(successfulLoginResponseSpec)
                 .extract().as(SuccessfulLoginResponseModel.class);
 
-        String actualRefresh = refreshToken.refresh();
+        String actualRefreshToken = refreshToken.refresh();
 
-        LogoutBodyModel logoutData = new LogoutBodyModel(actualRefresh);
+        LogoutBodyModel logoutData = new LogoutBodyModel(actualRefreshToken);
 
         Response logoutResponse = given(logoutRequestSpec)
                 .body(logoutData)

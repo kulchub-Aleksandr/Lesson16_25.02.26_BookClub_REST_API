@@ -2,14 +2,17 @@ package tests;
 
 import models.registration.*;
 import net.datafaker.Faker;
+import net.datafaker.providers.base.Text;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static allure.CustomAllureListener.withCustomTemplate;
+import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
-import static io.restassured.http.ContentType.JSON;
+import static net.datafaker.providers.base.Text.DIGITS;
+import static net.datafaker.providers.base.Text.EN_UPPERCASE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static specs.registration.RegistrationSpec.*;
 
 public class RegistrationTests extends TestBase {
@@ -21,89 +24,75 @@ public class RegistrationTests extends TestBase {
     public void prepareTestData() {
         Faker faker = new Faker();
         username = faker.name().firstName();
-        password = faker.name().firstName();
+        password = faker.text().text(Text.TextSymbolsBuilder.builder().len(8).with(EN_UPPERCASE, 2).with(DIGITS, 3).build());
     }
 
     @Test
+    @DisplayName("Тест на проверку регистрации нового пользователя")
     public void successfulRegistrationTest() {
+        step("Регистрация нового пользователя и проверка ответа (201)", () -> {
+            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+            SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
+                    .body(registrationData)
+                    .when()
+                    .post("/users/register/")
+                    .then()
+                    .spec(successfulRegistrationResponseSpec)
+                    .extract()
+                    .as(SuccessfulRegistrationResponseModel.class);
 
-        SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
-                .body(registrationData)
-                .when()
-                .post("/users/register/")
-                .then()
-                .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+            assertThat(registrationResponse.id()).isGreaterThan(0);
+            assertThat(registrationResponse.username()).isEqualTo(username);
+            assertThat(registrationResponse.firstName()).isEqualTo("");
+            assertThat(registrationResponse.lastName()).isEqualTo("");
+            assertThat(registrationResponse.email()).isEqualTo("");
 
-        assertThat(registrationResponse.id()).isGreaterThan(0);
-        assertThat(registrationResponse.username()).isEqualTo(username);
-        assertThat(registrationResponse.firstName()).isEqualTo("");
-        assertThat(registrationResponse.lastName()).isEqualTo("");
-        assertThat(registrationResponse.email()).isEqualTo("");
-
-        String ipAddrRegexp = "^((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.){3}"
-                + "(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)$";
-        assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
-
-    }
-
-    @Test
-    public void successfulRegistrationTest_BadPractice() {
-
-        Faker faker = new Faker();
-        String username = faker.name().firstName();
-        String password = faker.name().firstName();
-        String data = "{\"username\": \"" + username + "\", \"password\": \"" + password + "\"}";
-
-        given()
-                .log().all()
-                .contentType(JSON)
-                .body(data)
-                .when()
-                .post("http://bookclub.qa.guru:8000/api/v1/users/register/")
-                .then()
-                .log().all()
-                .statusCode(201)
-                .body("username", is(username))
-                .body("id", notNullValue());
+            String ipAddrRegexp = "^((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.){3}"
+                    + "(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)$";
+            assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
+        });
 
     }
 
     @Test
+    @DisplayName("Тест на проверку регистрации пользователя с уже существующими регистрационными данными")
     public void existingUserRegistrationNegativeTest() {
 
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+        step("Регистрация нового пользователя", () -> {
+            SuccessfulRegistrationResponseModel registrationResponse_1 = given(registrationRequestSpec)
+                    .body(registrationData)
+                    .when()
+                    .post("/users/register/")
+                    .then()
+                    .spec(successfulRegistrationResponseSpec)
+                    .extract()
+                    .as(SuccessfulRegistrationResponseModel.class);
 
-        SuccessfulRegistrationResponseModel registrationResponse_1 = given(registrationRequestSpec)
-                .body(registrationData)
-                .when()
-                .post("/users/register/")
-                .then()
-                .spec(successfulRegistrationResponseSpec)
-                .extract()
-                .as(SuccessfulRegistrationResponseModel.class);
+            assertThat(registrationResponse_1.username()).isEqualTo(username);
+        });
 
-        assertThat(registrationResponse_1.username()).isEqualTo(username);
+        step("Регистрация нового пользователя с уже существующими регистрационными данными и проверка ответа (400)", () -> {
 
-        ExistingUserResponseModel registrationResponse_2 = given(registrationRequestSpec)
-                .body(registrationData)
-                .when()
-                .post("/users/register/")
-                .then()
-                .spec(existingUserRegistrationResponseSpec)
-                .extract()
-                .as(ExistingUserResponseModel.class);
+            ExistingUserResponseModel registrationResponse_2 = given(registrationRequestSpec)
+                    .body(registrationData)
+                    .when()
+                    .post("/users/register/")
+                    .then()
+                    .spec(existingUserRegistrationResponseSpec)
+                    .extract()
+                    .as(ExistingUserResponseModel.class);
 
-        String expectedError = "A user with that username already exists.";
-        String actualError = registrationResponse_2.username().getFirst();
-        assertThat(actualError).isEqualTo(expectedError);
+            String expectedError = "A user with that username already exists.";
+            String actualError = registrationResponse_2.username().getFirst();
+            assertThat(actualError).isEqualTo(expectedError);
+        });
 
     }
 
     @Test
+    @DisplayName("Тест на проверку регистрации пользователя с невалидными регистрационными данными")
     public void invalidUserNameRegistrationNegativeTest() {
 
         Faker faker = new Faker();
@@ -111,41 +100,43 @@ public class RegistrationTests extends TestBase {
         String password = faker.name().firstName();
 
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+        step("Регистрация нового пользователя с невалидными регистрационными данными и проверка ответа (400)", () -> {
+            InvalidUserNameResponseModel registrationResponse = given(registrationRequestSpec)
+                    .body(registrationData)
+                    .when()
+                    .post("/users/register/")
+                    .then()
+                    .spec(invalidUserNameRegistrationResponseSpec)
+                    .extract()
+                    .as(InvalidUserNameResponseModel.class);
 
-        InvalidUserNameResponseModel registrationResponse = given(registrationRequestSpec)
-                .body(registrationData)
-                .when()
-                .post("/users/register/")
-                .then()
-                .spec(invalidUserNameRegistrationResponseSpec)
-                .extract()
-                .as(InvalidUserNameResponseModel.class);
-
-        String expectedError = "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.";
-        String actualError = registrationResponse.username().getFirst();
-        assertThat(actualError).isEqualTo(expectedError);
+            String expectedError = "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.";
+            String actualError = registrationResponse.username().getFirst();
+            assertThat(actualError).isEqualTo(expectedError);
+        });
 
     }
 
     @Test
+    @DisplayName("Тест на проверку регистрации пользователя с неподдерживаемым типом передаваемых данных")
     public void unsupportedMediaTypeRegistrationNegativeTest() {
 
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+        step("Регистрация нового пользователя с неподдерживаемым типом передаваемых данных и проверка ответа (415)", () -> {
+            UnsupportedMediaTypeResponseModel registrationResponse = given()
+                    .filter(withCustomTemplate())
+                    .log().all()
+                    .body(registrationData)
+                    .when()
+                    .post("/users/register/")
+                    .then()
+                    .spec(unsupportedMediaTypeResponseSpec)
+                    .extract()
+                    .as(UnsupportedMediaTypeResponseModel.class);
 
-        UnsupportedMediaTypeResponseModel registrationResponse = given()
-                .log().all()
-                .body(registrationData)
-                .when()
-                .post("/users/register/")
-                .then()
-                .spec(unsupportedMediaTypeResponseSpec)
-                .extract()
-                .as(UnsupportedMediaTypeResponseModel.class);
-
-        String expectedError = "Unsupported media type \"text/plain; charset=ISO-8859-1\" in request.";
-        String actualError = registrationResponse.detail();
-        assertThat(actualError).isEqualTo(expectedError);
-
+            String expectedError = "Unsupported media type \"text/plain; charset=ISO-8859-1\" in request.";
+            String actualError = registrationResponse.detail();
+            assertThat(actualError).isEqualTo(expectedError);
+        });
     }
-
 }

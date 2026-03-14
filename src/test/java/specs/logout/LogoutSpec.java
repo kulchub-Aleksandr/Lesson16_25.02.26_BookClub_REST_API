@@ -9,11 +9,10 @@ import static io.restassured.filter.log.LogDetail.ALL;
 import static io.restassured.http.ContentType.JSON;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.notNullValue;
+import static specs.BaseSpec.baseRequestSpec;
 
 public class LogoutSpec {
-    public static RequestSpecification logoutRequestSpec = with()
-            .log().all()
-            .contentType(JSON);
+    public static RequestSpecification logoutRequestSpec = baseRequestSpec;
 
     public static ResponseSpecification successfulLogoutResponseSpec = new ResponseSpecBuilder()
             .log(ALL)

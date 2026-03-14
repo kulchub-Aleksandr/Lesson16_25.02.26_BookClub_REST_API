@@ -21,21 +21,23 @@ import static specs.registration.RegistrationSpec.registrationRequestSpec;
 import static specs.registration.RegistrationSpec.successfulRegistrationResponseSpec;
 
 public class LoginTests extends TestBase {
-
-    String username;
-    String password;
-    String wrongPassword;
-    String wrongUsername;
-    String emptyPassword = "";
-    String emptyUsername = "";
+    private final TestData testData = new TestData();
+    private String username;
+    private String password;
+    private String wrongPassword;
+    private String wrongUsername;
+    private String emptyPassword;
+    private String emptyUsername;
 
     @BeforeEach
     public void prepareTestData() {
-        Faker faker = new Faker();
-        username = faker.name().firstName();
-        password = faker.text().text(Text.TextSymbolsBuilder.builder().len(8).with(EN_UPPERCASE, 2).with(DIGITS, 3).build());
+        username = testData.getUsername();
+        password = testData.getPassword();
         wrongPassword = password + "1234";
         wrongUsername = username + "qa";
+        emptyPassword = testData.getEmptyPassword();
+        emptyUsername = testData.getEmptyUsername();
+
     }
 
     @Test
@@ -298,20 +300,20 @@ public class LoginTests extends TestBase {
     @DisplayName("Тест на проверку авторизации пользователя с применением пустого поля для логина")
     public void emptyUserNameLoginNegativeTest() {
         step("Регистрация нового пользователя", () -> {
-                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-                    SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
-                            .body(registrationData)
-                            .when()
-                            .post("/users/register/")
-                            .then()
-                            .spec(successfulRegistrationResponseSpec)
-                            .extract()
-                            .as(SuccessfulRegistrationResponseModel.class);
+            SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
+                    .body(registrationData)
+                    .when()
+                    .post("/users/register/")
+                    .then()
+                    .spec(successfulRegistrationResponseSpec)
+                    .extract()
+                    .as(SuccessfulRegistrationResponseModel.class);
 
-                    assertThat(registrationResponse.id()).isGreaterThan(0);
-                    assertThat(registrationResponse.username()).isEqualTo(username);
-                });
+            assertThat(registrationResponse.id()).isGreaterThan(0);
+            assertThat(registrationResponse.username()).isEqualTo(username);
+        });
 
         LoginBodyModel wrongLoginData = new LoginBodyModel(emptyUsername, password);
 
@@ -360,20 +362,20 @@ public class LoginTests extends TestBase {
     @DisplayName("Тест на проверку авторизации пользователя с применением пустого поля для логина и пустого поля для пароля")
     public void emptyUserNameEmptyPasswordLoginNegativeTest() {
         step("Регистрация нового пользователя", () -> {
-                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-                    SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
-                            .body(registrationData)
-                            .when()
-                            .post("/users/register/")
-                            .then()
-                            .spec(successfulRegistrationResponseSpec)
-                            .extract()
-                            .as(SuccessfulRegistrationResponseModel.class);
+            SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
+                    .body(registrationData)
+                    .when()
+                    .post("/users/register/")
+                    .then()
+                    .spec(successfulRegistrationResponseSpec)
+                    .extract()
+                    .as(SuccessfulRegistrationResponseModel.class);
 
-                    assertThat(registrationResponse.id()).isGreaterThan(0);
-                    assertThat(registrationResponse.username()).isEqualTo(username);
-                });
+            assertThat(registrationResponse.id()).isGreaterThan(0);
+            assertThat(registrationResponse.username()).isEqualTo(username);
+        });
 
         LoginBodyModel wrongLoginData = new LoginBodyModel(emptyUsername, emptyPassword);
         step("Авторизация с применением пустого поля для логина и пароля с проверкой ответа (400)", () -> {

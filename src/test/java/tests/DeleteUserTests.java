@@ -24,21 +24,14 @@ import static specs.registration.RegistrationSpec.successfulRegistrationResponse
 import static specs.update.UpdateSpec.*;
 
 public class DeleteUserTests extends TestBase {
-
-    String username;
-    String password;
-    String firstName;
-    String lastName;
-    String email;
+    private final TestData testData = new TestData();
+    private String username;
+    private String password;
 
     @BeforeEach
     public void prepareTestData() {
-        Faker faker = new Faker();
-        username = faker.name().firstName();
-        password = faker.text().text(Text.TextSymbolsBuilder.builder().len(8).with(EN_UPPERCASE, 2).with(DIGITS, 3).build());
-        firstName = faker.name().firstName();
-        lastName = faker.name().lastName();
-        email = faker.internet().emailAddress();
+        username = testData.getUsername();
+        password = testData.getPassword();
     }
 
     @Test

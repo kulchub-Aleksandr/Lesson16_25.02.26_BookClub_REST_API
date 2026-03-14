@@ -2,7 +2,6 @@ package tests;
 
 import models.registration.*;
 import net.datafaker.Faker;
-import net.datafaker.providers.base.Text;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,21 +9,18 @@ import org.junit.jupiter.api.Test;
 import static allure.CustomAllureListener.withCustomTemplate;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
-import static net.datafaker.providers.base.Text.DIGITS;
-import static net.datafaker.providers.base.Text.EN_UPPERCASE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static specs.registration.RegistrationSpec.*;
 
 public class RegistrationTests extends TestBase {
-
-    String username;
-    String password;
+    private final TestData testData = new TestData();
+    private String username;
+    private String password;
 
     @BeforeEach
     public void prepareTestData() {
-        Faker faker = new Faker();
-        username = faker.name().firstName();
-        password = faker.text().text(Text.TextSymbolsBuilder.builder().len(8).with(EN_UPPERCASE, 2).with(DIGITS, 3).build());
+        username = testData.getUsername();
+        password = testData.getPassword();
     }
 
     @Test

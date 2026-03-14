@@ -27,15 +27,14 @@ import static specs.registration.RegistrationSpec.registrationRequestSpec;
 import static specs.registration.RegistrationSpec.successfulRegistrationResponseSpec;
 
 public class LogoutTests extends TestBase {
-
-    String username;
-    String password;
+    private final TestData testData = new TestData();
+    private String username;
+    private String password;
 
     @BeforeEach
     public void prepareTestData() {
-        Faker faker = new Faker();
-        username = faker.name().firstName();
-        password = faker.text().text(Text.TextSymbolsBuilder.builder().len(8).with(EN_UPPERCASE, 2).with(DIGITS, 3).build());
+        username = testData.getUsername();
+        password = testData.getPassword();
     }
 
     @Test

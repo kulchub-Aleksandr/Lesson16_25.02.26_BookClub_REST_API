@@ -25,20 +25,20 @@ import static specs.update.UpdateSpec.*;
 
 public class UpdateUserTests extends TestBase {
 
-    String username;
-    String password;
-    String firstName;
-    String lastName;
-    String email;
+    private final TestData testData = new TestData();
+    private String username;
+    private String password;
+    private String firstName;
+    private String lastName;
+    private String email;
 
     @BeforeEach
     public void prepareTestData() {
-        Faker faker = new Faker();
-        username = faker.name().firstName();
-        password = faker.text().text(Text.TextSymbolsBuilder.builder().len(8).with(EN_UPPERCASE, 2).with(DIGITS, 3).build());
-        firstName = faker.name().firstName();
-        lastName = faker.name().lastName();
-        email = faker.internet().emailAddress();
+        username = testData.getUsername();
+        password = testData.getPassword();
+        firstName = testData.getFirstName();
+        lastName = testData.getLastName();
+        email = testData.getEmail();
     }
 
     @Test
@@ -66,7 +66,6 @@ public class UpdateUserTests extends TestBase {
                     + "(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)$";
             assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
 
-            //String registrationIpAddress = registrationResponse.remoteAddr();
         });
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
@@ -81,11 +80,6 @@ public class UpdateUserTests extends TestBase {
                         .extract()
                         .path("access"));
 
-//        String actualAccessToken = loginResponse.access();
-//        String actualRefreshToken = loginResponse.refresh();
-
-        //assertThat(actualAccessToken).isNotEqualTo(actualRefreshToken);
-
         UpdateBodyModel updateData = new UpdateBodyModel(username,
                 firstName, lastName, email);
 
@@ -99,16 +93,11 @@ public class UpdateUserTests extends TestBase {
                     .spec(successfulUpdateResponseSpec)
                     .extract()
                     .as(SuccessfulUpdateUserResponseModel.class);
-
-            // assertThat(updateResponse.id()).isEqualTo(registrationResponse.id());
             assertThat(updateResponse.username()).isEqualTo(username);
             assertThat(updateResponse.firstName()).isEqualTo(firstName);
             assertThat(updateResponse.lastName()).isEqualTo(lastName);
             assertThat(updateResponse.email()).isEqualTo(email);
-            //assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
 
-            //String updateIpAddress = updateResponse.remoteAddr();
-            //assertThat(registrationIpAddress).isEqualTo(updateIpAddress);
         });
 
         step("Проверка изменений методом get и проверка ответа (200)", () -> {
@@ -122,7 +111,6 @@ public class UpdateUserTests extends TestBase {
                     .extract()
                     .as(SuccessfulUpdateUserResponseModel.class);
 
-            //assertThat(updatedUserData.id()).isEqualTo(registrationResponse.id());
             assertThat(updatedUserData.username()).isEqualTo(username);
             assertThat(updatedUserData.firstName()).isEqualTo(firstName);
             assertThat(updatedUserData.lastName()).isEqualTo(lastName);

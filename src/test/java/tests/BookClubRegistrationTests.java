@@ -25,9 +25,10 @@ import static specs.registration.RegistrationSpec.registrationRequestSpec;
 import static specs.registration.RegistrationSpec.successfulRegistrationResponseSpec;
 
 public class BookClubRegistrationTests extends TestBase {
+    private final TestData testData = new TestData();
+    private String username;
+    private String password;
 
-    String username;
-    String password;
     String bookTitle;
     String bookAuthors;
     Integer publicationYear;
@@ -37,14 +38,13 @@ public class BookClubRegistrationTests extends TestBase {
 
     @BeforeEach
     public void prepareTestData() {
-        Faker faker = new Faker();
-        username = faker.name().firstName();
-        password = faker.text().text(Text.TextSymbolsBuilder.builder().len(8).with(EN_UPPERCASE, 2).with(DIGITS, 3).build());
-        bookTitle = faker.book().title();
-        bookAuthors = faker.book().author();
-        publicationYear = faker.number().numberBetween(1800, java.time.Year.now().getValue());
-        description = faker.book().title();
-        telegramChatLink = faker.internet().url();
+        username = testData.getUsername();
+        password = testData.getPassword();
+        bookTitle = testData.getBookTitle();
+        bookAuthors = testData.getBookAuthor();
+        publicationYear = testData.getPublicationYear();
+        description = testData.getBookDescription();
+        telegramChatLink = testData.getTelegramChatLink();
 
 
     }

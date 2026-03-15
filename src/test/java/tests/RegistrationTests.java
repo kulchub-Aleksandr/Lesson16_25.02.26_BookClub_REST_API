@@ -1,26 +1,25 @@
 package tests;
 
+import models.login.LoginBodyModel;
 import models.registration.*;
-import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static allure.CustomAllureListener.withCustomTemplate;
 import static io.qameta.allure.Allure.step;
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static specs.registration.RegistrationSpec.*;
 
 public class RegistrationTests extends TestBase {
     private final TestData testData = new TestData();
     private String username;
     private String password;
+    private String WrongUsername;
 
     @BeforeEach
     public void prepareTestData() {
         username = testData.getUsername();
         password = testData.getPassword();
+        WrongUsername = testData.getWrongUsername();
     }
 
     @Test
@@ -29,14 +28,8 @@ public class RegistrationTests extends TestBase {
         step("Регистрация нового пользователя и проверка ответа (201)", () -> {
             RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-            SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
-                    .body(registrationData)
-                    .when()
-                    .post("/users/register/")
-                    .then()
-                    .spec(successfulRegistrationResponseSpec)
-                    .extract()
-                    .as(SuccessfulRegistrationResponseModel.class);
+            SuccessfulRegistrationResponseModel registrationResponse =
+                    api.users.registration(registrationData);
 
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
@@ -49,6 +42,11 @@ public class RegistrationTests extends TestBase {
             assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
         });
 
+        LoginBodyModel loginData = new LoginBodyModel(username, password);
+        String accessToken = api.auth.loginAndGetAccessToken(loginData);
+        api.users.deleteUserAuthorized(accessToken);
+
+
     }
 
     @Test
@@ -56,34 +54,28 @@ public class RegistrationTests extends TestBase {
     public void existingUserRegistrationNegativeTest() {
 
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+
         step("Регистрация нового пользователя", () -> {
-            SuccessfulRegistrationResponseModel registrationResponse_1 = given(registrationRequestSpec)
-                    .body(registrationData)
-                    .when()
-                    .post("/users/register/")
-                    .then()
-                    .spec(successfulRegistrationResponseSpec)
-                    .extract()
-                    .as(SuccessfulRegistrationResponseModel.class);
+            SuccessfulRegistrationResponseModel registrationResponse_1 =
+                    api.users.registration(registrationData);
 
             assertThat(registrationResponse_1.username()).isEqualTo(username);
         });
 
         step("Регистрация нового пользователя с уже существующими регистрационными данными и проверка ответа (400)", () -> {
 
-            ExistingUserResponseModel registrationResponse_2 = given(registrationRequestSpec)
-                    .body(registrationData)
-                    .when()
-                    .post("/users/register/")
-                    .then()
-                    .spec(existingUserRegistrationResponseSpec)
-                    .extract()
-                    .as(ExistingUserResponseModel.class);
+            ExistingUserResponseModel registrationResponse_2 =
+                    api.users.registrationExistingUse(registrationData);
 
             String expectedError = "A user with that username already exists.";
             String actualError = registrationResponse_2.username().getFirst();
             assertThat(actualError).isEqualTo(expectedError);
         });
+
+        LoginBodyModel loginData = new LoginBodyModel(username, password);
+        String accessToken = api.auth.loginAndGetAccessToken(loginData);
+        api.users.deleteUserAuthorized(accessToken);
+
 
     }
 
@@ -91,20 +83,10 @@ public class RegistrationTests extends TestBase {
     @DisplayName("Тест на проверку регистрации пользователя с невалидными регистрационными данными")
     public void invalidUserNameRegistrationNegativeTest() {
 
-        Faker faker = new Faker();
-        String username = faker.name().fullName();
-        String password = faker.name().firstName();
-
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+        RegistrationBodyModel registrationData = new RegistrationBodyModel(WrongUsername, password);
         step("Регистрация нового пользователя с невалидными регистрационными данными и проверка ответа (400)", () -> {
-            InvalidUserNameResponseModel registrationResponse = given(registrationRequestSpec)
-                    .body(registrationData)
-                    .when()
-                    .post("/users/register/")
-                    .then()
-                    .spec(invalidUserNameRegistrationResponseSpec)
-                    .extract()
-                    .as(InvalidUserNameResponseModel.class);
+            InvalidUserNameResponseModel registrationResponse =
+                    api.users.registrationInvalidUserName(registrationData);
 
             String expectedError = "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.";
             String actualError = registrationResponse.username().getFirst();
@@ -119,16 +101,8 @@ public class RegistrationTests extends TestBase {
 
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
         step("Регистрация нового пользователя с неподдерживаемым типом передаваемых данных и проверка ответа (415)", () -> {
-            UnsupportedMediaTypeResponseModel registrationResponse = given()
-                    .filter(withCustomTemplate())
-                    .log().all()
-                    .body(registrationData)
-                    .when()
-                    .post("/users/register/")
-                    .then()
-                    .spec(unsupportedMediaTypeResponseSpec)
-                    .extract()
-                    .as(UnsupportedMediaTypeResponseModel.class);
+            UnsupportedMediaTypeResponseModel registrationResponse =
+                    api.users.registrationUnsupportedMediaType(registrationData);
 
             String expectedError = "Unsupported media type \"text/plain; charset=ISO-8859-1\" in request.";
             String actualError = registrationResponse.detail();

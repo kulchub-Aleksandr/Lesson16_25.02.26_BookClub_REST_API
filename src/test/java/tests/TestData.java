@@ -12,6 +12,10 @@ public class TestData {
     public String getUsername() {
         return faker.name().firstName();
     }
+    public String getWrongUsername() {
+        return faker.name().fullName();
+    }
+
 
     public String getPassword() {
         return  faker.text().text(Text.TextSymbolsBuilder.builder()

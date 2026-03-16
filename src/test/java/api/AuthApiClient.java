@@ -2,16 +2,16 @@ package api;
 
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
-import models.login.*;
-import models.logout.EmptyRequestBodyLogoutResponseModel;
-import models.logout.EmptyTokenLogoutResponseModel;
-import models.logout.LogoutBodyModel;
-import models.logout.UnauthorizedUserLogoutResponseModel;
+import models.users.login.*;
+import models.users.logout.EmptyRequestBodyLogoutResponseModel;
+import models.users.logout.EmptyTokenLogoutResponseModel;
+import models.users.logout.LogoutBodyModel;
+import models.users.logout.UnauthorizedUserLogoutResponseModel;
 
 import static io.restassured.RestAssured.given;
-import static specs.login.LoginSpec.*;
-import static specs.logout.LogoutSpec.*;
-import static specs.registration.RegistrationSpec.registrationRequestSpec;
+import static specs.users.login.LoginSpec.*;
+import static specs.users.logout.LogoutSpec.*;
+import static specs.users.registration.RegistrationSpec.registrationRequestSpec;
 
 public class AuthApiClient {
     @Step("Авторизация существующего пользователя и проверка ответа (200)")

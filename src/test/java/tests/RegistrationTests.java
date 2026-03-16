@@ -124,17 +124,17 @@ public class RegistrationTests extends TestBase {
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
         UnsupportedMediaTypeResponseModel registrationResponse =
                 step("Регистрация нового пользователя с неподдерживаемым типом передаваемых данных и проверка ответа (415)", () -> {
-            return given()
-                    .filter(withCustomTemplate())
-                    .log().all()
-                    .body(registrationData)
-                    .when()
-                    .post("/users/register/")
-                    .then()
-                    .spec(unsupportedMediaTypeResponseSpec)
-                    .extract()
-                    .as(UnsupportedMediaTypeResponseModel.class);
-        });
+                    return given()
+                            .filter(withCustomTemplate())
+                            .log().all()
+                            .body(registrationData)
+                            .when()
+                            .post("/users/register/")
+                            .then()
+                            .spec(unsupportedMediaTypeResponseSpec)
+                            .extract()
+                            .as(UnsupportedMediaTypeResponseModel.class);
+                });
         step("Проверка текста ошибки в ответе", () -> {
             String expectedError = "Unsupported media type \"text/plain; charset=ISO-8859-1\" in request.";
             String actualError = registrationResponse.detail();

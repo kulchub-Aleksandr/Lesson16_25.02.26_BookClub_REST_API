@@ -248,8 +248,8 @@ public class UpdateUserTests extends TestBase {
                         .path("access"));
 
         PartialUpdateBodyModel updateData = new PartialUpdateBodyModel(firstName, lastName);
-        PartialWithPutMethodUpdateUserResponseModel updateResponse =  step("Отправка запроса put с access-токеном и проверка ответа (400)", () -> {
-           return given(updateRequestSpec)
+        PartialWithPutMethodUpdateUserResponseModel updateResponse = step("Отправка запроса put с access-токеном и проверка ответа (400)", () -> {
+            return given(updateRequestSpec)
                     .header("Authorization", "Bearer " + actualAccessToken)
                     .body(updateData)
                     .when()

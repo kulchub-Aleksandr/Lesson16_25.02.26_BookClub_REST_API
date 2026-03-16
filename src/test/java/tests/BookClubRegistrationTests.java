@@ -3,19 +3,14 @@ package tests;
 import models.bookClubRegistration.BookClubRegistrationBodyModel;
 import models.bookClubRegistration.SuccessfulBookClubRegistrationResponseModel;
 import models.login.LoginBodyModel;
-import models.login.SuccessfulLoginResponseModel;
 import models.registration.RegistrationBodyModel;
 import models.registration.SuccessfulRegistrationResponseModel;
-import net.datafaker.Faker;
-import net.datafaker.providers.base.Text;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
-import static net.datafaker.providers.base.Text.DIGITS;
-import static net.datafaker.providers.base.Text.EN_UPPERCASE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static specs.bookClubRegistration.BookClubRegistrationSpec.bookClubRegistrationRequestSpec;
 import static specs.bookClubRegistration.BookClubRegistrationSpec.bookClubSuccessfulRegistrationResponseSpec;
@@ -88,17 +83,17 @@ public class BookClubRegistrationTests extends TestBase {
 
         SuccessfulBookClubRegistrationResponseModel registrationClubResponse =
                 step("Регистрация нового клуба  и проверка ответа (201)", () -> {
-           return given(bookClubRegistrationRequestSpec)
-                    .header("Authorization", "Bearer " + actualAccessToken)
-                    .body(registrationClubData)
-                    .when()
-                    .post("/clubs/")
-                    .then()
-                    .spec(bookClubSuccessfulRegistrationResponseSpec)
-                    .extract()
-                    .as(SuccessfulBookClubRegistrationResponseModel.class);
+                    return given(bookClubRegistrationRequestSpec)
+                            .header("Authorization", "Bearer " + actualAccessToken)
+                            .body(registrationClubData)
+                            .when()
+                            .post("/clubs/")
+                            .then()
+                            .spec(bookClubSuccessfulRegistrationResponseSpec)
+                            .extract()
+                            .as(SuccessfulBookClubRegistrationResponseModel.class);
 
-        });
+                });
         step("Проверка соответствия отправленных данных с данными в ответе", () -> {
             assertThat(registrationClubResponse.bookTitle()).isEqualTo(bookTitle);
             assertThat(registrationClubResponse.bookAuthors()).isEqualTo(bookAuthors);

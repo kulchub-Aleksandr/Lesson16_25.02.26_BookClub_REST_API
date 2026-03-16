@@ -14,7 +14,7 @@ public class TestData {
     }
 
     public String getPassword() {
-        return  faker.text().text(Text.TextSymbolsBuilder.builder()
+        return faker.text().text(Text.TextSymbolsBuilder.builder()
                 .len(8).with(EN_UPPERCASE, 2)
                 .with(DIGITS, 3)
                 .build()
@@ -36,6 +36,7 @@ public class TestData {
     public String getEmptyPassword() {
         return "";
     }
+
     public String getEmptyUsername() {
         return "";
     }
@@ -48,7 +49,7 @@ public class TestData {
         return faker.book().author();
     }
 
-    public int getPublicationYear (){
+    public int getPublicationYear() {
         return faker.number().numberBetween(1800, java.time.Year.now().getValue());
     }
 

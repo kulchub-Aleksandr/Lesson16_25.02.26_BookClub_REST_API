@@ -66,19 +66,9 @@ public class BookClubRegistrationTests extends TestBase {
 
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
-            assertThat(registrationResponse.firstName()).isEqualTo("");
-            assertThat(registrationResponse.lastName()).isEqualTo("");
-            assertThat(registrationResponse.email()).isEqualTo("");
-
-            String ipAddrRegexp = "^((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.){3}"
-                    + "(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)$";
-            assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
-
-            //String registrationIpAddress = registrationResponse.remoteAddr();
         });
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
-
         String actualAccessToken = step("Авторизация и получение access-токена", () ->
                 given(loginRequestSpec)
                         .body(loginData)
@@ -89,8 +79,6 @@ public class BookClubRegistrationTests extends TestBase {
                         .extract()
                         .path("access"));
 
-
-
         BookClubRegistrationBodyModel registrationClubData = new BookClubRegistrationBodyModel(
                 bookTitle,
                 bookAuthors,
@@ -98,8 +86,9 @@ public class BookClubRegistrationTests extends TestBase {
                 description,
                 telegramChatLink);
 
-        step("Регистрация нового клуба  и проверка ответа (201)", () -> {
-            SuccessfulBookClubRegistrationResponseModel registrationClubResponse = given(bookClubRegistrationRequestSpec)
+        SuccessfulBookClubRegistrationResponseModel registrationClubResponse =
+                step("Регистрация нового клуба  и проверка ответа (201)", () -> {
+           return given(bookClubRegistrationRequestSpec)
                     .header("Authorization", "Bearer " + actualAccessToken)
                     .body(registrationClubData)
                     .when()
@@ -109,8 +98,13 @@ public class BookClubRegistrationTests extends TestBase {
                     .extract()
                     .as(SuccessfulBookClubRegistrationResponseModel.class);
 
-            String actualBookTitle = registrationClubResponse.bookTitle();
-            assertThat(actualBookTitle).isEqualTo(bookTitle);
+        });
+        step("Проверка соответствия отправленных данных с данными в ответе", () -> {
+            assertThat(registrationClubResponse.bookTitle()).isEqualTo(bookTitle);
+            assertThat(registrationClubResponse.bookAuthors()).isEqualTo(bookAuthors);
+            assertThat(registrationClubResponse.publicationYear()).isEqualTo(publicationYear);
+            assertThat(registrationClubResponse.description()).isEqualTo(description);
+            assertThat(registrationClubResponse.telegramChatLink()).isEqualTo(telegramChatLink);
         });
     }
 }

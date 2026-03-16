@@ -80,19 +80,20 @@ public class LogoutTests extends TestBase {
     @DisplayName("Тест на проверку выхода из системы не зарегистрированного пользователя")
     public void unauthorizedUserLogoutNegativeTest() {
 
-        UnauthorizedUserLogoutResponseModel logoutResponse = step("Отправка запроса logout с некорректным refresh-токеном и проверка ответа (401)", () -> {
+        UnauthorizedUserLogoutResponseModel logoutResponse =
+                step("Отправка запроса logout с некорректным refresh-токеном и проверка ответа (401)", () -> {
 
-            String refresh = "cmVmcmVzaCIsImV4cCI6MTc";
-            LogoutBodyModel logoutData = new LogoutBodyModel(refresh);
+                    String refresh = "cmVmcmVzaCIsImV4cCI6MTc";
+                    LogoutBodyModel logoutData = new LogoutBodyModel(refresh);
 
-            return given(logoutRequestSpec)
-                    .body(logoutData)
-                    .when()
-                    .post("/auth/logout/")
-                    .then()
-                    .spec(unauthorizedUserResponseSpec)
-                    .extract().as(UnauthorizedUserLogoutResponseModel.class);
-        });
+                    return given(logoutRequestSpec)
+                            .body(logoutData)
+                            .when()
+                            .post("/auth/logout/")
+                            .then()
+                            .spec(unauthorizedUserResponseSpec)
+                            .extract().as(UnauthorizedUserLogoutResponseModel.class);
+                });
         step("Проверка текста ошибки в ответе", () -> {
             String expectedDetail = "Token is invalid";
             String expectedCode = "token_not_valid";

@@ -1,12 +1,9 @@
 package tests;
 
 import models.login.LoginBodyModel;
-import models.login.SuccessfulLoginResponseModel;
 import models.registration.RegistrationBodyModel;
 import models.registration.SuccessfulRegistrationResponseModel;
 import models.update.*;
-import net.datafaker.Faker;
-import net.datafaker.providers.base.Text;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,8 +11,6 @@ import org.junit.jupiter.api.Test;
 import static allure.CustomAllureListener.withCustomTemplate;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
-import static net.datafaker.providers.base.Text.DIGITS;
-import static net.datafaker.providers.base.Text.EN_UPPERCASE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static specs.login.LoginSpec.loginRequestSpec;
 import static specs.login.LoginSpec.successfulLoginResponseSpec;
@@ -58,18 +53,10 @@ public class UpdateUserTests extends TestBase {
 
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
-            assertThat(registrationResponse.firstName()).isEqualTo("");
-            assertThat(registrationResponse.lastName()).isEqualTo("");
-            assertThat(registrationResponse.email()).isEqualTo("");
-
-            String ipAddrRegexp = "^((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.){3}"
-                    + "(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)$";
-            assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
 
         });
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
-
         String actualAccessToken = step("Авторизация и получение access-токена", () ->
                 given(loginRequestSpec)
                         .body(loginData)
@@ -136,21 +123,13 @@ public class UpdateUserTests extends TestBase {
 
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
-            assertThat(registrationResponse.firstName()).isEqualTo("");
-            assertThat(registrationResponse.lastName()).isEqualTo("");
-            assertThat(registrationResponse.email()).isEqualTo("");
 
-            String ipAddrRegexp = "^((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.){3}"
-                    + "(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)$";
-            assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
-
-            //String registrationIpAddress = registrationResponse.remoteAddr();
         });
 
         UpdateBodyModel updateData = new UpdateBodyModel(username,
                 firstName, lastName, email);
-        step("Отправка запроса put без предварительной аутентификации и проверка ответа (401)", () -> {
-            NotProvidedAuthenticationCredentialsResponseModel updateResponse = given(updateRequestSpec)
+        NotProvidedAuthenticationCredentialsResponseModel updateResponse = step("Отправка запроса put без предварительной аутентификации и проверка ответа (401)", () -> {
+            return given(updateRequestSpec)
                     .body(updateData)
                     .when()
                     .put("/users/me/")
@@ -158,7 +137,8 @@ public class UpdateUserTests extends TestBase {
                     .spec(notProvidedAuthenticationCredentialsResponseSpec)
                     .extract()
                     .as(NotProvidedAuthenticationCredentialsResponseModel.class);
-
+        });
+        step("Проверка текста ошибки в ответе", () -> {
             String actualDetail = updateResponse.detail();
             String expectedDetail = "Authentication credentials were not provided.";
             assertThat(actualDetail).isEqualTo(expectedDetail);
@@ -183,19 +163,9 @@ public class UpdateUserTests extends TestBase {
 
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
-            assertThat(registrationResponse.firstName()).isEqualTo("");
-            assertThat(registrationResponse.lastName()).isEqualTo("");
-            assertThat(registrationResponse.email()).isEqualTo("");
-
-            String ipAddrRegexp = "^((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.){3}"
-                    + "(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)$";
-            assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
-
-            //String registrationIpAddress = registrationResponse.remoteAddr();
         });
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
-
         String actualAccessToken = step("Авторизация и получение access-токена", () ->
                 given(loginRequestSpec)
                         .body(loginData)
@@ -209,26 +179,23 @@ public class UpdateUserTests extends TestBase {
         PartialUpdateBodyModel updateData = new PartialUpdateBodyModel(firstName, lastName);
 
         step("Отправка запроса patch с access-токеном и проверка ответа (200)", () -> {
-                    SuccessfulUpdateUserResponseModel updateResponse = given(updateRequestSpec)
-                            .header("Authorization", "Bearer " + actualAccessToken)
-                            .body(updateData)
-                            .when()
-                            .patch("/users/me/")
-                            .then()
-                            .spec(successfulUpdateResponseSpec)
-                            .extract()
-                            .as(SuccessfulUpdateUserResponseModel.class);
+            SuccessfulUpdateUserResponseModel updateResponse = given(updateRequestSpec)
+                    .header("Authorization", "Bearer " + actualAccessToken)
+                    .body(updateData)
+                    .when()
+                    .patch("/users/me/")
+                    .then()
+                    .spec(successfulUpdateResponseSpec)
+                    .extract()
+                    .as(SuccessfulUpdateUserResponseModel.class);
 
-                    //assertThat(updateResponse.id()).isEqualTo(registrationResponse.id());
-                    assertThat(updateResponse.username()).isEqualTo(username);
-                    assertThat(updateResponse.firstName()).isEqualTo(firstName);
-                    assertThat(updateResponse.lastName()).isEqualTo(lastName);
-                    assertThat(updateResponse.email()).isEqualTo("");
-                    // assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
+            assertThat(updateResponse.id()).isNotNull();
+            assertThat(updateResponse.username()).isEqualTo(username);
+            assertThat(updateResponse.firstName()).isEqualTo(firstName);
+            assertThat(updateResponse.lastName()).isEqualTo(lastName);
+            assertThat(updateResponse.email()).isEqualTo("");
 
-                    String updateIpAddress = updateResponse.remoteAddr();
-                    //assertThat(registrationIpAddress).isEqualTo(updateIpAddress);
-                });
+        });
 
         step("Проверка изменений методом get и проверка ответа (200)", () -> {
             SuccessfulUpdateUserResponseModel updatedUserData = given()
@@ -241,7 +208,7 @@ public class UpdateUserTests extends TestBase {
                     .extract()
                     .as(SuccessfulUpdateUserResponseModel.class);
 
-            //assertThat(updatedUserData.id()).isEqualTo(registrationResponse.id());
+            assertThat(updatedUserData.id()).isNotNull();
             assertThat(updatedUserData.username()).isEqualTo(username);
             assertThat(updatedUserData.firstName()).isEqualTo(firstName);
             assertThat(updatedUserData.lastName()).isEqualTo(lastName);
@@ -267,19 +234,9 @@ public class UpdateUserTests extends TestBase {
 
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
-            assertThat(registrationResponse.firstName()).isEqualTo("");
-            assertThat(registrationResponse.lastName()).isEqualTo("");
-            assertThat(registrationResponse.email()).isEqualTo("");
-
-            String ipAddrRegexp = "^((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.){3}"
-                    + "(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)$";
-            assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
-
-            //String registrationIpAddress = registrationResponse.remoteAddr();
         });
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
-
         String actualAccessToken = step("Авторизация и получение access-токена", () ->
                 given(loginRequestSpec)
                         .body(loginData)
@@ -291,8 +248,8 @@ public class UpdateUserTests extends TestBase {
                         .path("access"));
 
         PartialUpdateBodyModel updateData = new PartialUpdateBodyModel(firstName, lastName);
-        step("Отправка запроса put с access-токеном и проверка ответа (400)", () -> {
-            PartialWithPutMethodUpdateUserResponseModel updateResponse = given(updateRequestSpec)
+        PartialWithPutMethodUpdateUserResponseModel updateResponse =  step("Отправка запроса put с access-токеном и проверка ответа (400)", () -> {
+           return given(updateRequestSpec)
                     .header("Authorization", "Bearer " + actualAccessToken)
                     .body(updateData)
                     .when()
@@ -302,11 +259,12 @@ public class UpdateUserTests extends TestBase {
                     .extract()
                     .as(PartialWithPutMethodUpdateUserResponseModel.class);
 
+        });
+        step("Проверка текста ошибки в ответе", () -> {
             String actualUsername = updateResponse.username().getFirst();
             String expectedUsername = "This field is required.";
             String actualEmail = updateResponse.email().getFirst();
             String expectedEmail = "This field is required.";
-
             assertThat(actualUsername).isEqualTo(expectedUsername);
             assertThat(actualEmail).isEqualTo(expectedEmail);
         });

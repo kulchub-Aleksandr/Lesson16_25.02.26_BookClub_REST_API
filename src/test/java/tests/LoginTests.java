@@ -1,11 +1,8 @@
 package tests;
 
-import io.qameta.allure.restassured.AllureRestAssured;
 import models.login.*;
 import models.registration.RegistrationBodyModel;
 import models.registration.SuccessfulRegistrationResponseModel;
-import net.datafaker.Faker;
-import net.datafaker.providers.base.Text;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,8 +10,6 @@ import org.junit.jupiter.api.Test;
 import static allure.CustomAllureListener.withCustomTemplate;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
-import static net.datafaker.providers.base.Text.DIGITS;
-import static net.datafaker.providers.base.Text.EN_UPPERCASE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static specs.login.LoginSpec.*;
 import static specs.registration.RegistrationSpec.registrationRequestSpec;
@@ -46,7 +41,6 @@ public class LoginTests extends TestBase {
 
         step("Регистрация нового пользователя", () -> {
             RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
             SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
                     .body(registrationData)
                     .when()
@@ -60,9 +54,10 @@ public class LoginTests extends TestBase {
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        step("Авторизация существующего пользователя и проверка ответа (200)", () -> {
+        String accessToken = step("Авторизация существующего пользователя и проверка ответа ", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+
             SuccessfulLoginResponseModel loginResponse = given(registrationRequestSpec)
                     .body(loginData)
                     .when()
@@ -71,26 +66,18 @@ public class LoginTests extends TestBase {
                     .spec(successfulLoginResponseSpec)
                     .extract()
                     .as(SuccessfulLoginResponseModel.class);
-
             String expectedTokenPath = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
-
             String actualAccess = loginResponse.access();
             String actualRefresh = loginResponse.refresh();
 
             assertThat(actualAccess).startsWith(expectedTokenPath);
             assertThat(actualRefresh).startsWith(expectedTokenPath);
             assertThat(actualAccess).isNotEqualTo(actualRefresh);
+
+            return loginResponse.access();
+
         });
 
-        String accessToken = step("Авторизация и получение токена для удаления временного пользователя ", () ->
-                given(loginRequestSpec)
-                        .body(loginData)
-                        .when()
-                        .post("/auth/token/")
-                        .then()
-                        .spec(successfulLoginResponseSpec)
-                        .extract()
-                        .path("access"));
 
         step("Удаление пользователя", () -> {
             given()
@@ -102,9 +89,9 @@ public class LoginTests extends TestBase {
                     .then()
                     .log().all()
                     .statusCode(204);
+
+
         });
-
-
     }
 
     @Test
@@ -113,7 +100,6 @@ public class LoginTests extends TestBase {
 
         step("Регистрация нового пользователя", () -> {
             RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
             SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
                     .body(registrationData)
                     .when()
@@ -147,7 +133,6 @@ public class LoginTests extends TestBase {
         });
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
-
         String accessToken = step("Авторизация и получение токена для удаления временного пользователя ", () ->
                 given(loginRequestSpec)
                         .body(loginData)
@@ -177,7 +162,6 @@ public class LoginTests extends TestBase {
     public void emptyPasswordLoginNegativeTest() {
         step("Регистрация нового пользователя", () -> {
             RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
             SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
                     .body(registrationData)
                     .when()
@@ -209,7 +193,6 @@ public class LoginTests extends TestBase {
         });
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
-
         String accessToken = step("Авторизация и получение токена для удаления временного пользователя ", () ->
                 given(loginRequestSpec)
                         .body(loginData)
@@ -239,7 +222,6 @@ public class LoginTests extends TestBase {
 
         step("Регистрация нового пользователя", () -> {
             RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
             SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
                     .body(registrationData)
                     .when()
@@ -254,7 +236,6 @@ public class LoginTests extends TestBase {
         });
 
         LoginBodyModel wrongLoginData = new LoginBodyModel(wrongUsername, password);
-
         step("Авторизация с применением не правильного логина и проверка ответа (401)", () -> {
             WrongCredentialsLoginResponseModel loginResponse = given(loginRequestSpec)
                     .body(wrongLoginData)
@@ -272,7 +253,6 @@ public class LoginTests extends TestBase {
         });
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
-
         String accessToken = step("Авторизация и получение токена для удаления временного пользователя ", () ->
                 given(loginRequestSpec)
                         .body(loginData)
@@ -301,7 +281,6 @@ public class LoginTests extends TestBase {
     public void emptyUserNameLoginNegativeTest() {
         step("Регистрация нового пользователя", () -> {
             RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
             SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
                     .body(registrationData)
                     .when()
@@ -316,7 +295,6 @@ public class LoginTests extends TestBase {
         });
 
         LoginBodyModel wrongLoginData = new LoginBodyModel(emptyUsername, password);
-
         step("Авторизация с применением пустого поля для логина и проверка ответа (400)", () -> {
             EmptyUserResponseModel loginResponse = given(loginRequestSpec)
                     .body(wrongLoginData)
@@ -334,7 +312,6 @@ public class LoginTests extends TestBase {
         });
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
-
         String accessToken = step("Авторизация и получение токена для удаления временного пользователя ", () ->
                 given(loginRequestSpec)
                         .body(loginData)
@@ -363,7 +340,6 @@ public class LoginTests extends TestBase {
     public void emptyUserNameEmptyPasswordLoginNegativeTest() {
         step("Регистрация нового пользователя", () -> {
             RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
             SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
                     .body(registrationData)
                     .when()
@@ -397,7 +373,6 @@ public class LoginTests extends TestBase {
         });
 
         LoginBodyModel loginData = new LoginBodyModel(username, password);
-
         String accessToken = step("Авторизация и получение токена для удаления временного пользователя ", () ->
                 given(loginRequestSpec)
                         .body(loginData)

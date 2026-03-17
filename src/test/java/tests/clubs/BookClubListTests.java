@@ -1,6 +1,7 @@
 package tests.clubs;
 
 import models.clubs.listBookClub.BookClubsListResponseModel;
+import models.clubs.listBookClub.ClubModel;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import tests.TestBase;
@@ -37,6 +38,11 @@ public class BookClubListTests extends TestBase {
             assertThat(response.count()).isGreaterThanOrEqualTo(0);
             assertThat(response.results()).isNotNull();
             assertThat(response.results()).hasSize(response.count());
+
+            System.out.println("Количество книг: " + response.count());
+            System.out.println("Есть результаты: " + !response.results().isEmpty());
+            assertThat(response.results().getFirst().bookTitle()).isEqualTo("Сети");
+
         });
 
     }

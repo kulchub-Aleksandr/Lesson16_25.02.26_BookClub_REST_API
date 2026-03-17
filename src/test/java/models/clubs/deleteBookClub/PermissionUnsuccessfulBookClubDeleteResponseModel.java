@@ -1,4 +1,4 @@
-package models.clubs.deleteBookClubs;
+package models.clubs.deleteBookClub;
 
 
 public record PermissionUnsuccessfulBookClubDeleteResponseModel(

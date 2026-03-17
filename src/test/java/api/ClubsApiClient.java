@@ -1,7 +1,8 @@
 package api;
 
 import io.qameta.allure.Step;
-import models.clubs.deleteBookClubs.PermissionUnsuccessfulBookClubDeleteResponseModel;
+import models.clubs.deleteBookClub.PermissionUnsuccessfulBookClubDeleteResponseModel;
+import models.clubs.listBookClub.BookClubsListResponseModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
 
@@ -9,6 +10,8 @@ import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseM
 import static allure.CustomAllureListener.withCustomTemplate;
 import static io.restassured.RestAssured.given;
 import static specs.clubs.bookClubDelete.BookClubDeleteSpec.permissionUnsuccessfulBookClubDeleteResponseSpec;
+import static specs.clubs.bookClubList.BookClubListSpec.clubsRequestSpec;
+import static specs.clubs.bookClubList.BookClubListSpec.successfulBookClubsListResponseSpec;
 import static specs.clubs.bookClubRegistration.BookClubRegistrationSpec.bookClubRegistrationRequestSpec;
 import static specs.clubs.bookClubRegistration.BookClubRegistrationSpec.successfulBookClubRegistrationResponseSpec;
 
@@ -45,7 +48,7 @@ public class ClubsApiClient {
     }
 
     @Step("Удаление клуба с аккаунта не создателя клуба")
-    public  PermissionUnsuccessfulBookClubDeleteResponseModel bookClubPermissionDelete (
+    public PermissionUnsuccessfulBookClubDeleteResponseModel bookClubPermissionDelete(
             String accessToken, int id) {
         return given()
                 .log().all()
@@ -61,14 +64,28 @@ public class ClubsApiClient {
                 .as(PermissionUnsuccessfulBookClubDeleteResponseModel.class);
     }
 
-//    @Step("Получение списка клубов GET /clubs/")
-//    public ClubsListResponseModel getClubs() {
-//        return given(clubsRequestSpec)
-//                .when()
-//                .get("/clubs/")
-//                .then()
-//                .spec(successfulClubsListResponseSpec)
-//                .extract()
-//                .as(ClubsListResponseModel.class);
-//    }
+    @Step("Получение списка клубов GET /clubs/")
+    public BookClubsListResponseModel getClubsList() {
+        return given(clubsRequestSpec)
+                .when()
+                .get("/clubs/")
+                .then()
+                .spec(successfulBookClubsListResponseSpec)
+                .extract()
+                .as(BookClubsListResponseModel.class);
+    }
+
+    @Step("Получение карточки клуба по названию клуба")
+    public BookClubsListResponseModel getClubsListBookTitle(String search, int page, int page_size) {
+        return given(clubsRequestSpec)
+                .pathParam("search", search)
+                .pathParam("page", page)
+                .pathParam("page_size", page_size)
+                .when()
+                .get("/clubs/?search={search}&page={page}&page_size={page_size}")
+                .then()
+                .spec(successfulBookClubsListResponseSpec)
+                .extract()
+                .as(BookClubsListResponseModel.class);
+    }
 }

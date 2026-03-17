@@ -30,13 +30,11 @@ public class BookClubRegistrationTests extends TestBase {
     public void prepareTestData() {
         username = testData.getUsername();
         password = testData.getPassword();
-        bookTitle = testData.getBookTitle() + "qa.guru_039 AlexKulch";
+        bookTitle = testData.getBookTitle() + "  qa.guru_039 AlexKulch";
         bookAuthors = testData.getBookAuthor();
         publicationYear = testData.getPublicationYear();
         description = testData.getBookDescription();
         telegramChatLink = testData.getTelegramChatLink();
-
-
     }
 
     @Test
@@ -62,7 +60,7 @@ public class BookClubRegistrationTests extends TestBase {
 
             int actualId = registrationResponse.id();
 
-        step("Проверка соответствия полученных данными", () -> {
+        step("Проверка соответствия полученных данных в ответе", () -> {
             assertThat(actualId).isGreaterThan(0);
             assertThat(registrationResponse.bookTitle()).isEqualTo(bookTitle);
             assertThat(registrationResponse.bookAuthors()).isEqualTo(bookAuthors);

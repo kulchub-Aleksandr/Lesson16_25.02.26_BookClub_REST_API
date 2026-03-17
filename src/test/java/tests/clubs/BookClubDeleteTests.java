@@ -1,6 +1,6 @@
 package tests.clubs;
 
-import models.clubs.deleteBookClubs.PermissionUnsuccessfulBookClubDeleteResponseModel;
+import models.clubs.deleteBookClub.PermissionUnsuccessfulBookClubDeleteResponseModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
 import models.users.login.LoginBodyModel;
@@ -34,7 +34,7 @@ public class BookClubDeleteTests extends TestBase {
         username_1 = testData.getUsername();
         password = testData.getPassword();
         password_1 = testData.getPassword();
-        bookTitle = testData.getBookTitle() + "qa.guru_039 AlexKulch";
+        bookTitle = testData.getBookTitle() + "  qa.guru_039 AlexKulch";
         bookAuthors = testData.getBookAuthor();
         publicationYear = testData.getPublicationYear();
         description = testData.getBookDescription();
@@ -44,8 +44,46 @@ public class BookClubDeleteTests extends TestBase {
     }
 
     @Test
+    @DisplayName("Тест на проверку удаления клуба")
+    public void successfulBookClubDeleteTest() {
+
+        RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+        api.users.registration(registrationData);
+
+        LoginBodyModel loginData = new LoginBodyModel(username, password);
+        String actualAccessToken = api.auth.loginAndGetAccessToken(loginData);
+
+        SuccessfulBookClubRegistrationBodyModel registrationClubData = new SuccessfulBookClubRegistrationBodyModel(
+                bookTitle,
+                bookAuthors,
+                publicationYear,
+                description,
+                telegramChatLink);
+
+        SuccessfulBookClubRegistrationResponseModel registrationResponse =
+                step("Регистрация нового клуба и проверка ответа (201)", () ->
+                        api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData));
+
+        int actualId = registrationResponse.id();
+
+        step("Проверка соответствия полученных данными", () -> {
+            assertThat(actualId).isGreaterThan(0);
+            assertThat(registrationResponse.bookTitle()).isEqualTo(bookTitle);
+            assertThat(registrationResponse.bookAuthors()).isEqualTo(bookAuthors);
+            assertThat(registrationResponse.publicationYear()).isEqualTo(publicationYear);
+            assertThat(registrationResponse.description()).isEqualTo(description);
+            assertThat(registrationResponse.telegramChatLink()).isEqualTo(telegramChatLink);
+        });
+
+        api.clubs.bookClubDelete(actualAccessToken, actualId);
+        api.users.deleteUserAuthorized(actualAccessToken);
+
+
+    }
+
+    @Test
     @DisplayName("Тест на проверку удаления клуба с аккаунта не создателя клуба")
-    public void successfulBookClubRegistrationTest() {
+    public void PermissionUnsuccessfulBookClubDeleteTest() {
 
         RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
         api.users.registration(registrationData);

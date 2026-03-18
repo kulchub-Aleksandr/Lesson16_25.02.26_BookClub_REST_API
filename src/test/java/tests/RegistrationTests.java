@@ -1,5 +1,6 @@
 package tests;
 
+import models.login.LoginBodyModel;
 import models.registration.*;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,8 @@ import static allure.CustomAllureListener.withCustomTemplate;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static specs.login.LoginSpec.loginRequestSpec;
+import static specs.login.LoginSpec.successfulLoginResponseSpec;
 import static specs.registration.RegistrationSpec.*;
 
 public class RegistrationTests extends TestBase {
@@ -51,6 +54,30 @@ public class RegistrationTests extends TestBase {
             assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
         });
 
+        String actualAccessToken = step("Авторизация и получение access-токена для удаления пользователя", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return given(loginRequestSpec)
+                    .body(loginData)
+                    .when()
+                    .post("/auth/token/")
+                    .then()
+                    .spec(successfulLoginResponseSpec)
+                    .extract()
+                    .path("access");
+        });
+
+        step("Удаление пользователя", () -> {
+            given()
+                    .filter(withCustomTemplate())
+                    .log().all()
+                    .header("Authorization", "Bearer " + actualAccessToken)
+                    .when()
+                    .delete("/users/me/")
+                    .then()
+                    .log().all()
+                    .statusCode(204);
+        });
+
     }
 
     @Test
@@ -90,6 +117,30 @@ public class RegistrationTests extends TestBase {
             String expectedError = "A user with that username already exists.";
             String actualError = registrationResponse_2.username().getFirst();
             assertThat(actualError).isEqualTo(expectedError);
+        });
+
+        String actualAccessToken = step("Авторизация и получение access-токена для удаления пользователя", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return given(loginRequestSpec)
+                    .body(loginData)
+                    .when()
+                    .post("/auth/token/")
+                    .then()
+                    .spec(successfulLoginResponseSpec)
+                    .extract()
+                    .path("access");
+        });
+
+        step("Удаление пользователя", () -> {
+            given()
+                    .filter(withCustomTemplate())
+                    .log().all()
+                    .header("Authorization", "Bearer " + actualAccessToken)
+                    .when()
+                    .delete("/users/me/")
+                    .then()
+                    .log().all()
+                    .statusCode(204);
         });
 
     }

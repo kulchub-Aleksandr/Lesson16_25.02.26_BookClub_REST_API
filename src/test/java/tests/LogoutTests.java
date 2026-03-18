@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static allure.CustomAllureListener.withCustomTemplate;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -77,6 +78,30 @@ public class LogoutTests extends TestBase {
                 });
         step("Проверка корректности ответа", () -> {
             assertThat(logoutResponse.body().asString()).isEqualTo("{}");
+        });
+
+        String actualAccessToken = step("Авторизация и получение access-токена для удаления пользователя", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return given(loginRequestSpec)
+                    .body(loginData)
+                    .when()
+                    .post("/auth/token/")
+                    .then()
+                    .spec(successfulLoginResponseSpec)
+                    .extract()
+                    .path("access");
+        });
+
+        step("Удаление пользователя", () -> {
+            given()
+                    .filter(withCustomTemplate())
+                    .log().all()
+                    .header("Authorization", "Bearer " + actualAccessToken)
+                    .when()
+                    .delete("/users/me/")
+                    .then()
+                    .log().all()
+                    .statusCode(204);
         });
     }
 

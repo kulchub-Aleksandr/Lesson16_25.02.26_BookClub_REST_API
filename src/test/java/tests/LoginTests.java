@@ -146,7 +146,7 @@ public class LoginTests extends TestBase {
             assertThat(actualDetailError).isEqualTo(expectedDetailError);
         });
 
-        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
+        String actualAccessToken = step("Авторизация и получение access-токена для удаления пользователя", () -> {
             LoginBodyModel loginData = new LoginBodyModel(username, password);
             return given(loginRequestSpec)
                     .body(loginData)
@@ -211,7 +211,7 @@ public class LoginTests extends TestBase {
             assertThat(actualDetailError).isEqualTo(expectedDetailError);
         });
 
-        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
+        String actualAccessToken = step("Авторизация и получение access-токена для удаления пользователя", () -> {
             LoginBodyModel loginData = new LoginBodyModel(username, password);
             return given(loginRequestSpec)
                     .body(loginData)
@@ -276,7 +276,7 @@ public class LoginTests extends TestBase {
             assertThat(actualDetailError).isEqualTo(expectedDetailError);
         });
 
-        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
+        String actualAccessToken = step("Авторизация и получение access-токена для удаления пользователя", () -> {
             LoginBodyModel loginData = new LoginBodyModel(username, password);
             return given(loginRequestSpec)
                     .body(loginData)
@@ -340,7 +340,7 @@ public class LoginTests extends TestBase {
             assertThat(actualDetailError).isEqualTo(expectedDetailError);
         });
 
-        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
+        String actualAccessToken = step("Авторизация и получение access-токена для удаления пользователя", () -> {
             LoginBodyModel loginData = new LoginBodyModel(username, password);
             return given(loginRequestSpec)
                     .body(loginData)
@@ -406,7 +406,7 @@ public class LoginTests extends TestBase {
             assertThat(actualDetailError_2).isEqualTo(expectedDetailError);
         });
 
-        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
+        String actualAccessToken = step("Авторизация и получение access-токена для удаления пользователя", () -> {
             LoginBodyModel loginData = new LoginBodyModel(username, password);
             return given(loginRequestSpec)
                     .body(loginData)

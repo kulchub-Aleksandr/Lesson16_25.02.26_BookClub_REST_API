@@ -113,7 +113,7 @@ public class DeleteUserTests extends TestBase {
             assertThat(actualDetail).isEqualTo(expectedDetail);
         });
 
-        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
+        String actualAccessToken = step("Авторизация и получение access-токена для удаления пользователя", () -> {
             LoginBodyModel loginData = new LoginBodyModel(username, password);
             return given(loginRequestSpec)
                     .body(loginData)

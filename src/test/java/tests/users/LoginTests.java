@@ -47,21 +47,22 @@ public class LoginTests extends TestBase {
     @DisplayName("Тест на проверку авторизации существующего пользователя")
     public void successfulLoginTest() {
 
-        step("Регистрация нового пользователя", () -> {
+        SuccessfulRegistrationResponseModel registrationResponse
+                = step("Регистрация нового пользователя и проверка ответа (201)", () -> {
             RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
-            SuccessfulRegistrationResponseModel registrationResponse =
-                    api.users.registration(registrationData);
-
+            return api.users.registration(registrationData);
+        });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        LoginBodyModel loginData = new LoginBodyModel(username, password);
-        step("Авторизация", () -> {
-            SuccessfulLoginResponseModel loginResponse =
-                    api.auth.login(loginData);
 
+        SuccessfulLoginResponseModel loginResponse = step("Авторизация", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return api.auth.login(loginData);
+        });
+        step("Проверка корректности полученных токенов", () -> {
             String expectedTokenPath = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
 
             String actualAccess = loginResponse.access();
@@ -78,22 +79,23 @@ public class LoginTests extends TestBase {
     @DisplayName("Тест на проверку авторизации пользователя с применением не правильного пароля")
     public void wrongPasswordLoginNegativeTest() {
 
-        step("Регистрация нового пользователя", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
-            SuccessfulRegistrationResponseModel registrationResponse =
-                    api.users.registration(registrationData);
-
+        SuccessfulRegistrationResponseModel registrationResponse =
+                step("Регистрация нового пользователя и проверка ответа (201)", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return api.users.registration(registrationData);
+                });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        LoginBodyModel wrongLoginData = new LoginBodyModel(username, wrongPassword);
 
-        step("Авторизация с применением не правильного пароля и проверка ответа (401)", () -> {
-            WrongCredentialsLoginResponseModel loginResponse =
-                    api.auth.loginWrongCredentials(wrongLoginData);
-
+        WrongCredentialsLoginResponseModel loginResponse =
+                step("Авторизация с применением не правильного пароля и проверка ответа (401)", () -> {
+                    LoginBodyModel wrongLoginData = new LoginBodyModel(username, wrongPassword);
+                    return api.auth.loginWrongCredentials(wrongLoginData);
+                });
+        step("Проверка текста ошибки в ответе", () -> {
             String expectedDetailError = "Invalid username or password.";
             String actualDetailError = loginResponse.detail();
 
@@ -104,21 +106,22 @@ public class LoginTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку авторизации пользователя с применением пустого поля для пароля")
     public void emptyPasswordLoginNegativeTest() {
-        step("Регистрация нового пользователя", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
-            SuccessfulRegistrationResponseModel registrationResponse =
-                    api.users.registration(registrationData);
-
+        SuccessfulRegistrationResponseModel registrationResponse =
+                step("Регистрация нового пользователя и проверка ответа (201)", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return api.users.registration(registrationData);
+                });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        LoginBodyModel wrongLoginData = new LoginBodyModel(username, emptyPassword);
-        step("Авторизация с применением пустого поля для пароля и проверка ответа (400)", () -> {
-            EmptyPasswordResponseModel loginResponse =
-                    api.auth.loginEmptyPassword(wrongLoginData);
-
+        EmptyPasswordResponseModel loginResponse =
+                step("Авторизация с применением пустого поля для пароля и проверка ответа (400)", () -> {
+                    LoginBodyModel wrongLoginData = new LoginBodyModel(username, emptyPassword);
+                    return api.auth.loginEmptyPassword(wrongLoginData);
+                });
+        step("Проверка текста ошибки в ответе", () -> {
             String expectedDetailError = "This field may not be blank.";
             String actualDetailError = loginResponse.password().getFirst();
 
@@ -129,23 +132,23 @@ public class LoginTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку авторизации пользователя с применением не правильного логина")
     public void wrongUserNameLoginNegativeTest() {
-
-        step("Регистрация нового пользователя", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
-            SuccessfulRegistrationResponseModel registrationResponse =
-                    api.users.registration(registrationData);
-
+        SuccessfulRegistrationResponseModel registrationResponse =
+                step("Регистрация нового пользователя и проверка ответа (201)", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return api.users.registration(registrationData);
+                });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        LoginBodyModel wrongLoginData = new LoginBodyModel(wrongUsername, password);
 
-        step("Авторизация с применением не правильного логина и проверка ответа (401)", () -> {
-            WrongCredentialsLoginResponseModel loginResponse =
-                    api.auth.loginWrongCredentials(wrongLoginData);
-
+        WrongCredentialsLoginResponseModel loginResponse =
+                step("Авторизация с применением не правильного логина и проверка ответа (401)", () -> {
+                    LoginBodyModel wrongLoginData = new LoginBodyModel(wrongUsername, password);
+                    return api.auth.loginWrongCredentials(wrongLoginData);
+                });
+        step("Проверка текста ошибки в ответе", () -> {
             String expectedDetailError = "Invalid username or password.";
             String actualDetailError = loginResponse.detail();
 
@@ -157,22 +160,23 @@ public class LoginTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку авторизации пользователя с применением пустого поля для логина")
     public void emptyUserNameLoginNegativeTest() {
-        step("Регистрация нового пользователя", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
-            SuccessfulRegistrationResponseModel registrationResponse =
-                    api.users.registration(registrationData);
-
+        SuccessfulRegistrationResponseModel registrationResponse =
+                step("Регистрация нового пользователя и проверка ответа (201)", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return api.users.registration(registrationData);
+                });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        LoginBodyModel wrongLoginData = new LoginBodyModel(emptyUsername, password);
 
-        step("Авторизация с применением пустого поля для логина и проверка ответа (400)", () -> {
-            EmptyUserResponseModel loginResponse =
-                    api.auth.loginEmptyUser(wrongLoginData);
-
+        EmptyUserResponseModel loginResponse =
+                step("Авторизация с применением пустого поля для логина и проверка ответа (400)", () -> {
+                    LoginBodyModel wrongLoginData = new LoginBodyModel(emptyUsername, password);
+                    return api.auth.loginEmptyUser(wrongLoginData);
+                });
+        step("Проверка текста ошибки в ответе", () -> {
             String expectedDetailError = "This field may not be blank.";
             String actualDetailError = loginResponse.username().getFirst();
 
@@ -184,21 +188,22 @@ public class LoginTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку авторизации пользователя с применением пустого поля для логина и пустого поля для пароля")
     public void emptyUserNameEmptyPasswordLoginNegativeTest() {
-        step("Регистрация нового пользователя", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
-            SuccessfulRegistrationResponseModel registrationResponse =
-                    api.users.registration(registrationData);
-
+        SuccessfulRegistrationResponseModel registrationResponse =
+                step("Регистрация нового пользователя и проверка ответа (201)", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return api.users.registration(registrationData);
+                });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        LoginBodyModel wrongLoginData = new LoginBodyModel(emptyUsername, emptyPassword);
-        step("Авторизация с применением пустого поля для логина и пароля с проверкой ответа (400)", () -> {
-            EmptyUserEmptyPasswordResponseModel loginResponse =
-                    api.auth.loginEmptyUserEmptyPassword(wrongLoginData);
-
+        EmptyUserEmptyPasswordResponseModel loginResponse =
+                step("Авторизация с применением пустого поля для логина и пароля с проверкой ответа (400)", () -> {
+                    LoginBodyModel wrongLoginData = new LoginBodyModel(emptyUsername, emptyPassword);
+                    return api.auth.loginEmptyUserEmptyPassword(wrongLoginData);
+                });
+        step("Проверка текста ошибки в ответе", () -> {
             String expectedDetailError = "This field may not be blank.";
             String actualDetailError_1 = loginResponse.username().getFirst();
             String actualDetailError_2 = loginResponse.password().getFirst();

@@ -38,14 +38,15 @@ public class DeleteUserTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку удаления существующего пользователя")
     public void successfulDeleteUserTest() {
-
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
         SuccessfulRegistrationResponseModel registrationResponse =
-                api.users.registration(registrationData);
-
-        assertThat(registrationResponse.id()).isGreaterThan(0);
-        assertThat(registrationResponse.username()).isEqualTo(username);
+                step("Регистрация нового пользователя и проверка ответа (201)", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return api.users.registration(registrationData);
+                });
+        step("Проверка корректности зарегистрированных данных", () -> {
+            assertThat(registrationResponse.id()).isGreaterThan(0);
+            assertThat(registrationResponse.username()).isEqualTo(username);
+        });
 
 //        LoginBodyModel loginData = new LoginBodyModel(username, password);
 //
@@ -56,20 +57,20 @@ public class DeleteUserTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку удаления не авторизованного пользователя")
     public void notProvidedAuthenticationCredentialsDeleteUserNegativeTest() {
-
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
         SuccessfulRegistrationResponseModel registrationResponse =
-                api.users.registration(registrationData);
+                step("Регистрация нового пользователя и проверка ответа (201)", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return api.users.registration(registrationData);
+                });
+        step("Проверка корректности зарегистрированных данных", () -> {
+            assertThat(registrationResponse.id()).isGreaterThan(0);
+            assertThat(registrationResponse.username()).isEqualTo(username);
+        });
 
-        assertThat(registrationResponse.id()).isGreaterThan(0);
-        assertThat(registrationResponse.username()).isEqualTo(username);
-
-
-        step("Удаление пользователя без авторизации и проверка ответа (401)", () -> {
-            NotProvidedAuthenticationCredentialsResponseModel deleteResponse =
-                    api.users.deleteUserUnauthorized();
-
+        NotProvidedAuthenticationCredentialsResponseModel deleteResponse =
+                step("Удаление пользователя без авторизации и проверка ответа (401)",
+                        api.users::deleteUserUnauthorized);
+        step("Проверка текста ошибки в ответе", () -> {
             String actualDetail = deleteResponse.detail();
             String expectedDetail = "Authentication credentials were not provided.";
             assertThat(actualDetail).isEqualTo(expectedDetail);

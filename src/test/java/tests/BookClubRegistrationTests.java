@@ -35,7 +35,7 @@ public class BookClubRegistrationTests extends TestBase {
     public void prepareTestData() {
         username = testData.getUsername();
         password = testData.getPassword();
-        bookTitle = testData.getBookTitle();
+        bookTitle = testData.getBookTitle() + "qa.guru_039";
         bookAuthors = testData.getBookAuthor();
         publicationYear = testData.getPublicationYear();
         description = testData.getBookDescription();
@@ -47,10 +47,9 @@ public class BookClubRegistrationTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку регистрации нового клуба")
     public void successfulBookClubRegistrationTest() {
-        step("Регистрация нового пользователя", () -> {
+        SuccessfulRegistrationResponseModel registrationResponse = step("Регистрация нового пользователя", () -> {
             RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
-            SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
+            return given(registrationRequestSpec)
                     .body(registrationData)
                     .when()
                     .post("/users/register/")
@@ -58,31 +57,35 @@ public class BookClubRegistrationTests extends TestBase {
                     .spec(successfulRegistrationResponseSpec)
                     .extract()
                     .as(SuccessfulRegistrationResponseModel.class);
-
+        });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        LoginBodyModel loginData = new LoginBodyModel(username, password);
-        String actualAccessToken = step("Авторизация и получение access-токена", () ->
-                given(loginRequestSpec)
-                        .body(loginData)
-                        .when()
-                        .post("/auth/token/")
-                        .then()
-                        .spec(successfulLoginResponseSpec)
-                        .extract()
-                        .path("access"));
 
-        BookClubRegistrationBodyModel registrationClubData = new BookClubRegistrationBodyModel(
-                bookTitle,
-                bookAuthors,
-                publicationYear,
-                description,
-                telegramChatLink);
+        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return given(loginRequestSpec)
+                    .body(loginData)
+                    .when()
+                    .post("/auth/token/")
+                    .then()
+                    .spec(successfulLoginResponseSpec)
+                    .extract()
+                    .path("access");
+        });
+
 
         SuccessfulBookClubRegistrationResponseModel registrationClubResponse =
                 step("Регистрация нового клуба  и проверка ответа (201)", () -> {
+                    BookClubRegistrationBodyModel registrationClubData = new BookClubRegistrationBodyModel(
+                            bookTitle,
+                            bookAuthors,
+                            publicationYear,
+                            description,
+                            telegramChatLink);
+
                     return given(bookClubRegistrationRequestSpec)
                             .header("Authorization", "Bearer " + actualAccessToken)
                             .body(registrationClubData)

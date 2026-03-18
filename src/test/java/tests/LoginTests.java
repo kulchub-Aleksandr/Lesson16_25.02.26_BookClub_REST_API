@@ -39,33 +39,36 @@ public class LoginTests extends TestBase {
     @DisplayName("Тест на проверку авторизации существующего пользователя")
     public void successfulLoginTest() {
 
-        step("Регистрация нового пользователя", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-            SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
-                    .body(registrationData)
-                    .when()
-                    .post("/users/register/")
-                    .then()
-                    .spec(successfulRegistrationResponseSpec)
-                    .extract()
-                    .as(SuccessfulRegistrationResponseModel.class);
-
+        SuccessfulRegistrationResponseModel registrationResponse =
+                step("Регистрация нового пользователя", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return given(registrationRequestSpec)
+                            .body(registrationData)
+                            .when()
+                            .post("/users/register/")
+                            .then()
+                            .spec(successfulRegistrationResponseSpec)
+                            .extract()
+                            .as(SuccessfulRegistrationResponseModel.class);
+                });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-
-        String accessToken = step("Авторизация существующего пользователя и проверка ответа ", () -> {
-            LoginBodyModel loginData = new LoginBodyModel(username, password);
-
-            SuccessfulLoginResponseModel loginResponse = given(registrationRequestSpec)
-                    .body(loginData)
-                    .when()
-                    .post("/auth/token/")
-                    .then()
-                    .spec(successfulLoginResponseSpec)
-                    .extract()
-                    .as(SuccessfulLoginResponseModel.class);
+        SuccessfulLoginResponseModel loginResponse =
+                step("Авторизация существующего пользователя и проверка ответа ", () -> {
+                    LoginBodyModel loginData = new LoginBodyModel(username, password);
+                    return given(registrationRequestSpec)
+                            .body(loginData)
+                            .when()
+                            .post("/auth/token/")
+                            .then()
+                            .spec(successfulLoginResponseSpec)
+                            .extract()
+                            .as(SuccessfulLoginResponseModel.class);
+                });
+        step("Проверка корректности полученных токенов", () -> {
             String expectedTokenPath = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
             String actualAccess = loginResponse.access();
             String actualRefresh = loginResponse.refresh();
@@ -74,10 +77,19 @@ public class LoginTests extends TestBase {
             assertThat(actualRefresh).startsWith(expectedTokenPath);
             assertThat(actualAccess).isNotEqualTo(actualRefresh);
 
-            return loginResponse.access();
-
         });
-
+        String accessToken =
+                step("Авторизация и получение токена для удаления пользователя ", () -> {
+                    LoginBodyModel loginData = new LoginBodyModel(username, password);
+                    return given(loginRequestSpec)
+                            .body(loginData)
+                            .when()
+                            .post("/auth/token/")
+                            .then()
+                            .spec(successfulLoginResponseSpec)
+                            .extract()
+                            .path("access");
+                });
 
         step("Удаление пользователя", () -> {
             given()
@@ -89,8 +101,6 @@ public class LoginTests extends TestBase {
                     .then()
                     .log().all()
                     .statusCode(204);
-
-
         });
     }
 
@@ -98,56 +108,61 @@ public class LoginTests extends TestBase {
     @DisplayName("Тест на проверку авторизации пользователя с применением не правильного пароля")
     public void wrongPasswordLoginNegativeTest() {
 
-        step("Регистрация нового пользователя", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-            SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
-                    .body(registrationData)
-                    .when()
-                    .post("/users/register/")
-                    .then()
-                    .spec(successfulRegistrationResponseSpec)
-                    .extract()
-                    .as(SuccessfulRegistrationResponseModel.class);
-
-
+        SuccessfulRegistrationResponseModel registrationResponse =
+                step("Регистрация нового пользователя", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return given(registrationRequestSpec)
+                            .body(registrationData)
+                            .when()
+                            .post("/users/register/")
+                            .then()
+                            .spec(successfulRegistrationResponseSpec)
+                            .extract()
+                            .as(SuccessfulRegistrationResponseModel.class);
+                });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        LoginBodyModel wrongLoginData = new LoginBodyModel(username, wrongPassword);
 
-        step("Авторизация с применением не правильного пароля и проверка ответа (401)", () -> {
-            WrongCredentialsLoginResponseModel loginResponse = given(loginRequestSpec)
-                    .body(wrongLoginData)
-                    .when()
-                    .post("/auth/token/")
-                    .then()
-                    .spec(wrongCredentialsLoginResponseSpec)
-                    .extract()
-                    .as(WrongCredentialsLoginResponseModel.class);
+        WrongCredentialsLoginResponseModel loginResponse =
+                step("Авторизация с применением не правильного пароля и проверка ответа (401)", () -> {
+                    LoginBodyModel wrongLoginData = new LoginBodyModel(username, wrongPassword);
 
+                    return given(loginRequestSpec)
+                            .body(wrongLoginData)
+                            .when()
+                            .post("/auth/token/")
+                            .then()
+                            .spec(wrongCredentialsLoginResponseSpec)
+                            .extract()
+                            .as(WrongCredentialsLoginResponseModel.class);
+                });
+        step("Проверка текста ошибки в ответе", () -> {
             String expectedDetailError = "Invalid username or password.";
             String actualDetailError = loginResponse.detail();
 
             assertThat(actualDetailError).isEqualTo(expectedDetailError);
         });
 
-        LoginBodyModel loginData = new LoginBodyModel(username, password);
-        String accessToken = step("Авторизация и получение токена для удаления временного пользователя ", () ->
-                given(loginRequestSpec)
-                        .body(loginData)
-                        .when()
-                        .post("/auth/token/")
-                        .then()
-                        .spec(successfulLoginResponseSpec)
-                        .extract()
-                        .path("access"));
+        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return given(loginRequestSpec)
+                    .body(loginData)
+                    .when()
+                    .post("/auth/token/")
+                    .then()
+                    .spec(successfulLoginResponseSpec)
+                    .extract()
+                    .path("access");
+        });
 
         step("Удаление пользователя", () -> {
             given()
                     .filter(withCustomTemplate())
                     .log().all()
-                    .header("Authorization", "Bearer " + accessToken)
+                    .header("Authorization", "Bearer " + actualAccessToken)
                     .when()
                     .delete("/users/me/")
                     .then()
@@ -160,54 +175,59 @@ public class LoginTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку авторизации пользователя с применением пустого поля для пароля")
     public void emptyPasswordLoginNegativeTest() {
-        step("Регистрация нового пользователя", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-            SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
-                    .body(registrationData)
-                    .when()
-                    .post("/users/register/")
-                    .then()
-                    .spec(successfulRegistrationResponseSpec)
-                    .extract()
-                    .as(SuccessfulRegistrationResponseModel.class);
-
+        SuccessfulRegistrationResponseModel registrationResponse =
+                step("Регистрация нового пользователя", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return given(registrationRequestSpec)
+                            .body(registrationData)
+                            .when()
+                            .post("/users/register/")
+                            .then()
+                            .spec(successfulRegistrationResponseSpec)
+                            .extract()
+                            .as(SuccessfulRegistrationResponseModel.class);
+                });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
+        EmptyPasswordResponseModel loginResponse =
+                step("Авторизация с применением пустого поля для пароля и проверка ответа (400)", () -> {
+                    LoginBodyModel wrongLoginData = new LoginBodyModel(username, emptyPassword);
 
-        LoginBodyModel wrongLoginData = new LoginBodyModel(username, emptyPassword);
-        step("Авторизация с применением пустого поля для пароля и проверка ответа (400)", () -> {
-            EmptyPasswordResponseModel loginResponse = given(loginRequestSpec)
-                    .body(wrongLoginData)
-                    .when()
-                    .post("/auth/token/")
-                    .then()
-                    .spec(emptyPasswordLoginResponseSpec)
-                    .extract()
-                    .as(EmptyPasswordResponseModel.class);
-
+                    return given(loginRequestSpec)
+                            .body(wrongLoginData)
+                            .when()
+                            .post("/auth/token/")
+                            .then()
+                            .spec(emptyPasswordLoginResponseSpec)
+                            .extract()
+                            .as(EmptyPasswordResponseModel.class);
+                });
+        step("Проверка текста ошибки в ответе", () -> {
             String expectedDetailError = "This field may not be blank.";
             String actualDetailError = loginResponse.password().getFirst();
 
             assertThat(actualDetailError).isEqualTo(expectedDetailError);
         });
 
-        LoginBodyModel loginData = new LoginBodyModel(username, password);
-        String accessToken = step("Авторизация и получение токена для удаления временного пользователя ", () ->
-                given(loginRequestSpec)
-                        .body(loginData)
-                        .when()
-                        .post("/auth/token/")
-                        .then()
-                        .spec(successfulLoginResponseSpec)
-                        .extract()
-                        .path("access"));
+        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return given(loginRequestSpec)
+                    .body(loginData)
+                    .when()
+                    .post("/auth/token/")
+                    .then()
+                    .spec(successfulLoginResponseSpec)
+                    .extract()
+                    .path("access");
+        });
 
         step("Удаление пользователя", () -> {
             given()
                     .filter(withCustomTemplate())
                     .log().all()
-                    .header("Authorization", "Bearer " + accessToken)
+                    .header("Authorization", "Bearer " + actualAccessToken)
                     .when()
                     .delete("/users/me/")
                     .then()
@@ -219,55 +239,60 @@ public class LoginTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку авторизации пользователя с применением не правильного логина")
     public void wrongUserNameLoginNegativeTest() {
-
-        step("Регистрация нового пользователя", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-            SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
-                    .body(registrationData)
-                    .when()
-                    .post("/users/register/")
-                    .then()
-                    .spec(successfulRegistrationResponseSpec)
-                    .extract()
-                    .as(SuccessfulRegistrationResponseModel.class);
-
+        SuccessfulRegistrationResponseModel registrationResponse =
+                step("Регистрация нового пользователя", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return given(registrationRequestSpec)
+                            .body(registrationData)
+                            .when()
+                            .post("/users/register/")
+                            .then()
+                            .spec(successfulRegistrationResponseSpec)
+                            .extract()
+                            .as(SuccessfulRegistrationResponseModel.class);
+                });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        LoginBodyModel wrongLoginData = new LoginBodyModel(wrongUsername, password);
-        step("Авторизация с применением не правильного логина и проверка ответа (401)", () -> {
-            WrongCredentialsLoginResponseModel loginResponse = given(loginRequestSpec)
-                    .body(wrongLoginData)
-                    .when()
-                    .post("/auth/token/")
-                    .then()
-                    .spec(wrongCredentialsLoginResponseSpec)
-                    .extract()
-                    .as(WrongCredentialsLoginResponseModel.class);
 
+        WrongCredentialsLoginResponseModel loginResponse =
+                step("Авторизация с применением не правильного логина и проверка ответа (401)", () -> {
+                    LoginBodyModel wrongLoginData = new LoginBodyModel(wrongUsername, password);
+                    return given(loginRequestSpec)
+                            .body(wrongLoginData)
+                            .when()
+                            .post("/auth/token/")
+                            .then()
+                            .spec(wrongCredentialsLoginResponseSpec)
+                            .extract()
+                            .as(WrongCredentialsLoginResponseModel.class);
+                });
+        step("Проверка текста ошибки в ответе", () -> {
             String expectedDetailError = "Invalid username or password.";
             String actualDetailError = loginResponse.detail();
 
             assertThat(actualDetailError).isEqualTo(expectedDetailError);
         });
 
-        LoginBodyModel loginData = new LoginBodyModel(username, password);
-        String accessToken = step("Авторизация и получение токена для удаления временного пользователя ", () ->
-                given(loginRequestSpec)
-                        .body(loginData)
-                        .when()
-                        .post("/auth/token/")
-                        .then()
-                        .spec(successfulLoginResponseSpec)
-                        .extract()
-                        .path("access"));
+        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return given(loginRequestSpec)
+                    .body(loginData)
+                    .when()
+                    .post("/auth/token/")
+                    .then()
+                    .spec(successfulLoginResponseSpec)
+                    .extract()
+                    .path("access");
+        });
 
         step("Удаление пользователя", () -> {
             given()
                     .filter(withCustomTemplate())
                     .log().all()
-                    .header("Authorization", "Bearer " + accessToken)
+                    .header("Authorization", "Bearer " + actualAccessToken)
                     .when()
                     .delete("/users/me/")
                     .then()
@@ -279,54 +304,59 @@ public class LoginTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку авторизации пользователя с применением пустого поля для логина")
     public void emptyUserNameLoginNegativeTest() {
-        step("Регистрация нового пользователя", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-            SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
-                    .body(registrationData)
-                    .when()
-                    .post("/users/register/")
-                    .then()
-                    .spec(successfulRegistrationResponseSpec)
-                    .extract()
-                    .as(SuccessfulRegistrationResponseModel.class);
-
+        SuccessfulRegistrationResponseModel registrationResponse =
+                step("Регистрация нового пользователя", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return given(registrationRequestSpec)
+                            .body(registrationData)
+                            .when()
+                            .post("/users/register/")
+                            .then()
+                            .spec(successfulRegistrationResponseSpec)
+                            .extract()
+                            .as(SuccessfulRegistrationResponseModel.class);
+                });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        LoginBodyModel wrongLoginData = new LoginBodyModel(emptyUsername, password);
-        step("Авторизация с применением пустого поля для логина и проверка ответа (400)", () -> {
-            EmptyUserResponseModel loginResponse = given(loginRequestSpec)
-                    .body(wrongLoginData)
-                    .when()
-                    .post("/auth/token/")
-                    .then()
-                    .spec(emptyUserLoginResponseSpec)
-                    .extract()
-                    .as(EmptyUserResponseModel.class);
-
+        EmptyUserResponseModel loginResponse =
+                step("Авторизация с применением пустого поля для логина и проверка ответа (400)", () -> {
+                    LoginBodyModel wrongLoginData = new LoginBodyModel(emptyUsername, password);
+                    return given(loginRequestSpec)
+                            .body(wrongLoginData)
+                            .when()
+                            .post("/auth/token/")
+                            .then()
+                            .spec(emptyUserLoginResponseSpec)
+                            .extract()
+                            .as(EmptyUserResponseModel.class);
+                });
+        step("Проверка текста ошибки в ответе", () -> {
             String expectedDetailError = "This field may not be blank.";
             String actualDetailError = loginResponse.username().getFirst();
 
             assertThat(actualDetailError).isEqualTo(expectedDetailError);
         });
 
-        LoginBodyModel loginData = new LoginBodyModel(username, password);
-        String accessToken = step("Авторизация и получение токена для удаления временного пользователя ", () ->
-                given(loginRequestSpec)
-                        .body(loginData)
-                        .when()
-                        .post("/auth/token/")
-                        .then()
-                        .spec(successfulLoginResponseSpec)
-                        .extract()
-                        .path("access"));
+        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return given(loginRequestSpec)
+                    .body(loginData)
+                    .when()
+                    .post("/auth/token/")
+                    .then()
+                    .spec(successfulLoginResponseSpec)
+                    .extract()
+                    .path("access");
+        });
 
         step("Удаление пользователя", () -> {
             given()
                     .filter(withCustomTemplate())
                     .log().all()
-                    .header("Authorization", "Bearer " + accessToken)
+                    .header("Authorization", "Bearer " + actualAccessToken)
                     .when()
                     .delete("/users/me/")
                     .then()
@@ -338,32 +368,36 @@ public class LoginTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку авторизации пользователя с применением пустого поля для логина и пустого поля для пароля")
     public void emptyUserNameEmptyPasswordLoginNegativeTest() {
-        step("Регистрация нового пользователя", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-            SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
-                    .body(registrationData)
-                    .when()
-                    .post("/users/register/")
-                    .then()
-                    .spec(successfulRegistrationResponseSpec)
-                    .extract()
-                    .as(SuccessfulRegistrationResponseModel.class);
-
+        SuccessfulRegistrationResponseModel registrationResponse =
+                step("Регистрация нового пользователя", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return given(registrationRequestSpec)
+                            .body(registrationData)
+                            .when()
+                            .post("/users/register/")
+                            .then()
+                            .spec(successfulRegistrationResponseSpec)
+                            .extract()
+                            .as(SuccessfulRegistrationResponseModel.class);
+                });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        LoginBodyModel wrongLoginData = new LoginBodyModel(emptyUsername, emptyPassword);
-        step("Авторизация с применением пустого поля для логина и пароля с проверкой ответа (400)", () -> {
-            EmptyUserEmptyPasswordResponseModel loginResponse = given(loginRequestSpec)
-                    .body(wrongLoginData)
-                    .when()
-                    .post("/auth/token/")
-                    .then()
-                    .spec(emptyUserEmptyPasswordLoginResponseSpec)
-                    .extract()
-                    .as(EmptyUserEmptyPasswordResponseModel.class);
-
+        EmptyUserEmptyPasswordResponseModel loginResponse =
+                step("Авторизация с применением пустого поля для логина и пароля с проверкой ответа (400)", () -> {
+                    LoginBodyModel wrongLoginData = new LoginBodyModel(emptyUsername, emptyPassword);
+                    return given(loginRequestSpec)
+                            .body(wrongLoginData)
+                            .when()
+                            .post("/auth/token/")
+                            .then()
+                            .spec(emptyUserEmptyPasswordLoginResponseSpec)
+                            .extract()
+                            .as(EmptyUserEmptyPasswordResponseModel.class);
+                });
+        step("Проверка текста ошибки в ответе", () -> {
             String expectedDetailError = "This field may not be blank.";
             String actualDetailError_1 = loginResponse.username().getFirst();
             String actualDetailError_2 = loginResponse.password().getFirst();
@@ -372,22 +406,23 @@ public class LoginTests extends TestBase {
             assertThat(actualDetailError_2).isEqualTo(expectedDetailError);
         });
 
-        LoginBodyModel loginData = new LoginBodyModel(username, password);
-        String accessToken = step("Авторизация и получение токена для удаления временного пользователя ", () ->
-                given(loginRequestSpec)
-                        .body(loginData)
-                        .when()
-                        .post("/auth/token/")
-                        .then()
-                        .spec(successfulLoginResponseSpec)
-                        .extract()
-                        .path("access"));
+        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return given(loginRequestSpec)
+                    .body(loginData)
+                    .when()
+                    .post("/auth/token/")
+                    .then()
+                    .spec(successfulLoginResponseSpec)
+                    .extract()
+                    .path("access");
+        });
 
         step("Удаление пользователя", () -> {
             given()
                     .filter(withCustomTemplate())
                     .log().all()
-                    .header("Authorization", "Bearer " + accessToken)
+                    .header("Authorization", "Bearer " + actualAccessToken)
                     .when()
                     .delete("/users/me/")
                     .then()

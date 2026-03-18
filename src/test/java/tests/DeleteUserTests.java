@@ -32,9 +32,11 @@ public class DeleteUserTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку удаления существующего пользователя")
     public void successfulDeleteUserTest() {
-        step("Регистрация нового пользователя", () -> {
+
+
+        SuccessfulRegistrationResponseModel registrationResponse = step("Регистрация нового пользователя", () -> {
             RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-            SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
+            return given(registrationRequestSpec)
                     .body(registrationData)
                     .when()
                     .post("/users/register/")
@@ -42,23 +44,24 @@ public class DeleteUserTests extends TestBase {
                     .spec(successfulRegistrationResponseSpec)
                     .extract()
                     .as(SuccessfulRegistrationResponseModel.class);
-
+        });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
-
         });
 
-        LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        String accessToken = step("Авторизация и получение токена для удаления пользователя ", () ->
-                given(loginRequestSpec)
-                        .body(loginData)
-                        .when()
-                        .post("/auth/token/")
-                        .then()
-                        .spec(successfulLoginResponseSpec)
-                        .extract()
-                        .path("access"));
+        String accessToken = step("Авторизация и получение токена для удаления пользователя ", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return given(loginRequestSpec)
+                    .body(loginData)
+                    .when()
+                    .post("/auth/token/")
+                    .then()
+                    .spec(successfulLoginResponseSpec)
+                    .extract()
+                    .path("access");
+        });
 
         step("Удаление пользователя и проверка ответа (204)", () -> {
             given()
@@ -76,10 +79,9 @@ public class DeleteUserTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку удаления не авторизованного пользователя")
     public void notProvidedAuthenticationCredentialsDeleteUserNegativeTest() {
-        step("Регистрация нового пользователя", () -> {
+        SuccessfulRegistrationResponseModel registrationResponse = step("Регистрация нового пользователя", () -> {
             RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
-            SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
+            return given(registrationRequestSpec)
                     .body(registrationData)
                     .when()
                     .post("/users/register/")
@@ -87,10 +89,10 @@ public class DeleteUserTests extends TestBase {
                     .spec(successfulRegistrationResponseSpec)
                     .extract()
                     .as(SuccessfulRegistrationResponseModel.class);
-
+        });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
-
         });
 
         NotProvidedAuthenticationCredentialsResponseModel deleteResponse =
@@ -111,22 +113,23 @@ public class DeleteUserTests extends TestBase {
             assertThat(actualDetail).isEqualTo(expectedDetail);
         });
 
-        LoginBodyModel loginData = new LoginBodyModel(username, password);
-        String accessToken = step("Авторизация и получение токена для удаления временного пользователя ", () ->
-                given(loginRequestSpec)
-                        .body(loginData)
-                        .when()
-                        .post("/auth/token/")
-                        .then()
-                        .spec(successfulLoginResponseSpec)
-                        .extract()
-                        .path("access"));
+        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return given(loginRequestSpec)
+                    .body(loginData)
+                    .when()
+                    .post("/auth/token/")
+                    .then()
+                    .spec(successfulLoginResponseSpec)
+                    .extract()
+                    .path("access");
+        });
 
         step("Удаление пользователя", () -> {
             given()
                     .filter(withCustomTemplate())
                     .log().all()
-                    .header("Authorization", "Bearer " + accessToken)
+                    .header("Authorization", "Bearer " + actualAccessToken)
                     .when()
                     .delete("/users/me/")
                     .then()

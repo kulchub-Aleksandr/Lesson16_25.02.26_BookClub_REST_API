@@ -26,18 +26,20 @@ public class RegistrationTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку регистрации нового пользователя")
     public void successfulRegistrationTest() {
-        step("Регистрация нового пользователя и проверка ответа (201)", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
 
-            SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
-                    .body(registrationData)
-                    .when()
-                    .post("/users/register/")
-                    .then()
-                    .spec(successfulRegistrationResponseSpec)
-                    .extract()
-                    .as(SuccessfulRegistrationResponseModel.class);
-
+        SuccessfulRegistrationResponseModel registrationResponse =
+                step("Регистрация нового пользователя и проверка ответа (201)", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return given(registrationRequestSpec)
+                            .body(registrationData)
+                            .when()
+                            .post("/users/register/")
+                            .then()
+                            .spec(successfulRegistrationResponseSpec)
+                            .extract()
+                            .as(SuccessfulRegistrationResponseModel.class);
+                });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
             assertThat(registrationResponse.firstName()).isEqualTo("");
@@ -55,23 +57,26 @@ public class RegistrationTests extends TestBase {
     @DisplayName("Тест на проверку регистрации пользователя с уже существующими регистрационными данными")
     public void existingUserRegistrationNegativeTest() {
 
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-        step("Регистрация нового пользователя", () -> {
-            SuccessfulRegistrationResponseModel registrationResponse_1 = given(registrationRequestSpec)
-                    .body(registrationData)
-                    .when()
-                    .post("/users/register/")
-                    .then()
-                    .spec(successfulRegistrationResponseSpec)
-                    .extract()
-                    .as(SuccessfulRegistrationResponseModel.class);
+        SuccessfulRegistrationResponseModel registrationResponse_1 =
+                step("Регистрация нового пользователя", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return given(registrationRequestSpec)
+                            .body(registrationData)
+                            .when()
+                            .post("/users/register/")
+                            .then()
+                            .spec(successfulRegistrationResponseSpec)
+                            .extract()
+                            .as(SuccessfulRegistrationResponseModel.class);
+                });
 
+        step("Проверка соответствия отправленных данных с данными в ответе", () -> {
             assertThat(registrationResponse_1.username()).isEqualTo(username);
         });
 
         ExistingUserResponseModel registrationResponse_2 =
                 step("Регистрация нового пользователя с уже существующими регистрационными данными и проверка ответа (400)", () -> {
-
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
                     return given(registrationRequestSpec)
                             .body(registrationData)
                             .when()

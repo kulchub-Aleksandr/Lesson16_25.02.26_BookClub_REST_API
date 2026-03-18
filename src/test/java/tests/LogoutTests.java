@@ -35,43 +35,47 @@ public class LogoutTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку выхода из системы зарегистрированного пользователя")
     public void successfulLogoutTest() {
-
-        step("Регистрация нового пользователя", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-            SuccessfulRegistrationResponseModel registrationResponse = given(registrationRequestSpec)
-                    .body(registrationData)
-                    .when()
-                    .post("/users/register/")
-                    .then()
-                    .spec(successfulRegistrationResponseSpec)
-                    .extract()
-                    .as(SuccessfulRegistrationResponseModel.class);
-
+        SuccessfulRegistrationResponseModel registrationResponse =
+                step("Регистрация нового пользователя", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return given(registrationRequestSpec)
+                            .body(registrationData)
+                            .when()
+                            .post("/users/register/")
+                            .then()
+                            .spec(successfulRegistrationResponseSpec)
+                            .extract()
+                            .as(SuccessfulRegistrationResponseModel.class);
+                });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        LoginBodyModel loginData = new LoginBodyModel(username, password);
+        String refreshToken =
+                step("Авторизация и получение токена", () -> {
+                    LoginBodyModel loginData = new LoginBodyModel(username, password);
+                    return given(loginRequestSpec)
+                            .body(loginData)
+                            .when()
+                            .post("/auth/token/")
+                            .then()
+                            .spec(successfulLoginResponseSpec)
+                            .extract().path("refresh");
+                });
 
-        String refreshToken = step("Авторизация и получение токена", () ->
-                given(loginRequestSpec)
-                        .body(loginData)
-                        .when()
-                        .post("/auth/token/")
-                        .then()
-                        .spec(successfulLoginResponseSpec)
-                        .extract().path("refresh"));
-
-        step("Отправка запроса logout с refresh-токеном и проверка ответа (200)", () -> {
-            LogoutBodyModel logoutData = new LogoutBodyModel(refreshToken);
-
-            Response logoutResponse = given(logoutRequestSpec)
-                    .body(logoutData)
-                    .when()
-                    .post("/auth/logout/")
-                    .then()
-                    .spec(successfulLogoutResponseSpec)
-                    .extract().response();
+        Response logoutResponse =
+                step("Отправка запроса logout с refresh-токеном и проверка ответа (200)", () -> {
+                    LogoutBodyModel logoutData = new LogoutBodyModel(refreshToken);
+                    return given(logoutRequestSpec)
+                            .body(logoutData)
+                            .when()
+                            .post("/auth/logout/")
+                            .then()
+                            .spec(successfulLogoutResponseSpec)
+                            .extract().response();
+                });
+        step("Проверка корректности ответа", () -> {
             assertThat(logoutResponse.body().asString()).isEqualTo("{}");
         });
     }
@@ -82,7 +86,6 @@ public class LogoutTests extends TestBase {
 
         UnauthorizedUserLogoutResponseModel logoutResponse =
                 step("Отправка запроса logout с некорректным refresh-токеном и проверка ответа (401)", () -> {
-
                     String refresh = "cmVmcmVzaCIsImV4cCI6MTc";
                     LogoutBodyModel logoutData = new LogoutBodyModel(refresh);
 

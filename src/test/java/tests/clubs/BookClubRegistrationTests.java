@@ -47,29 +47,33 @@ public class BookClubRegistrationTests extends TestBase {
         LoginBodyModel loginData = new LoginBodyModel(username, password);
         String actualAccessToken = api.auth.loginAndGetAccessToken(loginData);
 
-        SuccessfulBookClubRegistrationBodyModel registrationClubData = new SuccessfulBookClubRegistrationBodyModel(
-                bookTitle,
-                bookAuthors,
-                publicationYear,
-                description,
-                telegramChatLink);
 
+       // int actualId = 0;
         SuccessfulBookClubRegistrationResponseModel registrationResponse =
-                step("Регистрация нового клуба и проверка ответа (201)", () ->
-                        api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData));
+                step("Регистрация нового клуба и проверка ответа (201)", () -> {
+                    SuccessfulBookClubRegistrationBodyModel registrationClubData = new SuccessfulBookClubRegistrationBodyModel(
+                            bookTitle,
+                            bookAuthors,
+                            publicationYear,
+                            description,
+                            telegramChatLink);
+                    SuccessfulBookClubRegistrationResponseModel response =
+                            api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
 
-            int actualId = registrationResponse.id();
-
+                   // actualId = response.id();
+                    return response;
+                });
         step("Проверка соответствия полученных данных в ответе", () -> {
-            assertThat(actualId).isGreaterThan(0);
+            int idFromResponse = registrationResponse.id();
+            assertThat(idFromResponse).isGreaterThan(0);
             assertThat(registrationResponse.bookTitle()).isEqualTo(bookTitle);
             assertThat(registrationResponse.bookAuthors()).isEqualTo(bookAuthors);
             assertThat(registrationResponse.publicationYear()).isEqualTo(publicationYear);
             assertThat(registrationResponse.description()).isEqualTo(description);
             assertThat(registrationResponse.telegramChatLink()).isEqualTo(telegramChatLink);
-    });
+        });
 
-        api.clubs.bookClubDelete(actualAccessToken,actualId);
+        api.clubs.bookClubDelete(actualAccessToken, registrationResponse.id());
         api.users.deleteUserAuthorized(actualAccessToken);
 
     }

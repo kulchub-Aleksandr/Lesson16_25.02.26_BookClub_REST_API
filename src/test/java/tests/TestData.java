@@ -3,14 +3,19 @@ package tests;
 import net.datafaker.Faker;
 import net.datafaker.providers.base.Text;
 
+import java.util.Random;
+
 import static net.datafaker.providers.base.Text.DIGITS;
 import static net.datafaker.providers.base.Text.EN_UPPERCASE;
 
 public class TestData {
     private final Faker faker = new Faker();
+    private final Random random = new Random();
 
     public String getUsername() {
-        return faker.name().firstName();
+        String baseName = faker.name().firstName();
+        int suffix = random.nextInt(9000) + 1000;
+        return baseName + suffix;
     }
 
     public String getWrongUsername() {

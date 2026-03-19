@@ -58,7 +58,6 @@ public class RegistrationTests extends TestBase {
     @DisplayName("Тест на проверку регистрации пользователя с уже существующими регистрационными данными")
     public void existingUserRegistrationNegativeTest() {
 
-
         SuccessfulRegistrationResponseModel registrationResponse_1 =
                 step("Регистрация нового пользователя", () -> {
                     RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);

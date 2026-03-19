@@ -33,28 +33,32 @@ public class LogoutTests extends TestBase {
     @DisplayName("Тест на проверку выхода из системы зарегистрированного пользователя")
     public void successfulLogoutTest() {
 
-        step("Регистрация нового пользователя", () -> {
+        SuccessfulRegistrationResponseModel registrationResponse
+                = step("Регистрация нового пользователя и проверка ответа (201)", () -> {
             RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
-            SuccessfulRegistrationResponseModel registrationResponse =
-                    api.users.registration(registrationData);
-
+            return api.users.registration(registrationData);
+        });
+        step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        LoginBodyModel loginData = new LoginBodyModel(username, password);
+        String refreshToken =
+                step("Отправка запроса logout с refresh-токеном и проверка ответа (200)", () -> {
+                    LoginBodyModel loginData = new LoginBodyModel(username, password);
 
-        String refreshToken = api.auth.loginAndGetRefreshToken(loginData);
-
-        step("Отправка запроса logout с refresh-токеном и проверка ответа (200)", () -> {
+                    return api.auth.loginAndGetRefreshToken(loginData);
+                });
+        step("Проверка, что ответ logout — пустой объект {}", () -> {
             LogoutBodyModel logoutData = new LogoutBodyModel(refreshToken);
 
             Response logoutResponse = api.auth.logout(logoutData);
             assertThat(logoutResponse.body().asString()).isEqualTo("{}");
         });
-
-        String accessToken = api.auth.loginAndGetAccessToken(loginData);
+        String accessToken = step("Авторизация и получение access-токена для удаления пользователя", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return api.auth.loginAndGetAccessToken(loginData);
+        });
         api.users.deleteUserAuthorized(accessToken);
 
     }
@@ -63,14 +67,14 @@ public class LogoutTests extends TestBase {
     @DisplayName("Тест на проверку выхода из системы не зарегистрированного пользователя")
     public void unauthorizedUserLogoutNegativeTest() {
 
-        step("Отправка запроса logout с некорректным refresh-токеном и проверка ответа (401)", () -> {
+        UnauthorizedUserLogoutResponseModel logoutResponse =
+                step("Отправка запроса logout с некорректным refresh-токеном и проверка ответа (401)", () -> {
+                    String refresh = "cmVmcmVzaCIsImV4cCI6MTc";
+                    LogoutBodyModel logoutData = new LogoutBodyModel(refresh);
 
-            String refresh = "cmVmcmVzaCIsImV4cCI6MTc";
-            LogoutBodyModel logoutData = new LogoutBodyModel(refresh);
-
-            UnauthorizedUserLogoutResponseModel logoutResponse =
-                    api.auth.logoutUnauthorizedUser(logoutData);
-
+                    return api.auth.logoutUnauthorizedUser(logoutData);
+                });
+        step("Проверка текста ошибки в ответе", () -> {
             String expectedDetail = "Token is invalid";
             String expectedCode = "token_not_valid";
             String actualDetail = logoutResponse.detail();
@@ -86,17 +90,15 @@ public class LogoutTests extends TestBase {
     @DisplayName("Тест на проверку выхода из системы с пустым refresh-токеном")
     public void emptyTokenLogoutNegativeTest() {
 
-        step("Отправка запроса logout с пустым refresh-токеном и проверка ответа (400)", () -> {
-            String refresh = "";
-
-            LogoutBodyModel logoutData = new LogoutBodyModel(refresh);
-
-            EmptyTokenLogoutResponseModel logoutResponse =
-                    api.auth.logoutEmptyToken(logoutData);
-
+        EmptyTokenLogoutResponseModel logoutResponse =
+                step("Отправка запроса logout с пустым refresh-токеном и проверка ответа (400)", () -> {
+                    String refresh = "";
+                    LogoutBodyModel logoutData = new LogoutBodyModel(refresh);
+                    return api.auth.logoutEmptyToken(logoutData);
+                });
+        step("Проверка текста ошибки в ответе", () -> {
             String expectedRefresh = "This field may not be blank.";
             String actualRefresh = logoutResponse.refresh().getFirst();
-
             assertThat(actualRefresh).isEqualTo(expectedRefresh);
         });
     }
@@ -105,11 +107,10 @@ public class LogoutTests extends TestBase {
     @DisplayName("Тест на проверку выхода из системы с пустым телом запроса")
     public void emptyRequestBodyLogoutNegativeTest() {
 
-        step("Отправка запроса logout с пустым телом  и проверка ответа (400)", () -> {
-
-            EmptyRequestBodyLogoutResponseModel logoutResponse =
-                    api.auth.logoutEmptyRequestBody();
-
+        EmptyRequestBodyLogoutResponseModel logoutResponse =
+                step("Отправка запроса logout с пустым телом  и проверка ответа (400)",
+                        api.auth::logoutEmptyRequestBody);
+        step("Проверка текста ошибки в ответе", () -> {
             String expectedRefresh = "This field is required.";
             String actualRefresh = logoutResponse.refresh().getFirst();
 

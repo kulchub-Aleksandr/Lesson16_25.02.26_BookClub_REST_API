@@ -30,8 +30,11 @@ public class BookClubListTests extends TestBase {
     @DisplayName("Тест на получение клуба по названию клуба")
     public void getClubsListBookTitle() {
 
-        String search = "Сети";
-        BookClubsListResponseModel response = api.clubs.getClubsListBookTitle(search, 1, 10);
+        BookClubsListResponseModel response =
+                step("Тест на получение клуба по названию клуба \"Сети\"", () -> {
+                    String search = "Сети";
+                    return api.clubs.getClubsListBookTitle(search, 1, 10);
+                });
 
         step("Проверка соответствия полученных данных в ответе", () -> {
             assertThat(response).isNotNull();

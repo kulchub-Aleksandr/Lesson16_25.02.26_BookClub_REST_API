@@ -53,21 +53,21 @@ public class BookClubDeleteTests extends TestBase {
         LoginBodyModel loginData = new LoginBodyModel(username, password);
         String actualAccessToken = api.auth.loginAndGetAccessToken(loginData);
 
-        SuccessfulBookClubRegistrationBodyModel registrationClubData = new SuccessfulBookClubRegistrationBodyModel(
-                bookTitle,
-                bookAuthors,
-                publicationYear,
-                description,
-                telegramChatLink);
-
         SuccessfulBookClubRegistrationResponseModel registrationResponse =
-                step("Регистрация нового клуба и проверка ответа (201)", () ->
-                        api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData));
-
-        int actualId = registrationResponse.id();
-
-        step("Проверка соответствия полученных данными", () -> {
-            assertThat(actualId).isGreaterThan(0);
+                step("Регистрация нового клуба и проверка ответа (201)", () -> {
+                    SuccessfulBookClubRegistrationBodyModel registrationClubData = new SuccessfulBookClubRegistrationBodyModel(
+                            bookTitle,
+                            bookAuthors,
+                            publicationYear,
+                            description,
+                            telegramChatLink);
+                    SuccessfulBookClubRegistrationResponseModel response =
+                            api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
+                    return response;
+                });
+        step("Проверка соответствия полученных данных в ответе", () -> {
+            int idFromResponse = registrationResponse.id();
+            assertThat(idFromResponse).isGreaterThan(0);
             assertThat(registrationResponse.bookTitle()).isEqualTo(bookTitle);
             assertThat(registrationResponse.bookAuthors()).isEqualTo(bookAuthors);
             assertThat(registrationResponse.publicationYear()).isEqualTo(publicationYear);
@@ -75,7 +75,7 @@ public class BookClubDeleteTests extends TestBase {
             assertThat(registrationResponse.telegramChatLink()).isEqualTo(telegramChatLink);
         });
 
-        api.clubs.bookClubDelete(actualAccessToken, actualId);
+        api.clubs.bookClubDelete(actualAccessToken, registrationResponse.id());
         api.users.deleteUserAuthorized(actualAccessToken);
 
 
@@ -91,21 +91,21 @@ public class BookClubDeleteTests extends TestBase {
         LoginBodyModel loginData = new LoginBodyModel(username, password);
         String actualAccessToken = api.auth.loginAndGetAccessToken(loginData);
 
-        SuccessfulBookClubRegistrationBodyModel registrationClubData = new SuccessfulBookClubRegistrationBodyModel(
-                bookTitle,
-                bookAuthors,
-                publicationYear,
-                description,
-                telegramChatLink);
-
         SuccessfulBookClubRegistrationResponseModel registrationResponse =
-                step("Регистрация нового клуба и проверка ответа (201)", () ->
-                        api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData));
-
-        int actualId = registrationResponse.id();
-
-        step("Проверка соответствия полученных данными", () -> {
-            assertThat(actualId).isGreaterThan(0);
+                step("Регистрация нового клуба и проверка ответа (201)", () -> {
+                    SuccessfulBookClubRegistrationBodyModel registrationClubData = new SuccessfulBookClubRegistrationBodyModel(
+                            bookTitle,
+                            bookAuthors,
+                            publicationYear,
+                            description,
+                            telegramChatLink);
+                    SuccessfulBookClubRegistrationResponseModel response =
+                            api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
+                    return response;
+                });
+        step("Проверка соответствия полученных данных в ответе", () -> {
+            int idFromResponse = registrationResponse.id();
+            assertThat(idFromResponse).isGreaterThan(0);
             assertThat(registrationResponse.bookTitle()).isEqualTo(bookTitle);
             assertThat(registrationResponse.bookAuthors()).isEqualTo(bookAuthors);
             assertThat(registrationResponse.publicationYear()).isEqualTo(publicationYear);
@@ -121,7 +121,7 @@ public class BookClubDeleteTests extends TestBase {
 
         PermissionUnsuccessfulBookClubDeleteResponseModel registrationResponse_1 =
                 step("Удаление клуба с аккаунта не создателя клуба", () ->
-                        api.clubs.bookClubPermissionDelete(actualAccessToken_1, actualId));
+                        api.clubs.bookClubPermissionDelete(actualAccessToken_1, registrationResponse.id()));
 
         step("Проверка текста ошибки в ответе", () -> {
             String actualDetail = registrationResponse_1.detail();
@@ -129,7 +129,7 @@ public class BookClubDeleteTests extends TestBase {
             assertThat(actualDetail).isEqualTo(detail);
         });
 
-        api.clubs.bookClubDelete(actualAccessToken, actualId);
+        api.clubs.bookClubDelete(actualAccessToken, registrationResponse.id());
         api.users.deleteUserAuthorized(actualAccessToken);
         api.users.deleteUserAuthorized(actualAccessToken_1);
 

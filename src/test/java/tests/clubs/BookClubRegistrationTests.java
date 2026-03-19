@@ -47,8 +47,6 @@ public class BookClubRegistrationTests extends TestBase {
         LoginBodyModel loginData = new LoginBodyModel(username, password);
         String actualAccessToken = api.auth.loginAndGetAccessToken(loginData);
 
-
-       // int actualId = 0;
         SuccessfulBookClubRegistrationResponseModel registrationResponse =
                 step("Регистрация нового клуба и проверка ответа (201)", () -> {
                     SuccessfulBookClubRegistrationBodyModel registrationClubData = new SuccessfulBookClubRegistrationBodyModel(
@@ -59,8 +57,6 @@ public class BookClubRegistrationTests extends TestBase {
                             telegramChatLink);
                     SuccessfulBookClubRegistrationResponseModel response =
                             api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
-
-                   // actualId = response.id();
                     return response;
                 });
         step("Проверка соответствия полученных данных в ответе", () -> {

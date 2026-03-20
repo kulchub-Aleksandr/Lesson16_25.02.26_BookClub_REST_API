@@ -80,7 +80,7 @@ public class UpdateUserTests extends TestBase {
 
         SuccessfulUpdateUserResponseModel updatedUserData =
                 step("Проверка изменений методом get и проверка ответа (200)", () ->
-                        api.users.updateCheck(actualAccessToken));
+                        api.users.getUserData(actualAccessToken));
         step("Подтверждение изменений через GET‑запрос", () -> {
             assertThat(updatedUserData.username()).isEqualTo(username);
             assertThat(updatedUserData.firstName()).isEqualTo(firstName);
@@ -170,7 +170,7 @@ public class UpdateUserTests extends TestBase {
 
         SuccessfulUpdateUserResponseModel updatedUserData =
                 step("Проверка изменений методом get и проверка ответа (200)", () ->
-                        api.users.updateCheck(accessToken));
+                        api.users.getUserData(accessToken));
         step("Подтверждение изменений через GET‑запрос", () -> {
             assertThat(updatedUserData.id()).isEqualTo(registrationResponse.id());
             assertThat(updatedUserData.username()).isEqualTo(username);

@@ -75,5 +75,6 @@ public class DeleteUserTests extends TestBase {
             String expectedDetail = "Authentication credentials were not provided.";
             assertThat(actualDetail).isEqualTo(expectedDetail);
         });
+
     }
 }

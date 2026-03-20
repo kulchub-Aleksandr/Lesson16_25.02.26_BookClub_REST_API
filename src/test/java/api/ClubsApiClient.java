@@ -9,6 +9,7 @@ import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseM
 
 import static allure.CustomAllureListener.withCustomTemplate;
 import static io.restassured.RestAssured.given;
+import static specs.clubs.bookClubDelete.BookClubDeleteSpec.permissionBookClubDeleteRequestSpec;
 import static specs.clubs.bookClubDelete.BookClubDeleteSpec.permissionUnsuccessfulBookClubDeleteResponseSpec;
 import static specs.clubs.bookClubList.BookClubListSpec.clubsRequestSpec;
 import static specs.clubs.bookClubList.BookClubListSpec.successfulBookClubsListResponseSpec;
@@ -36,9 +37,7 @@ public class ClubsApiClient {
     @Step("Удаление клуба")
     public void bookClubDelete(
             String accessToken, int id) {
-        given()
-                .log().all()
-                .filter(withCustomTemplate())
+        given(permissionBookClubDeleteRequestSpec)
                 .header("Authorization", "Bearer " + accessToken)
                 .pathParam("id", id)
                 .when()
@@ -50,9 +49,7 @@ public class ClubsApiClient {
     @Step("Удаление клуба с аккаунта не создателя клуба")
     public PermissionUnsuccessfulBookClubDeleteResponseModel bookClubPermissionDelete(
             String accessToken, int id) {
-        return given()
-                .log().all()
-                .filter(withCustomTemplate())
+        return given(permissionBookClubDeleteRequestSpec)
                 .header("Authorization", "Bearer " + accessToken)
                 .pathParam("id", id)
                 .when()
@@ -75,12 +72,26 @@ public class ClubsApiClient {
                 .as(BookClubsListResponseModel.class);
     }
 
+    @Step("Получение клуба  GET /clubs/{id}")
+    public BookClubsListResponseModel getClubById(String accessToken, int id) {
+        return given(clubsRequestSpec)
+                .header("Authorization", "Bearer " + accessToken)
+                .pathParam("id", id)
+                .when()
+                .get("/clubs/{id}/")
+                .then()
+                .spec(successfulBookClubsListResponseSpec)
+                .extract()
+                .as(BookClubsListResponseModel.class);
+    }
+
+
     @Step("Получение карточки клуба по названию клуба")
     public BookClubsListResponseModel getClubsListBookTitle(String search, int page, int page_size) {
         return given(clubsRequestSpec)
-                .pathParam ("search", search)
-                .pathParam ("page", page)
-                .pathParam ("page_size", page_size)
+                .pathParam("search", search)
+                .pathParam("page", page)
+                .pathParam("page_size", page_size)
                 .when()
                 .get("/clubs/?search={search}&page={page}&page_size={page_size}")
                 .then()
@@ -103,10 +114,29 @@ public class ClubsApiClient {
                 .extract()
                 .as(BookClubsListResponseModel.class);
     }
-    @Step("Получение карточки клуба по названию и членству")
+
+    @Step("Получение карточки клуба по членству в клубе")
     public BookClubsListResponseModel getClubsBookClubsMembershipList(int page, int page_size, String membership) {
         return given(clubsRequestSpec)
+                .pathParam("page", page)
+                .pathParam("page_size", page_size)
+                .pathParam("membership", membership)
+                .when()
+                .get("/clubs/?page={page}&page_size={page_size}&membership={membership}")
+                .then()
+                .spec(successfulBookClubsListResponseSpec)
+                .extract()
+                .as(BookClubsListResponseModel.class);
+    }
 
+    @Step("Получение карточки клуба по членству в клубе")
+    public BookClubsListResponseModel getClubsBookClubsMembershipListOwner(
+            String accessToken,
+            int page,
+            int page_size,
+            String membership) {
+        return given(clubsRequestSpec)
+                .header("Authorization", "Bearer " + accessToken)
                 .pathParam("page", page)
                 .pathParam("page_size", page_size)
                 .pathParam("membership", membership)

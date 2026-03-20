@@ -78,11 +78,40 @@ public class ClubsApiClient {
     @Step("Получение карточки клуба по названию клуба")
     public BookClubsListResponseModel getClubsListBookTitle(String search, int page, int page_size) {
         return given(clubsRequestSpec)
+                .pathParam ("search", search)
+                .pathParam ("page", page)
+                .pathParam ("page_size", page_size)
+                .when()
+                .get("/clubs/?search={search}&page={page}&page_size={page_size}")
+                .then()
+                .spec(successfulBookClubsListResponseSpec)
+                .extract()
+                .as(BookClubsListResponseModel.class);
+    }
+
+    @Step("Получение карточки клуба по названию и членству")
+    public BookClubsListResponseModel getClubsBookClubsBookTitleMembershipList(String search, int page, int page_size, String membership) {
+        return given(clubsRequestSpec)
                 .pathParam("search", search)
                 .pathParam("page", page)
                 .pathParam("page_size", page_size)
+                .pathParam("membership", membership)
                 .when()
-                .get("/clubs/?search={search}&page={page}&page_size={page_size}")
+                .get("/clubs/?search={search}&page={page}&page_size={page_size}&membership={membership}")
+                .then()
+                .spec(successfulBookClubsListResponseSpec)
+                .extract()
+                .as(BookClubsListResponseModel.class);
+    }
+    @Step("Получение карточки клуба по названию и членству")
+    public BookClubsListResponseModel getClubsBookClubsMembershipList(int page, int page_size, String membership) {
+        return given(clubsRequestSpec)
+
+                .pathParam("page", page)
+                .pathParam("page_size", page_size)
+                .pathParam("membership", membership)
+                .when()
+                .get("/clubs/?page={page}&page_size={page_size}&membership={membership}")
                 .then()
                 .spec(successfulBookClubsListResponseSpec)
                 .extract()

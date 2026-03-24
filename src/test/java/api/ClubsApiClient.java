@@ -12,6 +12,7 @@ import static io.restassured.RestAssured.given;
 import static specs.clubs.bookClubDelete.BookClubDeleteSpec.permissionBookClubDeleteRequestSpec;
 import static specs.clubs.bookClubDelete.BookClubDeleteSpec.permissionUnsuccessfulBookClubDeleteResponseSpec;
 import static specs.clubs.bookClubList.BookClubListSpec.*;
+import static specs.clubs.bookClubMembers.BookClubMembersSpec.*;
 import static specs.clubs.bookClubRegistration.BookClubRegistrationSpec.bookClubRegistrationRequestSpec;
 import static specs.clubs.bookClubRegistration.BookClubRegistrationSpec.successfulBookClubRegistrationResponseSpec;
 import static specs.clubs.bookClubUpdate.BookClubUpdateSpec.bookClubUpdateRequestSpec;
@@ -108,7 +109,7 @@ public class ClubsApiClient {
     }
 
     @Step("Получение клуба  GET /clubs/{id}")
-    public SuccessfulBookClubRegistrationResponseModel getClubById(String accessToken, int id) {
+    public SuccessfulBookClubRegistrationResponseModel getClubById(String accessToken, long id) {
         return given(clubsRequestSpec)
                 .header("Authorization", "Bearer " + accessToken)
                 .pathParam("id", id)
@@ -122,7 +123,7 @@ public class ClubsApiClient {
 
 
     @Step("Получение клуба  GET /clubs/{id}")
-    public SuccessfulBookClubRegistrationResponseModel getClubByIdAfterPut(String accessToken, int id) {
+    public SuccessfulBookClubRegistrationResponseModel getClubByIdAfterPut(String accessToken, long id) {
         return given(clubsRequestSpec)
                 .header("Authorization", "Bearer " + accessToken)
                 .pathParam("id", id)
@@ -197,16 +198,29 @@ public class ClubsApiClient {
                 .as(BookClubsListResponseModel.class);
     }
 
-    @Step("Выход из клуба")
+    @Step("Регистрация членом клуба")
+    public void bookClubMemberRegistration(
+            String accessToken, int id) {
+        given(membersBookClubRequestSpec)
+                .header("Authorization", "Bearer " + accessToken)
+                .pathParam("id", id)
+                .when()
+                .post("/clubs/{id}/members/me/")
+                .then()
+                .spec(membersBookClubRegistrationResponseSpec);
+    }
+
+
+    @Step("Выход из членства клуба")
     public void bookClubMemberDelete(
             String accessToken, int id) {
-        given(permissionBookClubDeleteRequestSpec)
+        given(membersBookClubRequestSpec)
                 .header("Authorization", "Bearer " + accessToken)
                 .pathParam("id", id)
                 .when()
                 .delete("/clubs/{id}/members/me/")
                 .then()
-                .log().all();
+                .spec(membersBookClubDeleteResponseSpec);
     }
 
 

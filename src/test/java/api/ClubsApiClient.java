@@ -5,6 +5,8 @@ import models.clubs.deleteBookClub.PermissionUnsuccessfulBookClubDeleteResponseM
 import models.clubs.listBookClub.BookClubsListResponseModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
+import models.clubs.reviewsPostBookClub.SuccessfulBookClubReviewsBodyModel;
+import models.clubs.reviewsPostBookClub.SuccessfulBookClubReviewsResponseModel;
 import models.clubs.updateBookClub.SuccessfulBookClubUpdateBodyModel;
 
 
@@ -15,6 +17,8 @@ import static specs.clubs.bookClubList.BookClubListSpec.*;
 import static specs.clubs.bookClubMembers.BookClubMembersSpec.*;
 import static specs.clubs.bookClubRegistration.BookClubRegistrationSpec.bookClubRegistrationRequestSpec;
 import static specs.clubs.bookClubRegistration.BookClubRegistrationSpec.successfulBookClubRegistrationResponseSpec;
+import static specs.clubs.bookClubReviewsPost.BookClubReviewsSpec.reviewsBookClubRequestSpec;
+import static specs.clubs.bookClubReviewsPost.BookClubReviewsSpec.reviewsPostBookClubResponseSpec;
 import static specs.clubs.bookClubUpdate.BookClubUpdateSpec.bookClubUpdateRequestSpec;
 import static specs.clubs.bookClubUpdate.BookClubUpdateSpec.successfulBookClubUpdateResponseSpec;
 
@@ -210,7 +214,6 @@ public class ClubsApiClient {
                 .spec(membersBookClubRegistrationResponseSpec);
     }
 
-
     @Step("Выход из членства клуба")
     public void bookClubMemberDelete(
             String accessToken, int id) {
@@ -221,6 +224,20 @@ public class ClubsApiClient {
                 .delete("/clubs/{id}/members/me/")
                 .then()
                 .spec(membersBookClubDeleteResponseSpec);
+    }
+
+    @Step("Оставление отзыва на книгу")
+    public SuccessfulBookClubReviewsResponseModel bookClubReviewsPost(
+            String accessToken, SuccessfulBookClubReviewsBodyModel body) {
+        return given(reviewsBookClubRequestSpec)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(body)
+                .when()
+                .post("/clubs/reviews/")
+                .then()
+                .spec(reviewsPostBookClubResponseSpec)
+                .extract()
+                .as(SuccessfulBookClubReviewsResponseModel.class);
     }
 
 

@@ -52,7 +52,9 @@ public class TestData {
     }
 
     public String getBookTitle() {
-        return faker.book().title();
+        String baseTitle = faker.book().title();
+        int suffix = random.nextInt(9000) + 1000;
+        return baseTitle + suffix;
     }
 
     public String getBookAuthor() {

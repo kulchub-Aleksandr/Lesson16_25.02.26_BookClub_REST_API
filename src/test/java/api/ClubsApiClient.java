@@ -7,13 +7,14 @@ import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
 
 
-import static allure.CustomAllureListener.withCustomTemplate;
 import static io.restassured.RestAssured.given;
 import static specs.clubs.bookClubDelete.BookClubDeleteSpec.permissionBookClubDeleteRequestSpec;
 import static specs.clubs.bookClubDelete.BookClubDeleteSpec.permissionUnsuccessfulBookClubDeleteResponseSpec;
 import static specs.clubs.bookClubList.BookClubListSpec.*;
 import static specs.clubs.bookClubRegistration.BookClubRegistrationSpec.bookClubRegistrationRequestSpec;
 import static specs.clubs.bookClubRegistration.BookClubRegistrationSpec.successfulBookClubRegistrationResponseSpec;
+import static specs.clubs.bookClubUpdate.BookClubUpdateSpec.bookClubUpdateRequestSpec;
+import static specs.clubs.bookClubUpdate.BookClubUpdateSpec.successfulBookClubUpdateResponseSpec;
 
 
 public class ClubsApiClient {
@@ -29,6 +30,23 @@ public class ClubsApiClient {
                 .post("/clubs/")
                 .then()
                 .spec(successfulBookClubRegistrationResponseSpec)
+                .extract()
+                .as(SuccessfulBookClubRegistrationResponseModel.class);
+    }
+
+    @Step("Обновление данных клуба")
+    public SuccessfulBookClubRegistrationResponseModel bookClubsUpdate(
+            String accessToken,
+            SuccessfulBookClubRegistrationBodyModel body,
+            int id) {
+        return given(bookClubUpdateRequestSpec)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(body)
+                .pathParam("id", id)
+                .when()
+                .put("/clubs/{id}/")
+                .then()
+                .spec(successfulBookClubUpdateResponseSpec)
                 .extract()
                 .as(SuccessfulBookClubRegistrationResponseModel.class);
     }
@@ -72,7 +90,7 @@ public class ClubsApiClient {
     }
 
     @Step("Получение клуба  GET /clubs/{id}")
-    public SuccessfulBookClubRegistrationBodyModel getClubById(String accessToken, int id) {
+    public SuccessfulBookClubRegistrationResponseModel getClubById(String accessToken, int id) {
         return given(clubsRequestSpec)
                 .header("Authorization", "Bearer " + accessToken)
                 .pathParam("id", id)
@@ -81,7 +99,21 @@ public class ClubsApiClient {
                 .then()
                 .spec(successfulBookClubListGetResponseSpec)
                 .extract()
-                .as(SuccessfulBookClubRegistrationBodyModel.class);
+                .as(SuccessfulBookClubRegistrationResponseModel.class);
+    }
+
+
+    @Step("Получение клуба  GET /clubs/{id}")
+    public SuccessfulBookClubRegistrationResponseModel getClubByIdAfterPut(String accessToken, int id) {
+        return given(clubsRequestSpec)
+                .header("Authorization", "Bearer " + accessToken)
+                .pathParam("id", id)
+                .when()
+                .get("/clubs/{id}/")
+                .then()
+                .spec(successfulBookClubListGetAfterChangeResponseSpec)
+                .extract()
+                .as(SuccessfulBookClubRegistrationResponseModel.class);
     }
 
 

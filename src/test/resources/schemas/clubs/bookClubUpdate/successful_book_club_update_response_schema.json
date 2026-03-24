@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$ref": "#/definitions/Welcome8",
+  "definitions": {
+    "Welcome8": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "bookTitle": {
+          "type": "string"
+        },
+        "bookAuthors": {
+          "type": "string"
+        },
+        "publicationYear": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "telegramChatLink": {
+          "type": "string",
+          "format": "uri",
+          "qt-uri-protocols": [
+            "https"
+          ]
+        },
+        "owner": {
+          "type": "integer"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "reviews": {
+          "type": "array",
+          "items": {}
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modified": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "bookAuthors",
+        "bookTitle",
+        "created",
+        "description",
+        "id",
+        "members",
+        "modified",
+        "owner",
+        "publicationYear",
+        "reviews",
+        "telegramChatLink"
+      ],
+      "title": "Welcome8"
+    }
+  }
+}

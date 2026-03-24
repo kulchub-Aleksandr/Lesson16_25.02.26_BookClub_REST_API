@@ -261,20 +261,20 @@ public class BookClubListTests extends TestBase {
             assertThat(registrationResponseBookClub.bookTitle()).isEqualTo(bookTitle);
         });
 
-        SuccessfulBookClubRegistrationBodyModel response =
+        SuccessfulBookClubRegistrationResponseModel response =
                 step("Тест на получение клуба по ID", () -> {
 
                     return api.clubs.getClubById(actualAccessToken, registrationResponseBookClub.id());
                 });
 
         step("Проверка соответствия полученных данных в ответе", () -> {
-            assertThat(registrationResponseBookClub.id()).isGreaterThan(0);
-            assertThat(registrationResponseBookClub.owner()).isGreaterThan(0);
-            assertThat(registrationResponseBookClub.bookTitle()).isEqualTo(bookTitle);
-            assertThat(registrationResponseBookClub.bookAuthors()).isEqualTo(bookAuthors);
-            assertThat(registrationResponseBookClub.publicationYear()).isEqualTo(publicationYear);
-            assertThat(registrationResponseBookClub.description()).isEqualTo(description);
-            assertThat(registrationResponseBookClub.telegramChatLink()).isEqualTo(telegramChatLink);
+            assertThat(response.id()).isGreaterThan(0);
+            assertThat(response.owner()).isGreaterThan(0);
+            assertThat(response.bookTitle()).isEqualTo(bookTitle);
+            assertThat(response.bookAuthors()).isEqualTo(bookAuthors);
+            assertThat(response.publicationYear()).isEqualTo(publicationYear);
+            assertThat(response.description()).isEqualTo(description);
+            assertThat(response.telegramChatLink()).isEqualTo(telegramChatLink);
 
         });
 

@@ -33,4 +33,14 @@ public class BookClubListSpec {
             .expectBody("bookTitle", notNullValue())
             .expectBody("bookAuthors", notNullValue())
             .build();
+
+    public static ResponseSpecification successfulBookClubListGetAfterChangeResponseSpec = new ResponseSpecBuilder()
+            .log(ALL)
+            .expectStatusCode(200)
+            .expectBody(matchesJsonSchemaInClasspath(
+                    "schemas/clubs/bookClubUpdate/successful_book_club_update_response_schema.json"))
+            .expectBody("id", notNullValue())
+            .expectBody("bookTitle", notNullValue())
+            .expectBody("bookAuthors", notNullValue())
+            .build();
 }

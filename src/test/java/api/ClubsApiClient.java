@@ -11,8 +11,7 @@ import static allure.CustomAllureListener.withCustomTemplate;
 import static io.restassured.RestAssured.given;
 import static specs.clubs.bookClubDelete.BookClubDeleteSpec.permissionBookClubDeleteRequestSpec;
 import static specs.clubs.bookClubDelete.BookClubDeleteSpec.permissionUnsuccessfulBookClubDeleteResponseSpec;
-import static specs.clubs.bookClubList.BookClubListSpec.clubsRequestSpec;
-import static specs.clubs.bookClubList.BookClubListSpec.successfulBookClubsListResponseSpec;
+import static specs.clubs.bookClubList.BookClubListSpec.*;
 import static specs.clubs.bookClubRegistration.BookClubRegistrationSpec.bookClubRegistrationRequestSpec;
 import static specs.clubs.bookClubRegistration.BookClubRegistrationSpec.successfulBookClubRegistrationResponseSpec;
 
@@ -73,16 +72,16 @@ public class ClubsApiClient {
     }
 
     @Step("Получение клуба  GET /clubs/{id}")
-    public BookClubsListResponseModel getClubById(String accessToken, int id) {
+    public SuccessfulBookClubRegistrationBodyModel getClubById(String accessToken, int id) {
         return given(clubsRequestSpec)
                 .header("Authorization", "Bearer " + accessToken)
                 .pathParam("id", id)
                 .when()
                 .get("/clubs/{id}/")
                 .then()
-                .spec(successfulBookClubsListResponseSpec)
+                .spec(successfulBookClubListGetResponseSpec)
                 .extract()
-                .as(BookClubsListResponseModel.class);
+                .as(SuccessfulBookClubRegistrationBodyModel.class);
     }
 
 
@@ -147,4 +146,18 @@ public class ClubsApiClient {
                 .extract()
                 .as(BookClubsListResponseModel.class);
     }
+
+    @Step("Выход из клуба")
+    public void bookClubMemberDelete(
+            String accessToken, int id) {
+        given(permissionBookClubDeleteRequestSpec)
+                .header("Authorization", "Bearer " + accessToken)
+                .pathParam("id", id)
+                .when()
+                .delete("/clubs/{id}/members/me/")
+                .then()
+                .log().all();
+    }
+
+
 }

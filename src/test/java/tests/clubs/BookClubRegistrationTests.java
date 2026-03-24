@@ -65,13 +65,12 @@ public class BookClubRegistrationTests extends TestBase {
                             publicationYear,
                             description,
                             telegramChatLink);
-                    SuccessfulBookClubRegistrationResponseModel response =
-                            api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
-                    return response;
+                    return api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
+
                 });
         step("Проверка соответствия полученных данных в ответе", () -> {
-            int idFromResponse = registrationResponseBookClub.id();
-            assertThat(idFromResponse).isGreaterThan(0);
+            assertThat(registrationResponseBookClub.id()).isGreaterThan(0);
+            assertThat(registrationResponseBookClub.owner()).isGreaterThan(0);
             assertThat(registrationResponseBookClub.bookTitle()).isEqualTo(bookTitle);
             assertThat(registrationResponseBookClub.bookAuthors()).isEqualTo(bookAuthors);
             assertThat(registrationResponseBookClub.publicationYear()).isEqualTo(publicationYear);

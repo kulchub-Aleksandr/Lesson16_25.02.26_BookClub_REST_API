@@ -71,9 +71,7 @@ public class BookClubDeleteTests extends TestBase {
                             publicationYear,
                             description,
                             telegramChatLink);
-                    SuccessfulBookClubRegistrationResponseModel response =
-                            api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
-                    return response;
+                    return api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
                 });
         step("Проверка соответствия полученных данных в ответе", () -> {
             int idFromResponse = registrationResponse.id();
@@ -118,9 +116,7 @@ public class BookClubDeleteTests extends TestBase {
                             publicationYear,
                             description,
                             telegramChatLink);
-                    SuccessfulBookClubRegistrationResponseModel response =
-                            api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
-                    return response;
+                    return api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
                 });
         step("Проверка соответствия полученных данных в ответе", () -> {
             int idFromResponse = registrationResponseBookClub.id();

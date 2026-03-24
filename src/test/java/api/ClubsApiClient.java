@@ -5,6 +5,7 @@ import models.clubs.deleteBookClub.PermissionUnsuccessfulBookClubDeleteResponseM
 import models.clubs.listBookClub.BookClubsListResponseModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
+import models.clubs.updateBookClub.SuccessfulBookClubUpdateBodyModel;
 
 
 import static io.restassured.RestAssured.given;
@@ -34,7 +35,7 @@ public class ClubsApiClient {
                 .as(SuccessfulBookClubRegistrationResponseModel.class);
     }
 
-    @Step("Обновление данных клуба")
+    @Step("Обновление данных клуба методом PUT")
     public SuccessfulBookClubRegistrationResponseModel bookClubsUpdate(
             String accessToken,
             SuccessfulBookClubRegistrationBodyModel body,
@@ -45,6 +46,23 @@ public class ClubsApiClient {
                 .pathParam("id", id)
                 .when()
                 .put("/clubs/{id}/")
+                .then()
+                .spec(successfulBookClubUpdateResponseSpec)
+                .extract()
+                .as(SuccessfulBookClubRegistrationResponseModel.class);
+    }
+
+    @Step("Обновление данных клуба методом PATCH")
+    public SuccessfulBookClubRegistrationResponseModel bookClubsPartialUpdate(
+            String accessToken,
+            SuccessfulBookClubUpdateBodyModel body,
+            int id) {
+        return given(bookClubUpdateRequestSpec)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(body)
+                .pathParam("id", id)
+                .when()
+                .patch("/clubs/{id}/")
                 .then()
                 .spec(successfulBookClubUpdateResponseSpec)
                 .extract()

@@ -3,6 +3,7 @@ package tests.clubs;
 import models.clubs.listBookClub.BookClubsListResponseModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
+import models.clubs.updateBookClub.SuccessfulBookClubUpdateBodyModel;
 import models.users.login.LoginBodyModel;
 import models.users.registration.RegistrationBodyModel;
 import models.users.registration.SuccessfulRegistrationResponseModel;
@@ -28,6 +29,7 @@ public class BookClubUpdateTests extends TestBase {
     private Integer publicationYear;
     private String description;
     private String telegramChatLink;
+
     private String bookTitle_1;
     private String bookAuthors_1;
     private Integer publicationYear_1;
@@ -57,10 +59,9 @@ public class BookClubUpdateTests extends TestBase {
     }
 
 
-
     @Test
-    @DisplayName("Тест изменение всех данных клуба, с авторизованным пользователем, с созданием клуба")
-    public void getClubsListMembershipWithAnAuthorizedUserCreatingClubTest() {
+    @DisplayName("Тест на изменение всех данных клуба, с авторизованным пользователем, с созданием клуба")
+    public void updateClubWithAnAuthorizedUserCreatingClubTest() {
 
         SuccessfulRegistrationResponseModel registrationUserResponse =
                 step("Регистрация нового пользователя", () -> {
@@ -105,7 +106,7 @@ public class BookClubUpdateTests extends TestBase {
                             publicationYear_1,
                             description_1,
                             telegramChatLink_1);
-                    return api.clubs.bookClubsUpdate(actualAccessToken, registrationClubData,registrationResponseBookClub.id());
+                    return api.clubs.bookClubsUpdate(actualAccessToken, registrationClubData, registrationResponseBookClub.id());
                 });
 
         step("Проверка соответствия полученных данных в ответе", () -> {
@@ -116,7 +117,6 @@ public class BookClubUpdateTests extends TestBase {
             assertThat(updateBookClubResponse.publicationYear()).isEqualTo(publicationYear_1);
             assertThat(updateBookClubResponse.description()).isEqualTo(description_1);
             assertThat(updateBookClubResponse.telegramChatLink()).isEqualTo(telegramChatLink_1);
-
         });
 
         SuccessfulBookClubRegistrationResponseModel response =
@@ -133,7 +133,83 @@ public class BookClubUpdateTests extends TestBase {
             assertThat(response.publicationYear()).isEqualTo(publicationYear_1);
             assertThat(response.description()).isEqualTo(description_1);
             assertThat(response.telegramChatLink()).isEqualTo(telegramChatLink_1);
+        });
 
+        api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
+        api.users.deleteUserAuthorized(actualAccessToken);
+    }
+
+    @Test
+    @DisplayName("Тест на изменение частичных данных клуба, с авторизованным пользователем, с созданием клуба")
+    public void partialUpdateClubWithAnAuthorizedUserCreatingClubTest() {
+
+        SuccessfulRegistrationResponseModel registrationUserResponse =
+                step("Регистрация нового пользователя", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return api.users.registration(registrationData);
+                });
+
+        step("Проверка соответствия отправленных данных с данными в ответе", () -> {
+            assertThat(registrationUserResponse.username()).isEqualTo(username);
+        });
+
+        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return api.auth.loginAndGetAccessToken(loginData);
+        });
+
+        SuccessfulBookClubRegistrationResponseModel registrationResponseBookClub =
+                step("Регистрация нового клуба и проверка ответа (201)", () -> {
+                    SuccessfulBookClubRegistrationBodyModel registrationClubData = new SuccessfulBookClubRegistrationBodyModel(
+                            bookTitle,
+                            bookAuthors,
+                            publicationYear,
+                            description,
+                            telegramChatLink);
+                    return api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
+                });
+        step("Проверка соответствия полученных данных в ответе", () -> {
+            assertThat(registrationResponseBookClub.id()).isGreaterThan(0);
+            assertThat(registrationResponseBookClub.owner()).isGreaterThan(0);
+            assertThat(registrationResponseBookClub.bookTitle()).isEqualTo(bookTitle);
+            assertThat(registrationResponseBookClub.bookAuthors()).isEqualTo(bookAuthors);
+            assertThat(registrationResponseBookClub.publicationYear()).isEqualTo(publicationYear);
+            assertThat(registrationResponseBookClub.description()).isEqualTo(description);
+            assertThat(registrationResponseBookClub.telegramChatLink()).isEqualTo(telegramChatLink);
+        });
+
+        SuccessfulBookClubRegistrationResponseModel updateBookClubResponse =
+                step("Частичное внесение изменений в данные клуба", () -> {
+                    SuccessfulBookClubUpdateBodyModel updateClubData = new SuccessfulBookClubUpdateBodyModel(
+                            publicationYear_1,
+                            description_1);
+                    return api.clubs.bookClubsPartialUpdate(actualAccessToken, updateClubData, registrationResponseBookClub.id());
+                });
+
+        step("Проверка соответствия полученных данных в ответе", () -> {
+            assertThat(updateBookClubResponse.id()).isGreaterThan(0);
+            assertThat(updateBookClubResponse.owner()).isGreaterThan(0);
+            assertThat(updateBookClubResponse.bookTitle()).isEqualTo(bookTitle);
+            assertThat(updateBookClubResponse.bookAuthors()).isEqualTo(bookAuthors);
+            assertThat(updateBookClubResponse.publicationYear()).isEqualTo(publicationYear_1);
+            assertThat(updateBookClubResponse.description()).isEqualTo(description_1);
+            assertThat(updateBookClubResponse.telegramChatLink()).isEqualTo(telegramChatLink);
+        });
+
+        SuccessfulBookClubRegistrationResponseModel response =
+                step("Тест на получение клуба по ID и проверка что данные изменились", () -> {
+
+                    return api.clubs.getClubByIdAfterPut(actualAccessToken, registrationResponseBookClub.id());
+                });
+
+        step("Проверка соответствия полученных данных в ответе", () -> {
+            assertThat(response.id()).isGreaterThan(0);
+            assertThat(response.owner()).isGreaterThan(0);
+            assertThat(response.bookTitle()).isEqualTo(bookTitle);
+            assertThat(response.bookAuthors()).isEqualTo(bookAuthors);
+            assertThat(response.publicationYear()).isEqualTo(publicationYear_1);
+            assertThat(response.description()).isEqualTo(description_1);
+            assertThat(response.telegramChatLink()).isEqualTo(telegramChatLink);
         });
 
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());

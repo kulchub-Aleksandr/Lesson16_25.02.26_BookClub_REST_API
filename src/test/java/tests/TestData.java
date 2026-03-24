@@ -24,11 +24,8 @@ public class TestData {
 
 
     public String getPassword() {
-        return faker.text().text(Text.TextSymbolsBuilder.builder()
-                .len(8).with(EN_UPPERCASE, 2)
-                .with(DIGITS, 3)
-                .build()
-        );
+        return
+                faker.credentials().password();
     }
 
     public String getFirstName() {

@@ -31,8 +31,6 @@ public class BookClubMembersTests extends TestBase {
     private String telegramChatLink;
 
 
-
-
     @BeforeEach
     public void prepareTestData() {
         username = testData.getUsername();
@@ -133,13 +131,15 @@ public class BookClubMembersTests extends TestBase {
             assertThat(response.members()).contains(registrationUserResponse_1.id());
 
             List<Integer> members = response.members();
-            assertThat(members).hasSize(2)
-                    .as("Клуб должен содержать ровно двух участников");
-
-            assertThat(members.get(0)).isEqualTo(registrationUserResponse.id())
-                    .as("Первый в списке участников должен быть владелец клуба");
-            assertThat(members.get(1)).isEqualTo(registrationUserResponse_1.id())
-                    .as("Второй в списке участников должен быть новый участник");
+            assertThat(members)
+                    .as("Клуб должен содержать ровно двух участников")
+                    .hasSize(2);
+            assertThat(members.get(0))
+                    .as("Первый в списке участников должен быть владелец клуба")
+                    .isEqualTo(registrationUserResponse.id());
+            assertThat(members.get(1))
+                    .as("Второй в списке участников должен быть новый участник")
+                    .isEqualTo(registrationUserResponse_1.id());
 
         });
 
@@ -220,13 +220,16 @@ public class BookClubMembersTests extends TestBase {
             assertThat(response.members()).contains(registrationUserResponse_1.id());
 
             List<Integer> members = response.members();
-            assertThat(members).hasSize(2)
-                    .as("Клуб должен содержать ровно двух участников");
+            assertThat(members)
+                    .as("Клуб должен содержать ровно двух участников")
+                    .hasSize(2);
 
-            assertThat(members.get(0)).isEqualTo(registrationUserResponse.id())
-                    .as("Первый в списке участников должен быть владелец клуба");
-            assertThat(members.get(1)).isEqualTo(registrationUserResponse_1.id())
-                    .as("Второй в списке участников должен быть новый участник");
+            assertThat(members.get(0))
+                    .as("Первый в списке участников должен быть владелец клуба")
+                    .isEqualTo(registrationUserResponse.id());
+            assertThat(members.get(1))
+                    .as("Второй в списке участников должен быть новый участник")
+                    .isEqualTo(registrationUserResponse_1.id());
         });
 
         step("Выход из членов клуба", () -> {

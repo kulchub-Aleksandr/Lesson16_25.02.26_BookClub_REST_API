@@ -1,4 +1,4 @@
-package models.clubs.reviewsPostBookClub;
+package models.clubs.reviewsBookClub;
 
 public record UserRecord(
         Integer id,

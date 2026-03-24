@@ -1,7 +1,7 @@
-package models.clubs.reviewsPostBookClub;
+package models.clubs.reviewsBookClub;
 
 
-public record SuccessfulBookClubReviewsBodyModel(
+public record SuccessfulReviewsPostBookClubBodyModel(
         Integer club,
         String review,
         Integer assessment,

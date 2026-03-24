@@ -1,9 +1,9 @@
-package models.clubs.reviewsPostBookClub;
+package models.clubs.reviewsBookClub;
 
 import java.time.OffsetDateTime;
 
 
-public record SuccessfulBookClubReviewsResponseModel(
+public record SuccessfulReviewsPostBookClubResponseModel(
         Integer id,
         Integer club,
         UserRecord user,

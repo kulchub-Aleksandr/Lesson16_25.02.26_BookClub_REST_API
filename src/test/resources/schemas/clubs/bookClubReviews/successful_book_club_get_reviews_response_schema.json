@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$ref": "#/definitions/ReviewsListResponse",
+  "definitions": {
+    "ReviewsListResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "next": {
+          "type": ["string", "null"],
+          "format": "uri"
+        },
+        "previous": {
+          "type": ["string", "null"],
+          "format": "uri"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ReviewItem"
+          }
+        }
+      },
+      "required": ["count", "next", "previous", "results"],
+      "title": "ReviewsListResponse"
+    },
+    "ReviewItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "club": {
+          "type": "integer"
+        },
+        "user": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "username": {
+              "type": "string"
+            }
+          },
+          "required": ["id", "username"]
+        },
+        "review": {
+          "type": "string"
+        },
+        "assessment": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "readPages": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modified": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "club",
+        "user",
+        "review",
+        "assessment",
+        "readPages",
+        "created",
+        "modified"
+      ],
+      "title": "ReviewItem"
+    }
+  }
+}

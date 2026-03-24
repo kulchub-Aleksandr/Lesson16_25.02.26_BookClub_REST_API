@@ -5,8 +5,9 @@ import models.clubs.deleteBookClub.PermissionUnsuccessfulBookClubDeleteResponseM
 import models.clubs.listBookClub.BookClubsListResponseModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
-import models.clubs.reviewsPostBookClub.SuccessfulBookClubReviewsBodyModel;
-import models.clubs.reviewsPostBookClub.SuccessfulBookClubReviewsResponseModel;
+import models.clubs.reviewsBookClub.SuccessfulReviewsGetBookClubResponseModel;
+import models.clubs.reviewsBookClub.SuccessfulReviewsPostBookClubBodyModel;
+import models.clubs.reviewsBookClub.SuccessfulReviewsPostBookClubResponseModel;
 import models.clubs.updateBookClub.SuccessfulBookClubUpdateBodyModel;
 
 
@@ -17,8 +18,7 @@ import static specs.clubs.bookClubList.BookClubListSpec.*;
 import static specs.clubs.bookClubMembers.BookClubMembersSpec.*;
 import static specs.clubs.bookClubRegistration.BookClubRegistrationSpec.bookClubRegistrationRequestSpec;
 import static specs.clubs.bookClubRegistration.BookClubRegistrationSpec.successfulBookClubRegistrationResponseSpec;
-import static specs.clubs.bookClubReviewsPost.BookClubReviewsSpec.reviewsBookClubRequestSpec;
-import static specs.clubs.bookClubReviewsPost.BookClubReviewsSpec.reviewsPostBookClubResponseSpec;
+import static specs.clubs.bookClubReviewsPost.BookClubReviewsSpec.*;
 import static specs.clubs.bookClubUpdate.BookClubUpdateSpec.bookClubUpdateRequestSpec;
 import static specs.clubs.bookClubUpdate.BookClubUpdateSpec.successfulBookClubUpdateResponseSpec;
 
@@ -126,7 +126,7 @@ public class ClubsApiClient {
     }
 
 
-    @Step("Получение клуба  GET /clubs/{id}")
+    @Step("Получение клуба  GET /clubs/{id} после внесенных изменений")
     public SuccessfulBookClubRegistrationResponseModel getClubByIdAfterPut(String accessToken, long id) {
         return given(clubsRequestSpec)
                 .header("Authorization", "Bearer " + accessToken)
@@ -227,8 +227,8 @@ public class ClubsApiClient {
     }
 
     @Step("Оставление отзыва на книгу")
-    public SuccessfulBookClubReviewsResponseModel bookClubReviewsPost(
-            String accessToken, SuccessfulBookClubReviewsBodyModel body) {
+    public SuccessfulReviewsPostBookClubResponseModel bookClubReviewsPost(
+            String accessToken, SuccessfulReviewsPostBookClubBodyModel body) {
         return given(reviewsBookClubRequestSpec)
                 .header("Authorization", "Bearer " + accessToken)
                 .body(body)
@@ -237,7 +237,21 @@ public class ClubsApiClient {
                 .then()
                 .spec(reviewsPostBookClubResponseSpec)
                 .extract()
-                .as(SuccessfulBookClubReviewsResponseModel.class);
+                .as(SuccessfulReviewsPostBookClubResponseModel.class);
+    }
+
+    @Step("Просмотр отзывов на книгу")
+    public SuccessfulReviewsGetBookClubResponseModel getReviewsBookClub(int idClub, int page, int page_size) {
+        return given(reviewsBookClubRequestSpec)
+                .pathParam("idClub", idClub)
+                .pathParam("page", page)
+                .pathParam("page_size", page_size)
+                .when()
+                .get("/clubs/reviews/?club={idClub}&page={page}&page_size={page_size}")
+                .then()
+                .spec(reviewsGetBookClubResponseSpec)
+                .extract()
+                .as(SuccessfulReviewsGetBookClubResponseModel.class);
     }
 
 

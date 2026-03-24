@@ -2,8 +2,9 @@ package tests.clubs;
 
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
-import models.clubs.reviewsPostBookClub.SuccessfulBookClubReviewsBodyModel;
-import models.clubs.reviewsPostBookClub.SuccessfulBookClubReviewsResponseModel;
+import models.clubs.reviewsBookClub.SuccessfulReviewsGetBookClubResponseModel;
+import models.clubs.reviewsBookClub.SuccessfulReviewsPostBookClubBodyModel;
+import models.clubs.reviewsBookClub.SuccessfulReviewsPostBookClubResponseModel;
 import models.users.login.LoginBodyModel;
 import models.users.registration.RegistrationBodyModel;
 import models.users.registration.SuccessfulRegistrationResponseModel;
@@ -12,8 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import tests.TestBase;
 import tests.TestData;
-
-import java.util.List;
 
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,7 +52,7 @@ public class BookClubReviewsTests extends TestBase {
 
     @Test
     @DisplayName("Тест на оставление отзыва на книгу, с авторизованным пользователем, с созданием клуба")
-    public void membershipClubWithAnAuthorizedUserCreatingClubTest() {
+    public void bookClubReviewsPostWithAnAuthorizedUserCreatingClubTest() {
 
         SuccessfulRegistrationResponseModel registrationUserResponse =
                 step("Регистрация нового пользователя", () -> {
@@ -121,10 +120,10 @@ public class BookClubReviewsTests extends TestBase {
             assertThat(response.members()).contains(registrationUserResponse_1.id());
         });
 
-        SuccessfulBookClubReviewsResponseModel reviewsResponse =
+        SuccessfulReviewsPostBookClubResponseModel reviewsResponse =
                 step("Публикация отзыва на книгу", () -> {
-                    SuccessfulBookClubReviewsBodyModel reviewsData =
-                            new SuccessfulBookClubReviewsBodyModel(response.id(), newReview, 5, 22);
+                    SuccessfulReviewsPostBookClubBodyModel reviewsData =
+                            new SuccessfulReviewsPostBookClubBodyModel(response.id(), newReview, 5, 22);
                     return api.clubs.bookClubReviewsPost(actualAccessToken_1, reviewsData);
                 });
 
@@ -144,8 +143,8 @@ public class BookClubReviewsTests extends TestBase {
 
 
     @Test
-    @DisplayName("Тест на выход из членов клуба, с авторизованным пользователем, с созданием клуба")
-    public void membershipDeleteClubWithAnAuthorizedUserCreatingClubTest() {
+    @DisplayName("Тест на вызов отзывов на книгу, с авторизованным пользователем, с созданием клуба")
+    public void getReviewsBookClubWithAnAuthorizedUserCreatingClubTest() {
 
         SuccessfulRegistrationResponseModel registrationUserResponse =
                 step("Регистрация нового пользователя", () -> {
@@ -211,41 +210,41 @@ public class BookClubReviewsTests extends TestBase {
             assertThat(response.owner()).isGreaterThan(0);
             assertThat(response.members()).contains(response.owner());
             assertThat(response.members()).contains(registrationUserResponse_1.id());
-
-            List<Integer> members = response.members();
-            assertThat(members).hasSize(2)
-                    .as("Клуб должен содержать ровно двух участников");
-
-            assertThat(members.get(0)).isEqualTo(registrationUserResponse.id())
-                    .as("Первый в списке участников должен быть владелец клуба");
-            assertThat(members.get(1)).isEqualTo(registrationUserResponse_1.id())
-                    .as("Второй в списке участников должен быть новый участник");
         });
 
-        step("Выход из членов клуба", () -> {
-            api.clubs.bookClubMemberDelete(actualAccessToken_1, registrationResponseBookClub.id());
-        });
-
-        SuccessfulBookClubRegistrationResponseModel response_2 =
-                step("Тест на получение информации клуба по ID и проверка что данные изменились", () -> {
-                    return api.clubs.getClubById(actualAccessToken, registrationResponseBookClub.id());
+        SuccessfulReviewsPostBookClubResponseModel reviewsResponse =
+                step("Публикация отзыва на книгу", () -> {
+                    SuccessfulReviewsPostBookClubBodyModel reviewsData =
+                            new SuccessfulReviewsPostBookClubBodyModel(response.id(), newReview, 5, 22);
+                    return api.clubs.bookClubReviewsPost(actualAccessToken_1, reviewsData);
                 });
 
-        step("Проверка что из членов клуба удалился второй пользователь", () -> {
-            assertThat(response_2.id()).isGreaterThan(0);
-            assertThat(response_2.owner()).isGreaterThan(0);
-            assertThat(response_2.members()).contains(response_2.owner());
-
-            List<Integer> members = response_2.members();
-            assertThat(members).hasSize(1)
-                    .as("Клуб должен содержать одного участника");
-
-
+        step("Проверка что отзыв второго пользователя добавился ", () -> {
+            assertThat(reviewsResponse.id()).isGreaterThan(0);
+            assertThat(reviewsResponse.club()).isGreaterThan(0);
+            assertThat(reviewsResponse.user().id()).isEqualTo(registrationUserResponse_1.id());
+            assertThat(reviewsResponse.user().username()).isEqualTo(registrationUserResponse_1.username());
+            assertThat(reviewsResponse.review()).isEqualTo(newReview);
         });
+
+        SuccessfulReviewsGetBookClubResponseModel reviewsListResponse =
+                step("Запрос списка отзывов  ", () -> {
+//                    SuccessfulReviewsPostBookClubBodyModel reviewsData =
+//                            new SuccessfulReviewsPostBookClubBodyModel(response.id(), newReview, 5, 22);
+                    return api.clubs.getReviewsBookClub(registrationResponseBookClub.id(), 1, 100);
+                });
+        step("Проверка что отзывы видны ", () -> {
+            assertThat(reviewsListResponse.count()).isGreaterThan(0);
+            assertThat(reviewsListResponse.results().getFirst().user().id()).isEqualTo(registrationUserResponse_1.id());
+            assertThat(reviewsListResponse.results().getFirst().user().username()).isEqualTo(registrationUserResponse_1.username());
+            assertThat(reviewsListResponse.results().getFirst().review()).isEqualTo(newReview);//
+        });
+
 
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
         api.users.deleteUserAuthorized(actualAccessToken);
         api.users.deleteUserAuthorized(actualAccessToken_1);
+
     }
 
 }

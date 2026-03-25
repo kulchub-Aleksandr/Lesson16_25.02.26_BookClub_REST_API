@@ -30,7 +30,6 @@ public class LoginTests extends TestBase {
         wrongUsername = username + "qa";
         emptyPassword = testData.getEmptyPassword();
         emptyUsername = testData.getEmptyUsername();
-
     }
 
     @AfterEach
@@ -39,7 +38,6 @@ public class LoginTests extends TestBase {
             LoginBodyModel loginData = new LoginBodyModel(username, password);
             String accessToken = api.auth.loginAndGetAccessToken(loginData);
             api.users.deleteUserAuthorized(accessToken);
-
         }
     }
 
@@ -72,7 +70,6 @@ public class LoginTests extends TestBase {
             assertThat(actualRefresh).startsWith(expectedTokenPath);
             assertThat(actualAccess).isNotEqualTo(actualRefresh);
         });
-
     }
 
     @Test
@@ -88,7 +85,6 @@ public class LoginTests extends TestBase {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
-
 
         WrongCredentialsLoginResponseModel loginResponse =
                 step("Авторизация с применением не правильного пароля и проверка ответа (401)", () -> {
@@ -142,7 +138,6 @@ public class LoginTests extends TestBase {
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-
         WrongCredentialsLoginResponseModel loginResponse =
                 step("Авторизация с применением не правильного логина и проверка ответа (401)", () -> {
                     LoginBodyModel wrongLoginData = new LoginBodyModel(wrongUsername, password);
@@ -151,7 +146,6 @@ public class LoginTests extends TestBase {
         step("Проверка текста ошибки в ответе", () -> {
             String expectedDetailError = "Invalid username or password.";
             String actualDetailError = loginResponse.detail();
-
             assertThat(actualDetailError).isEqualTo(expectedDetailError);
         });
 
@@ -170,7 +164,6 @@ public class LoginTests extends TestBase {
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-
         EmptyUserResponseModel loginResponse =
                 step("Авторизация с применением пустого поля для логина и проверка ответа (400)", () -> {
                     LoginBodyModel wrongLoginData = new LoginBodyModel(emptyUsername, password);
@@ -182,7 +175,6 @@ public class LoginTests extends TestBase {
 
             assertThat(actualDetailError).isEqualTo(expectedDetailError);
         });
-
     }
 
     @Test

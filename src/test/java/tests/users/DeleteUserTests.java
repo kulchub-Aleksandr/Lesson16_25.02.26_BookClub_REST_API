@@ -31,7 +31,6 @@ public class DeleteUserTests extends TestBase {
             LoginBodyModel loginData = new LoginBodyModel(username, password);
             String accessToken = api.auth.loginAndGetAccessToken(loginData);
             api.users.deleteUserAuthorized(accessToken);
-
         }
     }
 
@@ -47,11 +46,6 @@ public class DeleteUserTests extends TestBase {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
-
-//        LoginBodyModel loginData = new LoginBodyModel(username, password);
-//
-//        String accessToken = api.auth.loginAndGetAccessToken(loginData);
-//        api.users.deleteUserAuthorized(accessToken);
     }
 
     @Test
@@ -75,6 +69,5 @@ public class DeleteUserTests extends TestBase {
             String expectedDetail = "Authentication credentials were not provided.";
             assertThat(actualDetail).isEqualTo(expectedDetail);
         });
-
     }
 }

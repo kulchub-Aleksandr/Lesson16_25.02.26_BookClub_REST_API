@@ -50,8 +50,6 @@ public class RegistrationTests extends TestBase {
             return api.auth.loginAndGetAccessToken(loginData);
         });
         api.users.deleteUserAuthorized(accessToken);
-
-
     }
 
     @Test
@@ -67,7 +65,6 @@ public class RegistrationTests extends TestBase {
         step("Проверка соответствия отправленных данных с данными в ответе", () -> {
             assertThat(registrationResponse_1.username()).isEqualTo(username);
         });
-
 
         ExistingUserResponseModel registrationResponse_2 =
                 step("Регистрация нового пользователя с уже существующими регистрационными данными и проверка ответа (400)", () -> {
@@ -86,8 +83,6 @@ public class RegistrationTests extends TestBase {
             return api.auth.loginAndGetAccessToken(loginData);
         });
         api.users.deleteUserAuthorized(accessToken);
-
-
     }
 
     @Test
@@ -104,7 +99,6 @@ public class RegistrationTests extends TestBase {
             String actualError = registrationResponse.username().getFirst();
             assertThat(actualError).isEqualTo(expectedError);
         });
-
     }
 
     @Test
@@ -116,7 +110,6 @@ public class RegistrationTests extends TestBase {
                     RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
                     return api.users.registrationUnsupportedMediaType(registrationData);
                 });
-
 
         step("Проверка текста ошибки в ответе", () -> {
             String expectedError = "Unsupported media type \"text/plain; charset=ISO-8859-1\" in request.";

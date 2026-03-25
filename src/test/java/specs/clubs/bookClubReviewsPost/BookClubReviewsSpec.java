@@ -27,6 +27,6 @@ public class BookClubReviewsSpec {
             .expectStatusCode(200)
             .expectBody(matchesJsonSchemaInClasspath(
                     "schemas/clubs/bookClubReviews/successful_book_club_get_reviews_response_schema.json"))
-//            .expectBody("detail", notNullValue())
+            .expectBody("count", notNullValue())
             .build();
 }

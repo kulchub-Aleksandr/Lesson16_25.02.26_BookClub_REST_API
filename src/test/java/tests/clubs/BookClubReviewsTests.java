@@ -49,7 +49,6 @@ public class BookClubReviewsTests extends TestBase {
         newReview = "Пробный отзыв";
     }
 
-
     @Test
     @DisplayName("Тест на оставление отзыва на книгу, с авторизованным пользователем, с созданием клуба")
     public void bookClubReviewsPostWithAnAuthorizedUserCreatingClubTest() {
@@ -244,7 +243,6 @@ public class BookClubReviewsTests extends TestBase {
         api.users.deleteUserAuthorized(actualAccessToken_1);
 
     }
-
 
     @Test
     @DisplayName("Тест на удаление отзыва на книгу, с авторизованным пользователем, с созданием клуба")

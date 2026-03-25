@@ -2,7 +2,6 @@ package tests.clubs;
 
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
-import models.clubs.updateBookClub.SuccessfulBookClubUpdateBodyModel;
 import models.users.login.LoginBodyModel;
 import models.users.registration.RegistrationBodyModel;
 import models.users.registration.SuccessfulRegistrationResponseModel;
@@ -109,7 +108,6 @@ public class BookClubMembersTests extends TestBase {
                     return api.clubs.getClubById(actualAccessToken_1, registrationResponseBookClub.id());
                 });
 
-
         step("Отладка: проверка значений перед сравнением", () -> {
             System.out.println("response.members(): " + response.members());
             System.out.println("response.members().get(0): " + response.members().get(0)); // владелец
@@ -140,13 +138,11 @@ public class BookClubMembersTests extends TestBase {
             assertThat(members.get(1))
                     .as("Второй в списке участников должен быть новый участник")
                     .isEqualTo(registrationUserResponse_1.id());
-
         });
 
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
         api.users.deleteUserAuthorized(actualAccessToken);
         api.users.deleteUserAuthorized(actualAccessToken_1);
-
     }
 
 
@@ -247,9 +243,9 @@ public class BookClubMembersTests extends TestBase {
             assertThat(response_2.members()).contains(response_2.owner());
 
             List<Integer> members = response_2.members();
-            assertThat(members).hasSize(1)
-                    .as("Клуб должен содержать одного участника");
-
+            assertThat(members)
+                    .as("Клуб должен содержать одного участника")
+                    .hasSize(1);
 
         });
 

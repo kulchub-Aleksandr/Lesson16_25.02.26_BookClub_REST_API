@@ -28,7 +28,6 @@ public class LogoutTests extends TestBase {
         password = testData.getPassword();
     }
 
-
     @Test
     @DisplayName("Тест на проверку выхода из системы зарегистрированного пользователя")
     public void successfulLogoutTest() {
@@ -60,7 +59,6 @@ public class LogoutTests extends TestBase {
             return api.auth.loginAndGetAccessToken(loginData);
         });
         api.users.deleteUserAuthorized(accessToken);
-
     }
 
     @Test
@@ -82,7 +80,6 @@ public class LogoutTests extends TestBase {
 
             assertThat(actualDetail).isEqualTo(expectedDetail);
             assertThat(actualCode).isEqualTo(expectedCode);
-
         });
     }
 
@@ -117,5 +114,4 @@ public class LogoutTests extends TestBase {
             assertThat(actualRefresh).isEqualTo(expectedRefresh);
         });
     }
-
 }

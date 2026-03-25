@@ -74,7 +74,6 @@ public class UsersApiClient {
                 .spec(successfulUpdateResponseSpec)
                 .extract()
                 .as(SuccessfulUpdateUserResponseModel.class);
-
     }
 
     @Step("Получение данных User методом get и проверка ответа (200)")
@@ -133,7 +132,7 @@ public class UsersApiClient {
 
     public NotProvidedAuthenticationCredentialsResponseModel
     deleteUserUnauthorized() {
-        return given(updateRequestSpec)//
+        return given(updateRequestSpec)
                 .when()
                 .delete("/users/me/")
                 .then()
@@ -147,8 +146,6 @@ public class UsersApiClient {
     @Step("Удаление пользователя")
     public void deleteUserAuthorized(String accessToken) {
         given(updateRequestSpec)
-//                .filter(withCustomTemplate())
-//                .log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .when()
                 .delete("/users/me/")

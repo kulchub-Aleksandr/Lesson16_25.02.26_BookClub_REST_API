@@ -38,7 +38,6 @@ public class UpdateUserTests extends TestBase {
             LoginBodyModel loginData = new LoginBodyModel(username, password);
             String accessToken = api.auth.loginAndGetAccessToken(loginData);
             api.users.deleteUserAuthorized(accessToken);
-
         }
     }
 

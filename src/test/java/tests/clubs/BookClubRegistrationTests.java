@@ -12,7 +12,6 @@ import tests.TestBase;
 import tests.TestData;
 
 import static io.qameta.allure.Allure.step;
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class BookClubRegistrationTests extends TestBase {
@@ -66,8 +65,8 @@ public class BookClubRegistrationTests extends TestBase {
                             description,
                             telegramChatLink);
                     return api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
-
                 });
+
         step("Проверка соответствия полученных данных в ответе", () -> {
             assertThat(registrationResponseBookClub.id()).isGreaterThan(0);
             assertThat(registrationResponseBookClub.owner()).isGreaterThan(0);

@@ -1,6 +1,5 @@
 package tests.clubs;
 
-import models.clubs.listBookClub.BookClubsListResponseModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
 import models.clubs.updateBookClub.SuccessfulBookClubUpdateBodyModel;
@@ -8,7 +7,6 @@ import models.users.login.LoginBodyModel;
 import models.users.registration.RegistrationBodyModel;
 import models.users.registration.SuccessfulRegistrationResponseModel;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import tests.TestBase;
@@ -20,9 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BookClubUpdateTests extends TestBase {
     private final TestData testData = new TestData();
     private String username;
-    private String username_1;
     private String password;
-    private String password_1;
 
     private String bookTitle;
     private String bookAuthors;
@@ -40,9 +36,7 @@ public class BookClubUpdateTests extends TestBase {
     @BeforeEach
     public void prepareTestData() {
         username = testData.getUsername();
-        username_1 = testData.getUsername();
         password = testData.getPassword();
-        password_1 = testData.getPassword();
 
         bookTitle = testData.getBookTitle() + "  qa.guru_039 AlexKulch";
         bookAuthors = testData.getBookAuthor();
@@ -55,9 +49,7 @@ public class BookClubUpdateTests extends TestBase {
         publicationYear_1 = testData.getPublicationYear();
         description_1 = testData.getBookDescription();
         telegramChatLink_1 = testData.getTelegramChatLink();
-
     }
-
 
     @Test
     @DisplayName("Тест на изменение всех данных клуба, с авторизованным пользователем, с созданием клуба")
@@ -121,7 +113,6 @@ public class BookClubUpdateTests extends TestBase {
 
         SuccessfulBookClubRegistrationResponseModel response =
                 step("Тест на получение клуба по ID и проверка что данные изменились", () -> {
-
                     return api.clubs.getClubByIdAfterPut(actualAccessToken, registrationResponseBookClub.id());
                 });
 

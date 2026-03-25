@@ -1,12 +1,8 @@
 package tests;
 
 import net.datafaker.Faker;
-import net.datafaker.providers.base.Text;
 
 import java.util.Random;
-
-import static net.datafaker.providers.base.Text.DIGITS;
-import static net.datafaker.providers.base.Text.EN_UPPERCASE;
 
 public class TestData {
     private final Faker faker = new Faker();

@@ -154,13 +154,12 @@ public class BookClubListTests extends TestBase {
 
         });
 
-//        api.clubs.bookClubDelete(actualAccessToken, registrationResponse.id());
         api.users.deleteUserAuthorized(actualAccessToken);
     }
 
     @Test
-    @DisplayName("Тест фильтрации списка клубов: поиск по членству, с авторизованным пользователем, с созданием клуба")
-    public void getClubsListMembershipWithAnAuthorizedUserCreatingClubTest() {
+    @DisplayName("Тест фильтрации списка клубов: поиск по членству Owner, с авторизованным пользователем, с созданием клуба")
+    public void getClubsListMembershipOwnerWithAnAuthorizedUserCreatingClubTest() {
 
         SuccessfulRegistrationResponseModel registrationUserResponse =
                 step("Регистрация нового пользователя", () -> {
@@ -201,6 +200,73 @@ public class BookClubListTests extends TestBase {
                 step("Тест на получение клуба по  membership=owner", () -> {
 
                     String membership = "owner";
+                    return api.clubs.getClubsBookClubsMembershipListOwner(actualAccessToken, 1, 10, membership);
+                });
+
+        step("Проверка соответствия полученных данных в ответе", () -> {
+            assertThat(response).isNotNull();
+            assertThat(response.count()).isGreaterThanOrEqualTo(0);
+            assertThat(response.results()).isNotNull();
+            assertThat(response.results()).hasSize(1);
+            assertThat(response.results().getFirst().bookTitle())
+                    .as("Название книги не совпадает с запросом в поиске")
+                    .isEqualTo(bookTitle);
+            assertThat(response.results().getFirst().bookAuthors()).isEqualTo(bookAuthors);
+            assertThat(response.results().getFirst().publicationYear()).isEqualTo(publicationYear);
+            assertThat(response.results().getFirst().description()).isEqualTo(description);
+            assertThat(response.results().getFirst().telegramChatLink()).isEqualTo(telegramChatLink);
+            assertThat(response.results().getFirst().owner()).isEqualTo(registrationResponseBookClub.owner());
+
+
+        });
+
+        api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
+        api.users.deleteUserAuthorized(actualAccessToken);
+    }
+
+    @Test
+    @DisplayName("Тест фильтрации списка клубов: поиск по членству Member, с авторизованным пользователем, с созданием клуба")
+    public void getClubsListMembershipMemberWithAnAuthorizedUserCreatingClubTest() {
+
+        SuccessfulRegistrationResponseModel registrationUserResponse =
+                step("Регистрация нового пользователя", () -> {
+                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
+                    return api.users.registration(registrationData);
+                });
+
+        step("Проверка соответствия отправленных данных с данными в ответе", () -> {
+            assertThat(registrationUserResponse.username()).isEqualTo(username);
+        });
+
+        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
+            LoginBodyModel loginData = new LoginBodyModel(username, password);
+            return api.auth.loginAndGetAccessToken(loginData);
+        });
+
+        SuccessfulBookClubRegistrationResponseModel registrationResponseBookClub =
+                step("Регистрация нового клуба и проверка ответа (201)", () -> {
+                    SuccessfulBookClubRegistrationBodyModel registrationClubData = new SuccessfulBookClubRegistrationBodyModel(
+                            bookTitle,
+                            bookAuthors,
+                            publicationYear,
+                            description,
+                            telegramChatLink);
+                    return api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
+                });
+        step("Проверка соответствия полученных данных в ответе", () -> {
+            assertThat(registrationResponseBookClub.id()).isGreaterThan(0);
+            assertThat(registrationResponseBookClub.owner()).isGreaterThan(0);
+            assertThat(registrationResponseBookClub.bookTitle()).isEqualTo(bookTitle);
+            assertThat(registrationResponseBookClub.bookAuthors()).isEqualTo(bookAuthors);
+            assertThat(registrationResponseBookClub.publicationYear()).isEqualTo(publicationYear);
+            assertThat(registrationResponseBookClub.description()).isEqualTo(description);
+            assertThat(registrationResponseBookClub.telegramChatLink()).isEqualTo(telegramChatLink);
+        });
+
+        BookClubsListResponseModel response =
+                step("Тест на получение клуба по  membership=owner", () -> {
+
+                    String membership = "member";
                     return api.clubs.getClubsBookClubsMembershipListOwner(actualAccessToken, 1, 10, membership);
                 });
 

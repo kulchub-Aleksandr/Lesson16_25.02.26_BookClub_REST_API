@@ -18,30 +18,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BookClubListTests extends TestBase {
     private final TestData testData = new TestData();
     private String username;
-    private String username_1;
     private String password;
-    private String password_1;
-
     private String bookTitle;
     private String bookAuthors;
     private Integer publicationYear;
     private String description;
     private String telegramChatLink;
 
-
     @BeforeEach
     public void prepareTestData() {
         username = testData.getUsername();
-        username_1 = testData.getUsername();
         password = testData.getPassword();
-        password_1 = testData.getPassword();
         bookTitle = testData.getBookTitle() + "  qa.guru_039 AlexKulch";
         bookAuthors = testData.getBookAuthor();
         publicationYear = testData.getPublicationYear();
         description = testData.getBookDescription();
         telegramChatLink = testData.getTelegramChatLink();
-
-
     }
 
     @Test
@@ -291,7 +283,6 @@ public class BookClubListTests extends TestBase {
         api.users.deleteUserAuthorized(actualAccessToken);
     }
 
-
     @Test
     @DisplayName("Тест на получение клуба по ID , с авторизованным пользователем, с созданием клуба")
     public void getClubsListByIdWithAnAuthorizedUserCreatingClubTest() {
@@ -347,8 +338,4 @@ public class BookClubListTests extends TestBase {
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
         api.users.deleteUserAuthorized(actualAccessToken);
     }
-
-
-
-
 }

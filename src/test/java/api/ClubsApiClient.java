@@ -12,6 +12,7 @@ import models.clubs.updateBookClub.SuccessfulBookClubUpdateBodyModel;
 
 
 import static io.restassured.RestAssured.given;
+import static specs.BaseSpec.baseRequestSpec;
 import static specs.clubs.bookClubDelete.BookClubDeleteSpec.permissionBookClubDeleteRequestSpec;
 import static specs.clubs.bookClubDelete.BookClubDeleteSpec.permissionUnsuccessfulBookClubDeleteResponseSpec;
 import static specs.clubs.bookClubList.BookClubListSpec.*;
@@ -125,7 +126,6 @@ public class ClubsApiClient {
                 .as(SuccessfulBookClubRegistrationResponseModel.class);
     }
 
-
     @Step("Получение клуба  GET /clubs/{id} после внесенных изменений")
     public SuccessfulBookClubRegistrationResponseModel getClubByIdAfterPut(String accessToken, long id) {
         return given(clubsRequestSpec)
@@ -138,7 +138,6 @@ public class ClubsApiClient {
                 .extract()
                 .as(SuccessfulBookClubRegistrationResponseModel.class);
     }
-
 
     @Step("Получение карточки клуба по названию клуба")
     public BookClubsListResponseModel getClubsListBookTitle(String search, int page, int page_size) {
@@ -252,6 +251,18 @@ public class ClubsApiClient {
                 .spec(reviewsGetBookClubResponseSpec)
                 .extract()
                 .as(SuccessfulReviewsGetBookClubResponseModel.class);
+    }
+
+    @Step("Удаление отзыва на книгу")
+    public void bookClubReviewsDelete(
+            String accessToken, int idReviews) {
+        given(baseRequestSpec)
+                .header("Authorization", "Bearer " + accessToken)
+                .pathParam("id", idReviews)
+                .when()
+                .delete("/clubs/reviews/{id}/")
+                .then()
+                .log().all();
     }
 
 

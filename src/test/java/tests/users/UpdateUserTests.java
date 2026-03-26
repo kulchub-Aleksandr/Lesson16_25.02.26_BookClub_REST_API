@@ -35,8 +35,7 @@ public class UpdateUserTests extends TestBase {
     @AfterEach
     void cleanUpTestUsers() {
         if (username != null && password != null) {
-            LoginBodyModel loginData = new LoginBodyModel(username, password);
-            String accessToken = api.auth.loginAndGetAccessToken(loginData);
+            String accessToken = api.auth.loginAndGetAccessToken(new LoginBodyModel(username, password));
             api.users.deleteUserAuthorized(accessToken);
         }
     }
@@ -45,30 +44,21 @@ public class UpdateUserTests extends TestBase {
     @DisplayName("Тест на проверку изменения всех данных пользователя методом PUT")
     public void successfulUpdateUserTest() {
 
-        SuccessfulRegistrationResponseModel registrationResponse_1 =
-                step("Регистрация нового пользователя", () -> {
-                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-                    return api.users.registration(registrationData);
-                });
-
+        SuccessfulRegistrationResponseModel registrationResponse
+                = api.users.registration(new RegistrationBodyModel(username, password));
         step("Проверка соответствия отправленных данных с данными в ответе", () -> {
-            assertThat(registrationResponse_1.username()).isEqualTo(username);
+            assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
-            LoginBodyModel loginData = new LoginBodyModel(username, password);
-            return api.auth.loginAndGetAccessToken(loginData);
-        });
+        String actualAccessToken = api.auth.loginAndGetAccessToken(new LoginBodyModel(username, password));
 
-        SuccessfulUpdateUserResponseModel updateResponse =
-                step("Отправка запроса put с access-токеном и проверка ответа (200)", () -> {
-                    UpdateBodyModel updateData = new UpdateBodyModel(
+        SuccessfulUpdateUserResponseModel updateResponse
+                = api.users.updateUser(actualAccessToken, new UpdateBodyModel(
                             username,
                             firstName,
                             lastName,
-                            email);
-                    return api.users.update(actualAccessToken, updateData);
-                });
+                            email));
+
         step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(updateResponse.username()).isEqualTo(username);
             assertThat(updateResponse.firstName()).isEqualTo(firstName);
@@ -77,9 +67,8 @@ public class UpdateUserTests extends TestBase {
 
         });
 
-        SuccessfulUpdateUserResponseModel updatedUserData =
-                step("Проверка изменений методом get и проверка ответа (200)", () ->
-                        api.users.getUserData(actualAccessToken));
+        SuccessfulUpdateUserResponseModel updatedUserData
+                = api.users.getUserData(actualAccessToken);
         step("Подтверждение изменений через GET‑запрос", () -> {
             assertThat(updatedUserData.username()).isEqualTo(username);
             assertThat(updatedUserData.firstName()).isEqualTo(firstName);
@@ -94,25 +83,18 @@ public class UpdateUserTests extends TestBase {
     public void notProvidedAuthenticationCredentialsUpdateUserNegativeTest() {
 
         SuccessfulRegistrationResponseModel registrationResponse
-                = step("Регистрация нового пользователя и проверка ответа (201)", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-            return api.users.registration(registrationData);
-        });
+                = api.users.registration(new RegistrationBodyModel(username, password));
         step("Проверка корректности зарегистрированных данных", () -> {
-            assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-
-        NotProvidedAuthenticationCredentialsResponseModel updateResponse =
-                step("Отправка запроса put без предварительной аутентификации и проверка ответа (401)", () -> {
-                    UpdateBodyModel updateData = new UpdateBodyModel(
+        NotProvidedAuthenticationCredentialsResponseModel updateResponse
+                = api.users.updateNotProvidedAuthenticationCredentials(new UpdateBodyModel(
                             username,
                             firstName,
                             lastName,
-                            email);
-                    return api.users.updateNotProvidedAuthenticationCredentials(updateData);
-                });
+                            email));
+
         step("Проверка текста ошибки в ответе", () -> {
             String actualDetail = updateResponse.detail();
             String expectedDetail = "Authentication credentials were not provided.";
@@ -127,34 +109,19 @@ public class UpdateUserTests extends TestBase {
     public void partialUpdateUserTest() {
 
         SuccessfulRegistrationResponseModel registrationResponse
-                = step("Регистрация нового пользователя и проверка ответа (201)", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-            return api.users.registration(registrationData);
-        });
+                = api.users.registration(new RegistrationBodyModel(username, password));
         step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
-            assertThat(registrationResponse.username()).isEqualTo(username);
-            assertThat(registrationResponse.firstName()).isEqualTo("");
-            assertThat(registrationResponse.lastName()).isEqualTo("");
-            assertThat(registrationResponse.email()).isEqualTo("");
-
-            String ipAddrRegexp = "^((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.){3}"
-                    + "(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)$";
-            assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
+            assertThat(registrationResponse.username()).isEqualTo(username);//
         });
 
-        String accessToken = step("Авторизация и получение access-токена для удаления пользователя", () -> {
-            LoginBodyModel loginData = new LoginBodyModel(username, password);
-            return api.auth.loginAndGetAccessToken(loginData);
-        });
+        String accessToken = api.auth.loginAndGetAccessToken(new LoginBodyModel(username, password));
 
-        SuccessfulUpdateUserResponseModel updateResponse =
-                step("Отправка запроса patch с access-токеном и проверка ответа (200)", () -> {
-                    PartialUpdateBodyModel updateData = new PartialUpdateBodyModel(
+        SuccessfulUpdateUserResponseModel updateResponse
+                = api.users.updateWithPatch(accessToken, new PartialUpdateBodyModel(
                             firstName,
-                            lastName);
-                    return api.users.updateWithPatch(accessToken, updateData);
-                });
+                            lastName));
+
         step("Проверка корректности полученных данных", () -> {
             assertThat(updateResponse.id()).isEqualTo(registrationResponse.id());
             assertThat(updateResponse.username()).isEqualTo(username);
@@ -167,9 +134,8 @@ public class UpdateUserTests extends TestBase {
             assertThat(registrationIpAddress).isEqualTo(updateIpAddress);
         });
 
-        SuccessfulUpdateUserResponseModel updatedUserData =
-                step("Проверка изменений методом get и проверка ответа (200)", () ->
-                        api.users.getUserData(accessToken));
+        SuccessfulUpdateUserResponseModel updatedUserData
+                = api.users.getUserData(accessToken);
         step("Подтверждение изменений через GET‑запрос", () -> {
             assertThat(updatedUserData.id()).isEqualTo(registrationResponse.id());
             assertThat(updatedUserData.username()).isEqualTo(username);
@@ -177,8 +143,6 @@ public class UpdateUserTests extends TestBase {
             assertThat(updatedUserData.lastName()).isEqualTo(lastName);
             assertThat(updatedUserData.email()).isEqualTo("");
         });
-
-
     }
 
     @Test
@@ -186,25 +150,18 @@ public class UpdateUserTests extends TestBase {
     public void partialUpdateUserWithPutMethodNegativeTest() {
 
         SuccessfulRegistrationResponseModel registrationResponse
-                = step("Регистрация нового пользователя и проверка ответа (201)", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-            return api.users.registration(registrationData);
-        });
+                = api.users.registration(new RegistrationBodyModel(username, password));
         step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
-            LoginBodyModel loginData = new LoginBodyModel(username, password);
-            return api.auth.loginAndGetAccessToken(loginData);
-        });
+        String actualAccessToken = api.auth.loginAndGetAccessToken(new LoginBodyModel(username, password));
 
-        PartialWithPutMethodUpdateUserResponseModel updateResponse =
-                step("Отправка запроса put с access-токеном и проверка ответа (400)", () -> {
-                    PartialUpdateBodyModel updateData = new PartialUpdateBodyModel(firstName, lastName);
-                    return api.users.updatePartialWithPut(actualAccessToken, updateData);
-                });
+        PartialWithPutMethodUpdateUserResponseModel updateResponse
+                = api.users.updatePartialWithPut(actualAccessToken, new PartialUpdateBodyModel(
+                            firstName, lastName));
+
         step("Проверка текста ошибки в ответе", () -> {
             String actualUsername = updateResponse.username().getFirst();
             String expectedUsername = "This field is required.";

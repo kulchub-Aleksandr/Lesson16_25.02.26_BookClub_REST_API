@@ -28,8 +28,7 @@ public class DeleteUserTests extends TestBase {
     @AfterEach
     void cleanUpTestUsers() {
         if (username != null && password != null) {
-            LoginBodyModel loginData = new LoginBodyModel(username, password);
-            String accessToken = api.auth.loginAndGetAccessToken(loginData);
+            String accessToken = api.auth.loginAndGetAccessToken(new LoginBodyModel(username, password));
             api.users.deleteUserAuthorized(accessToken);
         }
     }
@@ -37,11 +36,8 @@ public class DeleteUserTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку удаления существующего пользователя")
     public void successfulDeleteUserTest() {
-        SuccessfulRegistrationResponseModel registrationResponse =
-                step("Регистрация нового пользователя и проверка ответа (201)", () -> {
-                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-                    return api.users.registration(registrationData);
-                });
+        SuccessfulRegistrationResponseModel registrationResponse
+                = api.users.registration(new RegistrationBodyModel(username, password));
         step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
@@ -51,19 +47,15 @@ public class DeleteUserTests extends TestBase {
     @Test
     @DisplayName("Тест на проверку удаления не авторизованного пользователя")
     public void notProvidedAuthenticationCredentialsDeleteUserNegativeTest() {
-        SuccessfulRegistrationResponseModel registrationResponse =
-                step("Регистрация нового пользователя и проверка ответа (201)", () -> {
-                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-                    return api.users.registration(registrationData);
-                });
+        SuccessfulRegistrationResponseModel registrationResponse
+                = api.users.registration(new RegistrationBodyModel(username, password));
         step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        NotProvidedAuthenticationCredentialsResponseModel deleteResponse =
-                step("Удаление пользователя без авторизации и проверка ответа (401)",
-                        api.users::deleteUserUnauthorized);
+        NotProvidedAuthenticationCredentialsResponseModel deleteResponse
+                = api.users.deleteUserUnauthorized();
         step("Проверка текста ошибки в ответе", () -> {
             String actualDetail = deleteResponse.detail();
             String expectedDetail = "Authentication credentials were not provided.";

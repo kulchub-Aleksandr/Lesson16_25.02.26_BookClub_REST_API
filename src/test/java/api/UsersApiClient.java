@@ -11,7 +11,7 @@ import static specs.users.update.UpdateSpec.*;
 
 public class UsersApiClient {
 
-    @Step("Регистрация пользователя")
+    @Step("Регистрация нового пользователя")
     public SuccessfulRegistrationResponseModel
     registration(RegistrationBodyModel body) {
         return given(registrationRequestSpec)
@@ -23,7 +23,7 @@ public class UsersApiClient {
                 .extract()
                 .as(SuccessfulRegistrationResponseModel.class);
     }
-
+    @Step("Регистрация нового пользователя с уже существующими регистрационными данными и проверка ответа (400)")
     public ExistingUserResponseModel
     registrationExistingUse(RegistrationBodyModel body) {
         return given(registrationRequestSpec)
@@ -36,6 +36,7 @@ public class UsersApiClient {
                 .as(ExistingUserResponseModel.class);
     }
 
+    @Step("Регистрация нового пользователя с невалидными регистрационными данными и проверка ответа (400)")
     public InvalidUserNameResponseModel
     registrationInvalidUserName(RegistrationBodyModel body) {
         return given(registrationRequestSpec)
@@ -48,6 +49,7 @@ public class UsersApiClient {
                 .as(InvalidUserNameResponseModel.class);
     }
 
+    @Step("Регистрация нового пользователя с неподдерживаемым типом передаваемых данных и проверка ответа (415)")
     public UnsupportedMediaTypeResponseModel
     registrationUnsupportedMediaType(RegistrationBodyModel body) {
         return given()
@@ -62,7 +64,9 @@ public class UsersApiClient {
                 .as(UnsupportedMediaTypeResponseModel.class);
     }
 
-    public SuccessfulUpdateUserResponseModel update(
+
+    @Step("Отправка запроса put с access-токеном и проверка ответа (200)")
+    public SuccessfulUpdateUserResponseModel updateUser(
             String accessToken,
             UpdateBodyModel body) {
         return given(updateRequestSpec)
@@ -88,6 +92,7 @@ public class UsersApiClient {
                 .as(SuccessfulUpdateUserResponseModel.class);
     }
 
+    @Step("Отправка запроса put без предварительной аутентификации и проверка ответа (401)")
     public NotProvidedAuthenticationCredentialsResponseModel
     updateNotProvidedAuthenticationCredentials(UpdateBodyModel body) {
         return given(updateRequestSpec)
@@ -101,6 +106,7 @@ public class UsersApiClient {
 
     }
 
+    @Step("Отправка запроса patch с access-токеном и проверка ответа (200)")
     public SuccessfulUpdateUserResponseModel
     updateWithPatch(String accessToken,
                     PartialUpdateBodyModel body) {
@@ -115,6 +121,7 @@ public class UsersApiClient {
                 .as(SuccessfulUpdateUserResponseModel.class);
     }
 
+    @Step("Отправка запроса put с access-токеном и проверка ответа (400)")
     public PartialWithPutMethodUpdateUserResponseModel
     updatePartialWithPut(String accessToken,
                          PartialUpdateBodyModel body) {
@@ -130,6 +137,7 @@ public class UsersApiClient {
 
     }
 
+    @Step("Удаление пользователя без авторизации и проверка ответа (401)")
     public NotProvidedAuthenticationCredentialsResponseModel
     deleteUserUnauthorized() {
         return given(updateRequestSpec)

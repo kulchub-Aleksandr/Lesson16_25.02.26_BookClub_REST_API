@@ -50,6 +50,7 @@ public class AuthApiClient {
                 .path("refresh");
     }
 
+    @Step("Авторизация с применением не правильного пароля и проверка ответа (401)")
     public WrongCredentialsLoginResponseModel
     loginWrongCredentials(LoginBodyModel loginBody) {
         return given(loginRequestSpec)
@@ -62,6 +63,7 @@ public class AuthApiClient {
                 .as(WrongCredentialsLoginResponseModel.class);
     }
 
+    @Step("Авторизация с применением пустого поля для пароля и проверка ответа (400)")
     public EmptyPasswordResponseModel
     loginEmptyPassword(LoginBodyModel loginBody) {
         return given(loginRequestSpec)
@@ -74,6 +76,7 @@ public class AuthApiClient {
                 .as(EmptyPasswordResponseModel.class);
     }
 
+    @Step("Авторизация с применением пустого поля для логина и проверка ответа (400)")
     public EmptyUserResponseModel
     loginEmptyUser(LoginBodyModel loginBody) {
         return given(loginRequestSpec)
@@ -86,6 +89,7 @@ public class AuthApiClient {
                 .as(EmptyUserResponseModel.class);
     }
 
+    @Step("Авторизация с применением пустого поля для логина и пароля с проверкой ответа (400)")
     public EmptyUserEmptyPasswordResponseModel
     loginEmptyUserEmptyPassword(LoginBodyModel loginBody) {
         return given(loginRequestSpec)
@@ -109,6 +113,7 @@ public class AuthApiClient {
                 .extract().response();
     }
 
+    @Step("Отправка запроса logout с некорректным refresh-токеном и проверка ответа (401)")
     public UnauthorizedUserLogoutResponseModel
     logoutUnauthorizedUser(LogoutBodyModel logoutBody) {
         return given(logoutRequestSpec)
@@ -120,6 +125,7 @@ public class AuthApiClient {
                 .extract().as(UnauthorizedUserLogoutResponseModel.class);
     }
 
+    @Step("Отправка запроса logout с пустымм refresh-токеном и проверка ответа (400)")
     public EmptyTokenLogoutResponseModel
     logoutEmptyToken(LogoutBodyModel logoutBody) {
         return given(logoutRequestSpec)
@@ -131,6 +137,7 @@ public class AuthApiClient {
                 .extract().as(EmptyTokenLogoutResponseModel.class);
     }
 
+    @Step("Отправка запроса logout с пустым телом  и проверка ответа (400)")
     public EmptyRequestBodyLogoutResponseModel
     logoutEmptyRequestBody() {
         return given(logoutRequestSpec)

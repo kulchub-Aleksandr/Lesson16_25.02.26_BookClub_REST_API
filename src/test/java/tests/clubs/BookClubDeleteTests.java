@@ -91,7 +91,7 @@ public class BookClubDeleteTests extends TestBase {
 
     @Test
     @DisplayName("Тест на проверку удаления клуба с аккаунта не создателя клуба")
-    public void PermissionUnsuccessfulBookClubDeleteTest() {
+    public void permissionUnsuccessfulBookClubDeleteTest() {
 
         SuccessfulRegistrationResponseModel registrationResponse =
                 step("Регистрация нового пользователя", () -> {

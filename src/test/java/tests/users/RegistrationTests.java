@@ -29,10 +29,8 @@ public class RegistrationTests extends TestBase {
     public void successfulRegistrationTest() {
 
         SuccessfulRegistrationResponseModel registrationResponse
-                = step("Регистрация нового пользователя и проверка ответа (201)", () -> {
-            RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-            return api.users.registration(registrationData);
-        });
+                = api.users.registration(new RegistrationBodyModel(username, password));
+
         step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(registrationResponse.id()).isGreaterThan(0);
             assertThat(registrationResponse.username()).isEqualTo(username);
@@ -45,10 +43,7 @@ public class RegistrationTests extends TestBase {
             assertThat(registrationResponse.remoteAddr()).matches(ipAddrRegexp);
         });
 
-        String accessToken = step("Авторизация и получение access-токена для удаления пользователя", () -> {
-            LoginBodyModel loginData = new LoginBodyModel(username, password);
-            return api.auth.loginAndGetAccessToken(loginData);
-        });
+        String accessToken = api.auth.loginAndGetAccessToken(new LoginBodyModel(username, password));
         api.users.deleteUserAuthorized(accessToken);
     }
 
@@ -56,32 +51,22 @@ public class RegistrationTests extends TestBase {
     @DisplayName("Тест на проверку регистрации пользователя с уже существующими регистрационными данными")
     public void existingUserRegistrationNegativeTest() {
 
-        SuccessfulRegistrationResponseModel registrationResponse_1 =
-                step("Регистрация нового пользователя", () -> {
-                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-                    return api.users.registration(registrationData);
-                });
+        SuccessfulRegistrationResponseModel registrationResponse_1
+                = api.users.registration(new RegistrationBodyModel(username, password));
 
         step("Проверка соответствия отправленных данных с данными в ответе", () -> {
             assertThat(registrationResponse_1.username()).isEqualTo(username);
         });
 
-        ExistingUserResponseModel registrationResponse_2 =
-                step("Регистрация нового пользователя с уже существующими регистрационными данными и проверка ответа (400)", () -> {
-                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-
-                    return api.users.registrationExistingUse(registrationData);
-                });
+        ExistingUserResponseModel registrationResponse_2
+                = api.users.registrationExistingUse(new RegistrationBodyModel(username, password));
         step("Проверка текста ошибки в ответе", () -> {
             String expectedError = "A user with that username already exists.";
             String actualError = registrationResponse_2.username().getFirst();
             assertThat(actualError).isEqualTo(expectedError);
         });
 
-        String accessToken = step("Авторизация и получение access-токена для удаления пользователя", () -> {
-            LoginBodyModel loginData = new LoginBodyModel(username, password);
-            return api.auth.loginAndGetAccessToken(loginData);
-        });
+        String accessToken = api.auth.loginAndGetAccessToken(new LoginBodyModel(username, password));
         api.users.deleteUserAuthorized(accessToken);
     }
 
@@ -89,11 +74,9 @@ public class RegistrationTests extends TestBase {
     @DisplayName("Тест на проверку регистрации пользователя с невалидными регистрационными данными")
     public void invalidUserNameRegistrationNegativeTest() {
 
-        InvalidUserNameResponseModel registrationResponse =
-                step("Регистрация нового пользователя с невалидными регистрационными данными и проверка ответа (400)", () -> {
-                    RegistrationBodyModel registrationData = new RegistrationBodyModel(WrongUsername, password);
-                    return api.users.registrationInvalidUserName(registrationData);
-                });
+        InvalidUserNameResponseModel registrationResponse
+                = api.users.registrationInvalidUserName(new RegistrationBodyModel(WrongUsername, password));
+
         step("Проверка текста ошибки в ответе", () -> {
             String expectedError = "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.";
             String actualError = registrationResponse.username().getFirst();
@@ -105,11 +88,8 @@ public class RegistrationTests extends TestBase {
     @DisplayName("Тест на проверку регистрации пользователя с неподдерживаемым типом передаваемых данных")
     public void unsupportedMediaTypeRegistrationNegativeTest() {
 
-        UnsupportedMediaTypeResponseModel registrationResponse =
-                step("Регистрация нового пользователя с неподдерживаемым типом передаваемых данных и проверка ответа (415)", () -> {
-                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-                    return api.users.registrationUnsupportedMediaType(registrationData);
-                });
+        UnsupportedMediaTypeResponseModel registrationResponse
+                = api.users.registrationUnsupportedMediaType(new RegistrationBodyModel(username, password));
 
         step("Проверка текста ошибки в ответе", () -> {
             String expectedError = "Unsupported media type \"text/plain; charset=ISO-8859-1\" in request.";

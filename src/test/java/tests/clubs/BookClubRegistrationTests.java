@@ -41,31 +41,22 @@ public class BookClubRegistrationTests extends TestBase {
     @DisplayName("Тест на проверку регистрации нового клуба")
     public void successfulBookClubRegistrationTest() {
 
-        SuccessfulRegistrationResponseModel registrationResponse =
-                step("Регистрация нового пользователя", () -> {
-                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-                    return api.users.registration(registrationData);
-                });
+        SuccessfulRegistrationResponseModel registrationResponse
+                = api.users.registration(new RegistrationBodyModel(username, password));
 
         step("Проверка соответствия отправленных данных с данными в ответе", () -> {
             assertThat(registrationResponse.username()).isEqualTo(username);
         });
 
-        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
-            LoginBodyModel loginData = new LoginBodyModel(username, password);
-            return api.auth.loginAndGetAccessToken(loginData);
-        });
+        String actualAccessToken = api.auth.loginAndGetAccessToken(new LoginBodyModel(username, password));
 
-        SuccessfulBookClubRegistrationResponseModel registrationResponseBookClub =
-                step("Регистрация нового клуба и проверка ответа (201)", () -> {
-                    SuccessfulBookClubRegistrationBodyModel registrationClubData = new SuccessfulBookClubRegistrationBodyModel(
+        SuccessfulBookClubRegistrationResponseModel registrationResponseBookClub
+                =api.clubs.bookClubsRegistration(actualAccessToken, new SuccessfulBookClubRegistrationBodyModel(
                             bookTitle,
                             bookAuthors,
                             publicationYear,
                             description,
-                            telegramChatLink);
-                    return api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
-                });
+                            telegramChatLink));
 
         step("Проверка соответствия полученных данных в ответе", () -> {
             assertThat(registrationResponseBookClub.id()).isGreaterThan(0);
@@ -79,6 +70,5 @@ public class BookClubRegistrationTests extends TestBase {
 
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
         api.users.deleteUserAuthorized(actualAccessToken);
-
     }
 }

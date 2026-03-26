@@ -26,7 +26,7 @@ import static specs.clubs.bookClubUpdate.BookClubUpdateSpec.successfulBookClubUp
 
 public class ClubsApiClient {
 
-    @Step("Регистрация клуба")
+    @Step("Регистрация нового клуба и проверка ответа (201)")
     public SuccessfulBookClubRegistrationResponseModel bookClubsRegistration(
             String accessToken,
             SuccessfulBookClubRegistrationBodyModel body) {
@@ -41,8 +41,8 @@ public class ClubsApiClient {
                 .as(SuccessfulBookClubRegistrationResponseModel.class);
     }
 
-    @Step("Обновление данных клуба методом PUT")
-    public SuccessfulBookClubRegistrationResponseModel bookClubsUpdate(
+    @Step("Обновление всех данных клуба методом PUT")
+    public SuccessfulBookClubRegistrationResponseModel bookClubsUpdatePutMethod(
             String accessToken,
             SuccessfulBookClubRegistrationBodyModel body,
             int id) {
@@ -59,7 +59,7 @@ public class ClubsApiClient {
     }
 
     @Step("Обновление данных клуба методом PATCH")
-    public SuccessfulBookClubRegistrationResponseModel bookClubsPartialUpdate(
+    public SuccessfulBookClubRegistrationResponseModel bookClubsPartialUpdatePatchMethod(
             String accessToken,
             SuccessfulBookClubUpdateBodyModel body,
             int id) {
@@ -113,7 +113,7 @@ public class ClubsApiClient {
                 .as(BookClubsListResponseModel.class);
     }
 
-    @Step("Получение клуба  GET /clubs/{id}")
+    @Step("Получение клуба по ID GET /clubs/{id}")
     public SuccessfulBookClubRegistrationResponseModel getClubById(String accessToken, long id) {
         return given(clubsRequestSpec)
                 .header("Authorization", "Bearer " + accessToken)
@@ -126,7 +126,7 @@ public class ClubsApiClient {
                 .as(SuccessfulBookClubRegistrationResponseModel.class);
     }
 
-    @Step("Получение клуба  GET /clubs/{id} после внесенных изменений")
+    @Step("Тест на получение клуба по ID и проверка что данные изменились после внесенных изменений")
     public SuccessfulBookClubRegistrationResponseModel getClubByIdAfterPut(String accessToken, long id) {
         return given(clubsRequestSpec)
                 .header("Authorization", "Bearer " + accessToken)
@@ -139,7 +139,7 @@ public class ClubsApiClient {
                 .as(SuccessfulBookClubRegistrationResponseModel.class);
     }
 
-    @Step("Получение карточки клуба по названию клуба")
+    @Step("Получение карточки клуба по названию клуба: {search} ")
     public BookClubsListResponseModel getClubsListBookTitle(String search, int page, int page_size) {
         return given(clubsRequestSpec)
                 .pathParam("search", search)
@@ -153,7 +153,7 @@ public class ClubsApiClient {
                 .as(BookClubsListResponseModel.class);
     }
 
-    @Step("Получение карточки клуба по названию и членству")
+    @Step("Получение карточки клуба по названию {search} и членству {membership} ")
     public BookClubsListResponseModel getClubsBookClubsBookTitleMembershipList(String search, int page, int page_size, String membership) {
         return given(clubsRequestSpec)
                 .pathParam("search", search)
@@ -168,7 +168,7 @@ public class ClubsApiClient {
                 .as(BookClubsListResponseModel.class);
     }
 
-    @Step("Получение карточки клуба по членству в клубе")
+    @Step("Получение карточки клуба по членству {membership} в клубе")
     public BookClubsListResponseModel getClubsBookClubsMembershipList(int page, int page_size, String membership) {
         return given(clubsRequestSpec)
                 .pathParam("page", page)
@@ -182,7 +182,7 @@ public class ClubsApiClient {
                 .as(BookClubsListResponseModel.class);
     }
 
-    @Step("Получение карточки клуба по членству в клубе")
+    @Step("Получение карточки клуба по членству {membership} в клубе, с авторизованным пользователем")
     public BookClubsListResponseModel getClubsBookClubsMembershipListOwner(
             String accessToken,
             int page,

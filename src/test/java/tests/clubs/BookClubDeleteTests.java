@@ -76,7 +76,7 @@ public class BookClubDeleteTests extends TestBase {
         });
 
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
-//todo проверка
+//todo добавить проверку
         api.users.deleteUserAuthorized(actualAccessToken);
 
 

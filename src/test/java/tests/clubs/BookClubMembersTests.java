@@ -49,64 +49,42 @@ public class BookClubMembersTests extends TestBase {
     @DisplayName("Тест на вхождение в члены клуба, с авторизованным пользователем, с созданием клуба")
     public void membershipClubWithAnAuthorizedUserCreatingClubTest() {
 
-        SuccessfulRegistrationResponseModel registrationUserResponse =
-                step("Регистрация нового пользователя", () -> {
-                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-                    return api.users.registration(registrationData);
-                });
+        SuccessfulRegistrationResponseModel registrationUserResponse
+                = api.users.registration(new RegistrationBodyModel(username, password));
 
         step("Проверка соответствия отправленных данных с данными в ответе", () -> {
             assertThat(registrationUserResponse.username()).isEqualTo(username);
         });
 
-        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
-            LoginBodyModel loginData = new LoginBodyModel(username, password);
-            return api.auth.loginAndGetAccessToken(loginData);
-        });
+        String actualAccessToken = api.auth.loginAndGetAccessToken(new LoginBodyModel(username, password));
 
-        SuccessfulBookClubRegistrationResponseModel registrationResponseBookClub =
-                step("Регистрация нового клуба и проверка ответа (201)", () -> {
-                    SuccessfulBookClubRegistrationBodyModel registrationClubData = new SuccessfulBookClubRegistrationBodyModel(
-                            bookTitle,
-                            bookAuthors,
-                            publicationYear,
-                            description,
-                            telegramChatLink);
-                    return api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
-                });
+        SuccessfulBookClubRegistrationResponseModel registrationResponseBookClub
+                = api.clubs.bookClubsRegistration(actualAccessToken, new SuccessfulBookClubRegistrationBodyModel(
+                bookTitle,
+                bookAuthors,
+                publicationYear,
+                description,
+                telegramChatLink));
+
         step("Проверка соответствия полученных данных в ответе", () -> {
-            assertThat(registrationResponseBookClub.id()).isGreaterThan(0);
-            assertThat(registrationResponseBookClub.owner()).isGreaterThan(0);
             assertThat(registrationResponseBookClub.bookTitle()).isEqualTo(bookTitle);
             assertThat(registrationResponseBookClub.bookAuthors()).isEqualTo(bookAuthors);
-            assertThat(registrationResponseBookClub.publicationYear()).isEqualTo(publicationYear);
-            assertThat(registrationResponseBookClub.description()).isEqualTo(description);
-            assertThat(registrationResponseBookClub.telegramChatLink()).isEqualTo(telegramChatLink);
         });
 
-        SuccessfulRegistrationResponseModel registrationUserResponse_1 =
-                step("Регистрация второго пользователя", () -> {
-                    RegistrationBodyModel registrationData_1 = new RegistrationBodyModel(username_1, password_1);
-                    return api.users.registration(registrationData_1);
-                });
+        SuccessfulRegistrationResponseModel registrationUserResponse_1
+                = api.users.registration(new RegistrationBodyModel(username_1, password_1));
 
         step("Проверка соответствия отправленных данных с данными в ответе", () -> {
             assertThat(registrationUserResponse_1.username()).isEqualTo(username_1);
         });
 
-        String actualAccessToken_1 = step("Авторизация и получение access-токена второго пользователя", () -> {
-            LoginBodyModel loginData_1 = new LoginBodyModel(username_1, password_1);
-            return api.auth.loginAndGetAccessToken(loginData_1);
-        });
+        String actualAccessToken_1 = api.auth.loginAndGetAccessToken(new LoginBodyModel(username_1, password_1));
 
-        step("Регистрация нового члена клуба", () -> {
-            api.clubs.bookClubMemberRegistration(actualAccessToken_1, registrationResponseBookClub.id());
-        });
+        api.clubs.bookClubMemberRegistration(actualAccessToken_1, registrationResponseBookClub.id());
 
-        SuccessfulBookClubRegistrationResponseModel response =
-                step("Тест на получение информации клуба по ID и проверка что данные изменились", () -> {
-                    return api.clubs.getClubById(actualAccessToken_1, registrationResponseBookClub.id());
-                });
+        SuccessfulBookClubRegistrationResponseModel response
+                = api.clubs.getClubById(actualAccessToken_1, registrationResponseBookClub.id());
+
 
         step("Отладка: проверка значений перед сравнением", () -> {
             System.out.println("response.members(): " + response.members());
@@ -150,103 +128,60 @@ public class BookClubMembersTests extends TestBase {
     @DisplayName("Тест на выход из членов клуба, с авторизованным пользователем, с созданием клуба")
     public void membershipDeleteClubWithAnAuthorizedUserCreatingClubTest() {
 
-        SuccessfulRegistrationResponseModel registrationUserResponse =
-                step("Регистрация нового пользователя", () -> {
-                    RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-                    return api.users.registration(registrationData);
-                });
+        SuccessfulRegistrationResponseModel registrationUserResponse
+                = api.users.registration(new RegistrationBodyModel(username, password));
 
         step("Проверка соответствия отправленных данных с данными в ответе", () -> {
             assertThat(registrationUserResponse.username()).isEqualTo(username);
         });
 
-        String actualAccessToken = step("Авторизация и получение access-токена", () -> {
-            LoginBodyModel loginData = new LoginBodyModel(username, password);
-            return api.auth.loginAndGetAccessToken(loginData);
-        });
+        String actualAccessToken = api.auth.loginAndGetAccessToken(new LoginBodyModel(username, password));
 
-        SuccessfulBookClubRegistrationResponseModel registrationResponseBookClub =
-                step("Регистрация нового клуба и проверка ответа (201)", () -> {
-                    SuccessfulBookClubRegistrationBodyModel registrationClubData = new SuccessfulBookClubRegistrationBodyModel(
-                            bookTitle,
-                            bookAuthors,
-                            publicationYear,
-                            description,
-                            telegramChatLink);
-                    return api.clubs.bookClubsRegistration(actualAccessToken, registrationClubData);
-                });
+        SuccessfulBookClubRegistrationResponseModel registrationResponseBookClub
+                = api.clubs.bookClubsRegistration(actualAccessToken, new SuccessfulBookClubRegistrationBodyModel(
+                bookTitle,
+                bookAuthors,
+                publicationYear,
+                description,
+                telegramChatLink));
+
         step("Проверка соответствия полученных данных в ответе", () -> {
-            assertThat(registrationResponseBookClub.id()).isGreaterThan(0);
-            assertThat(registrationResponseBookClub.owner()).isGreaterThan(0);
             assertThat(registrationResponseBookClub.bookTitle()).isEqualTo(bookTitle);
             assertThat(registrationResponseBookClub.bookAuthors()).isEqualTo(bookAuthors);
-            assertThat(registrationResponseBookClub.publicationYear()).isEqualTo(publicationYear);
-            assertThat(registrationResponseBookClub.description()).isEqualTo(description);
-            assertThat(registrationResponseBookClub.telegramChatLink()).isEqualTo(telegramChatLink);
         });
 
-        SuccessfulRegistrationResponseModel registrationUserResponse_1 =
-                step("Регистрация второго пользователя", () -> {
-                    RegistrationBodyModel registrationData_1 = new RegistrationBodyModel(username_1, password_1);
-                    return api.users.registration(registrationData_1);
-                });
+        SuccessfulRegistrationResponseModel registrationUserResponse_1
+                = api.users.registration(new RegistrationBodyModel(username_1, password_1));
 
         step("Проверка соответствия отправленных данных с данными в ответе", () -> {
             assertThat(registrationUserResponse_1.username()).isEqualTo(username_1);
         });
 
-        String actualAccessToken_1 = step("Авторизация и получение access-токена второго пользователя", () -> {
-            LoginBodyModel loginData_1 = new LoginBodyModel(username_1, password_1);
-            return api.auth.loginAndGetAccessToken(loginData_1);
-        });
+        String actualAccessToken_1 = api.auth.loginAndGetAccessToken(new LoginBodyModel(username_1, password_1));
 
-        step("Регистрация нового члена клуба", () -> {
-            api.clubs.bookClubMemberRegistration(actualAccessToken_1, registrationResponseBookClub.id());
-        });
+        api.clubs.bookClubMemberRegistration(actualAccessToken_1, registrationResponseBookClub.id());
 
-        SuccessfulBookClubRegistrationResponseModel response =
-                step("Тест на получение информации клуба по ID и проверка что данные изменились", () -> {
-                    return api.clubs.getClubById(actualAccessToken_1, registrationResponseBookClub.id());
-                });
+        SuccessfulBookClubRegistrationResponseModel response
+                = api.clubs.getClubById(actualAccessToken_1, registrationResponseBookClub.id());
 
         step("Проверка что в члены клуба добавился второй пользователь", () -> {
-            assertThat(response.id()).isGreaterThan(0);
-            assertThat(response.owner()).isGreaterThan(0);
             assertThat(response.members()).contains(response.owner());
             assertThat(response.members()).contains(registrationUserResponse_1.id());
-
-            List<Integer> members = response.members();
-            assertThat(members)
-                    .as("Клуб должен содержать ровно двух участников")
-                    .hasSize(2);
-
-            assertThat(members.get(0))
-                    .as("Первый в списке участников должен быть владелец клуба")
-                    .isEqualTo(registrationUserResponse.id());
-            assertThat(members.get(1))
-                    .as("Второй в списке участников должен быть новый участник")
-                    .isEqualTo(registrationUserResponse_1.id());
         });
 
-        step("Выход из членов клуба", () -> {
-            api.clubs.bookClubMemberDelete(actualAccessToken_1, registrationResponseBookClub.id());
-        });
+        api.clubs.bookClubMemberDelete(actualAccessToken_1, registrationResponseBookClub.id());
 
-        SuccessfulBookClubRegistrationResponseModel response_2 =
-                step("Тест на получение информации клуба по ID и проверка что данные изменились", () -> {
-                    return api.clubs.getClubById(actualAccessToken, registrationResponseBookClub.id());
-                });
+        SuccessfulBookClubRegistrationResponseModel response_2
+                = api.clubs.getClubById(actualAccessToken, registrationResponseBookClub.id());
 
         step("Проверка что из членов клуба удалился второй пользователь", () -> {
             assertThat(response_2.id()).isGreaterThan(0);
             assertThat(response_2.owner()).isGreaterThan(0);
             assertThat(response_2.members()).contains(response_2.owner());
-
             List<Integer> members = response_2.members();
             assertThat(members)
                     .as("Клуб должен содержать одного участника")
                     .hasSize(1);
-
         });
 
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());

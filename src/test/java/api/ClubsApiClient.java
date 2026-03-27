@@ -201,7 +201,7 @@ public class ClubsApiClient {
                 .as(BookClubsListResponseModel.class);
     }
 
-    @Step("Регистрация членом клуба")
+    @Step("Регистрация нового  члена клуба")
     public void bookClubMemberRegistration(
             String accessToken, int id) {
         given(membersBookClubRequestSpec)

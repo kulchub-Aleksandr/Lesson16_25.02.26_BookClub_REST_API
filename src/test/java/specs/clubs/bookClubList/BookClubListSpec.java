@@ -34,6 +34,14 @@ public class BookClubListSpec {
             .expectBody("bookAuthors", notNullValue())
             .build();
 
+    public static ResponseSpecification nonExistentBookClubListGetResponseSpec = new ResponseSpecBuilder()
+            .log(ALL)
+            .expectStatusCode(404)
+            .expectBody(matchesJsonSchemaInClasspath(
+                    "schemas/clubs/bookClubList/non_existent_book_clubs_list_response_schema.json"))
+            .expectBody("detail", notNullValue())
+            .build();
+
     public static ResponseSpecification successfulBookClubListGetAfterChangeResponseSpec = new ResponseSpecBuilder()
             .log(ALL)
             .expectStatusCode(200)

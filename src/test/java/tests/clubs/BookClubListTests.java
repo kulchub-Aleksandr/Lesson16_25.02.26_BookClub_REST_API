@@ -59,9 +59,28 @@ public class BookClubListTests extends TestBase {
     @Test
     @DisplayName("Тест на получение клуба по названию клуба")
     public void getClubsListBookTitleTest() {
-//todo добавить создание клуба
+        SuccessfulRegistrationResponseModel registrationResponse
+                = api.users.registration(new RegistrationBodyModel(username, password));
+
+        step("Проверка соответствия отправленных данных с данными в ответе", () -> {
+            assertThat(registrationResponse.username()).isEqualTo(username);
+        });
+
+        String actualAccessToken = api.auth.loginAndGetAccessToken(new LoginBodyModel(username, password));
+
+        SuccessfulBookClubRegistrationResponseModel registrationResponseBookClub
+                = api.clubs.bookClubsRegistration(actualAccessToken, new SuccessfulBookClubRegistrationBodyModel(
+                bookTitle,
+                bookAuthors,
+                publicationYear,
+                description,
+                telegramChatLink));
+
         BookClubsListResponseModel response
-                = api.clubs.getClubsListBookTitle(search, 1, 10);
+                = api.clubs.getClubsListBookTitle(
+                registrationResponseBookClub.bookTitle(),
+                1,
+                10);
 
         step("Проверка соответствия полученных данных в ответе", () -> {
             assertThat(response).isNotNull();
@@ -72,7 +91,7 @@ public class BookClubListTests extends TestBase {
                     .hasSize(response.count());
             assertThat(response.results().getFirst().bookTitle())
                     .as("Название книги не совпадает с запросом в поиске")
-                    .isEqualTo(search);
+                    .isEqualTo(registrationResponseBookClub.bookTitle());
         });
     }
 
@@ -81,11 +100,11 @@ public class BookClubListTests extends TestBase {
     public void getClubsListBookTitleMembershipTest() {
 
         BookClubsListResponseModel response
-                = api.clubs.getClubsBookClubsBookTitleMembershipList(search, 1, 10, membershipOwner);
+                = api.clubs.getClubsBookClubsBookTitleMembershipList(bookTitle, 1, 10, membershipOwner);
 
         step("Проверка соответствия полученных данных в ответе", () -> {
             assertThat(response).isNotNull();
-            assertThat(response.count()).isGreaterThanOrEqualTo(0);
+            assertThat(response.count()).isEqualTo(0);
             assertThat(response.results()).isNotNull();
         });
     }
@@ -99,7 +118,7 @@ public class BookClubListTests extends TestBase {
 
         step("Проверка соответствия полученных данных в ответе", () -> {
             assertThat(response).isNotNull();
-            assertThat(response.count()).isGreaterThanOrEqualTo(0);
+            assertThat(response.count()).isEqualTo(0);
             assertThat(response.results()).isNotNull();
 
         });
@@ -123,9 +142,8 @@ public class BookClubListTests extends TestBase {
 
         step("Проверка соответствия полученных данных в ответе", () -> {
             assertThat(response).isNotNull();
-            assertThat(response.count()).isGreaterThanOrEqualTo(0);
+            assertThat(response.count()).isEqualTo(0);
             assertThat(response.results()).isNotNull();
-
         });
 
         api.users.deleteUserAuthorized(actualAccessToken);
@@ -158,7 +176,8 @@ public class BookClubListTests extends TestBase {
         });
 
         BookClubsListResponseModel response
-                = api.clubs.getClubsBookClubsMembershipListOwner(actualAccessToken, 1, 10, membershipOwner);
+                = api.clubs.getClubsBookClubsMembershipListOwner(
+                        actualAccessToken, 1, 10, membershipOwner);
 
         step("Проверка соответствия полученных данных в ответе", () -> {
             assertThat(response).isNotNull();

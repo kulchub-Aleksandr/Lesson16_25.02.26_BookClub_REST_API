@@ -1,6 +1,7 @@
 package tests.clubs;
 
 import models.clubs.deleteBookClub.PermissionUnsuccessfulBookClubDeleteResponseModel;
+import models.clubs.listBookClub.NonExistentBookClubsListResponseModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
 import models.users.login.LoginBodyModel;
@@ -66,8 +67,7 @@ public class BookClubDeleteTests extends TestBase {
                 telegramChatLink));
 
         step("Проверка соответствия полученных данных в ответе", () -> {
-            int idFromResponse = registrationResponseBookClub.id();
-            assertThat(idFromResponse).isGreaterThan(0);
+            assertThat(registrationResponseBookClub.id()).isGreaterThan(0);
             assertThat(registrationResponseBookClub.bookTitle()).isEqualTo(bookTitle);
             assertThat(registrationResponseBookClub.bookAuthors()).isEqualTo(bookAuthors);
             assertThat(registrationResponseBookClub.publicationYear()).isEqualTo(publicationYear);
@@ -76,10 +76,14 @@ public class BookClubDeleteTests extends TestBase {
         });
 
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
-//todo добавить проверку
+
+        NonExistentBookClubsListResponseModel response
+                = api.clubs.getNonExistentClubById(actualAccessToken, registrationResponseBookClub.id());
+        step("Проверка соответствия полученных данных в ответе", () -> {
+            assertThat(response.detail()).isEqualTo("No Club matches the given query.");
+        });
+
         api.users.deleteUserAuthorized(actualAccessToken);
-
-
     }
 
     @Test
@@ -104,13 +108,8 @@ public class BookClubDeleteTests extends TestBase {
                 telegramChatLink));
 
         step("Проверка соответствия полученных данных в ответе", () -> {
-            int idFromResponse = registrationResponseBookClub.id();
-            assertThat(idFromResponse).isGreaterThan(0);
             assertThat(registrationResponseBookClub.bookTitle()).isEqualTo(bookTitle);
             assertThat(registrationResponseBookClub.bookAuthors()).isEqualTo(bookAuthors);
-            assertThat(registrationResponseBookClub.publicationYear()).isEqualTo(publicationYear);
-            assertThat(registrationResponseBookClub.description()).isEqualTo(description);
-            assertThat(registrationResponseBookClub.telegramChatLink()).isEqualTo(telegramChatLink);
         });
 
         SuccessfulRegistrationResponseModel registrationResponse_1

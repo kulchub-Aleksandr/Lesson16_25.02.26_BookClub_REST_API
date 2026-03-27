@@ -3,6 +3,7 @@ package api;
 import io.qameta.allure.Step;
 import models.clubs.deleteBookClub.PermissionUnsuccessfulBookClubDeleteResponseModel;
 import models.clubs.listBookClub.BookClubsListResponseModel;
+import models.clubs.listBookClub.NonExistentBookClubsListResponseModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
 import models.clubs.reviewsBookClub.SuccessfulReviewsGetBookClubResponseModel;
@@ -113,7 +114,7 @@ public class ClubsApiClient {
                 .as(BookClubsListResponseModel.class);
     }
 
-    @Step("Получение клуба по ID GET /clubs/{id}")
+    @Step("Получение данных клуба по ID GET /clubs/{id}")
     public SuccessfulBookClubRegistrationResponseModel getClubById(String accessToken, long id) {
         return given(clubsRequestSpec)
                 .header("Authorization", "Bearer " + accessToken)
@@ -124,6 +125,19 @@ public class ClubsApiClient {
                 .spec(successfulBookClubListGetResponseSpec)
                 .extract()
                 .as(SuccessfulBookClubRegistrationResponseModel.class);
+    }
+
+    @Step("Получение данных несуществующего клуба по ID GET /clubs/{id}")
+    public NonExistentBookClubsListResponseModel getNonExistentClubById(String accessToken, long id) {
+        return given(clubsRequestSpec)
+                .header("Authorization", "Bearer " + accessToken)
+                .pathParam("id", id)
+                .when()
+                .get("/clubs/{id}/")
+                .then()
+                .spec(nonExistentBookClubListGetResponseSpec)
+                .extract()
+                .as(NonExistentBookClubsListResponseModel.class);
     }
 
     @Step("Тест на получение клуба по ID и проверка что данные изменились после внесенных изменений")

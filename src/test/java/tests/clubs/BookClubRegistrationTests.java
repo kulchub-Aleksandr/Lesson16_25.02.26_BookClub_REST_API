@@ -51,12 +51,12 @@ public class BookClubRegistrationTests extends TestBase {
         String actualAccessToken = api.auth.loginAndGetAccessToken(new LoginBodyModel(username, password));
 
         SuccessfulBookClubRegistrationResponseModel registrationResponseBookClub
-                =api.clubs.bookClubsRegistration(actualAccessToken, new SuccessfulBookClubRegistrationBodyModel(
-                            bookTitle,
-                            bookAuthors,
-                            publicationYear,
-                            description,
-                            telegramChatLink));
+                = api.clubs.bookClubsRegistration(actualAccessToken, new SuccessfulBookClubRegistrationBodyModel(
+                bookTitle,
+                bookAuthors,
+                publicationYear,
+                description,
+                telegramChatLink));
 
         step("Проверка соответствия полученных данных в ответе", () -> {
             assertThat(registrationResponseBookClub.id()).isGreaterThan(0);

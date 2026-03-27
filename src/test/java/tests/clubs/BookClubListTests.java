@@ -177,7 +177,7 @@ public class BookClubListTests extends TestBase {
 
         BookClubsListResponseModel response
                 = api.clubs.getClubsBookClubsMembershipListOwner(
-                        actualAccessToken, 1, 10, membershipOwner);
+                actualAccessToken, 1, 10, membershipOwner);
 
         step("Проверка соответствия полученных данных в ответе", () -> {
             assertThat(response).isNotNull();

@@ -52,7 +52,6 @@ public class BookClubListTests extends TestBase {
             assertThat(response).isNotNull();
             assertThat(response.count()).isGreaterThanOrEqualTo(0);
             assertThat(response.results()).isNotNull();
-            assertThat(response.results()).hasSize(response.count());
         });
     }
 

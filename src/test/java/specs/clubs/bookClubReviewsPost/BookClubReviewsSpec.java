@@ -22,6 +22,17 @@ public class BookClubReviewsSpec {
             .expectBody("club", notNullValue())
             .build();
 
+
+    public static ResponseSpecification reviewsPatchBookClubResponseSpec = new ResponseSpecBuilder()
+            .log(ALL)
+            .expectStatusCode(200)
+            .expectBody(matchesJsonSchemaInClasspath(
+                    "schemas/clubs/bookClubReviews/successful_book_club_patch_reviews_response_schema.json"))
+            .expectBody("id", notNullValue())
+            .expectBody("review", notNullValue())
+            .expectBody("club", notNullValue())
+            .build();
+
     public static ResponseSpecification reviewsGetBookClubResponseSpec = new ResponseSpecBuilder()
             .log(ALL)
             .expectStatusCode(200)

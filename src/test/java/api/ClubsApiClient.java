@@ -253,6 +253,22 @@ public class ClubsApiClient {
                 .as(SuccessfulReviewsPostBookClubResponseModel.class);
     }
 
+    @Step("Редактирование отзыва на книгу")
+    public SuccessfulReviewsPostBookClubResponseModel bookClubReviewsPatch(
+            String accessToken, SuccessfulReviewsPostBookClubBodyModel body,
+            int id) {
+        return given(reviewsBookClubRequestSpec)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(body)
+                .pathParam("id", id)
+                .when()
+                .patch("/clubs/reviews/{id}/")
+                .then()
+                .spec(reviewsPatchBookClubResponseSpec)
+                .extract()
+                .as(SuccessfulReviewsPostBookClubResponseModel.class);
+    }
+
     @Step("Просмотр отзывов на книгу")
     public SuccessfulReviewsGetBookClubResponseModel getReviewsBookClub(int idClub, int page, int page_size) {
         return given(reviewsBookClubRequestSpec)
@@ -276,6 +292,7 @@ public class ClubsApiClient {
                 .when()
                 .delete("/clubs/reviews/{id}/")
                 .then()
+                .statusCode(204)
                 .log().all();
     }
 

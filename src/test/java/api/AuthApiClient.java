@@ -38,6 +38,7 @@ public class AuthApiClient {
                 .path("access");
     }
 
+
     @Step("Авторизация и получение refresh-токена")
     public String loginAndGetRefreshToken(LoginBodyModel loginBody) {
         return given(loginRequestSpec)

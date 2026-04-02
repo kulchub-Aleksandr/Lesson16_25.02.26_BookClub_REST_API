@@ -1,4 +1,4 @@
-package tests.clubs;
+package tests.clubs.UI;
 
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
@@ -17,7 +17,7 @@ import tests.TestData;
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class BookClubReviewsTests extends TestBase {
+public class BookClubReviewsUITests extends TestBase {
     private final TestData testData = new TestData();
     private String username;
     private String username_1;

@@ -1,7 +1,6 @@
-package models.users.registration;
+package models.clubs.localStorage;
 
-
-public record SuccessfulRegistrationResponseModel(
+public record UserData(
         Integer id,
         String username,
         String firstName,

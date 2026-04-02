@@ -1,9 +1,14 @@
 package tests.clubs.UI;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import models.clubs.localStorage.LocalStorageAuthRequestBody;
+import models.clubs.localStorage.UserData;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import tests.TestBase;
 import tests.TestData;
@@ -12,7 +17,7 @@ import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.*;
 
-public class BookClubReviewsTests extends TestBase {
+public class BookClubOwnerLeaveTests extends TestBase {
 
     private final TestData testData = new TestData();
     private String username;
@@ -38,6 +43,7 @@ public class BookClubReviewsTests extends TestBase {
     }
 
     @Test
+    @DisplayName("UI + API Пользователь не может покинуть клуб, если он его владелец")
     public void cantLeaveClubAsOwnerTest() {
         // register user
         models.users.registration.SuccessfulRegistrationResponseModel registrationResponse
@@ -49,13 +55,71 @@ public class BookClubReviewsTests extends TestBase {
         String actualRefreshToken = api.auth.loginAndGetRefreshToken(new models.users.login.LoginBodyModel(username, password));
 
 
-//        LoginBodyModel loginData = new LoginBodyModel(username, password);
-//        SuccessfulLoginResponseModel loginResponse = api.auth.login(loginData);
-//
-//        String accessToken = loginResponse.access();
-//        String refreshToken = loginResponse.refresh();
 
-        // todo move to model
+        UserData userData = new UserData(
+                registrationResponse.id(),
+                registrationResponse.username(),
+                registrationResponse.firstName(),
+                registrationResponse.lastName(),
+                registrationResponse.email(),
+                registrationResponse.remoteAddr());
+
+        LocalStorageAuthRequestBody localStorageAuthBody = new LocalStorageAuthRequestBody(
+                userData,
+                actualAccessToken,
+                actualRefreshToken,
+                true);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String localStorageAuthJson;
+        try {
+            localStorageAuthJson = objectMapper.writeValueAsString(localStorageAuthBody);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize LocalStorageAuthRequestBody to JSON", e);
+        }
+
+        // create club
+        SuccessfulBookClubRegistrationResponseModel registrationBookClubResponse
+                = api.clubs.bookClubsRegistration(actualAccessToken, new SuccessfulBookClubRegistrationBodyModel(
+                bookTitle,
+                bookAuthors,
+                publicationYear,
+                description,
+                telegramChatLink));
+
+        String clubId = registrationBookClubResponse.id().toString();
+
+        // open club
+        open("/favicon.ico");
+        localStorage().setItem("book_club_auth", localStorageAuthJson);
+        open("/clubs/" + clubId);
+
+        // cant leave club as owner
+        $(".club-content").shouldBe(visible);
+        $(".leave-btn").click();
+        confirm();
+        $(".error").shouldHave(text("Не удалось покинуть клуб"));
+
+
+        api.clubs.bookClubDelete(actualAccessToken, registrationBookClubResponse.id());
+        api.users.deleteUserAuthorized(actualAccessToken);
+    }
+
+
+
+
+    @Test
+    @Disabled
+    public void cantLeaveClubAsAdminTest_with_login_by_api() {
+        // register user
+        models.users.registration.SuccessfulRegistrationResponseModel registrationResponse
+                = api.users.registration(new models.users.registration.RegistrationBodyModel(username, password));
+
+        // login user
+        String actualAccessToken = api.auth.loginAndGetAccessToken(new models.users.login.LoginBodyModel(username, password));
+        String actualRefreshToken = api.auth.loginAndGetRefreshToken(new models.users.login.LoginBodyModel(username, password));
+
+
         String localStorageAuthBody = """
                 {
                   "user": {
@@ -79,85 +143,6 @@ public class BookClubReviewsTests extends TestBase {
                 registrationResponse.remoteAddr(),
                 actualAccessToken,
                 actualRefreshToken
-        );
-
-        // create club
-        SuccessfulBookClubRegistrationResponseModel registrationBookClubResponse
-                = api.clubs.bookClubsRegistration(actualAccessToken, new SuccessfulBookClubRegistrationBodyModel(
-                bookTitle,
-                bookAuthors,
-                publicationYear,
-                description,
-                telegramChatLink));
-
-        String clubId = registrationBookClubResponse.id().toString();
-
-        // open club
-        open("/favicon.ico");
-        localStorage().setItem("book_club_auth", localStorageAuthBody);
-        open("/clubs/" + clubId);
-
-        // cant leave club as owner
-        $(".club-content").shouldBe(visible);
-        $(".leave-btn").click();
-        confirm();
-        $(".error").shouldHave(text("Не удалось покинуть клуб"));
-
-
-        api.clubs.bookClubDelete(actualAccessToken, registrationBookClubResponse.id());
-        api.users.deleteUserAuthorized(actualAccessToken);
-    }
-
-    @Test
-//    @WithNewUser
-//    @WithNewClub
-    public void cantLeaveClubAsOwnerTest_with_extensions() {
-        // cant leave club as owner
-        $(".club-content").shouldBe(visible);
-        $(".leave-btn").click();
-        confirm();
-        $(".error").shouldHave(text("Не удалось покинуть клуб"));
-    }
-
-//
-
-
-    @Test
-    @Disabled
-    public void cantLeaveClubAsAdminTest_with_login_by_api() {
-        // register user
-        RegistrationBodyModel registrationData = new RegistrationBodyModel(username, password);
-        SuccessfulRegistrationResponseModel registrationResponse = api.users.register(registrationData);
-        // login user
-        LoginBodyModel loginData = new LoginBodyModel(username, password);
-        SuccessfulLoginResponseModel loginResponse = api.auth.login(loginData);
-
-        String accessToken = loginResponse.access();
-        String refreshToken = loginResponse.refresh();
-
-        String localStorageAuthBody = """
-                {
-                  "user": {
-                    "id": %d,
-                    "username": "%s",
-                    "firstName": "%s",
-                    "lastName": "%s",
-                    "email": "%s",
-                    "remoteAddr": "%s"
-                  },
-                  "accessToken": "%s",
-                  "refreshToken": "%s",
-                  "isAuthenticated": true
-                }
-                """.formatted(
-                registrationResponse.id(),
-                registrationResponse.username(),
-                registrationResponse.firstName(),
-                registrationResponse.lastName(),
-                registrationResponse.email(),
-                registrationResponse.remoteAddr(),
-                accessToken,
-                refreshToken
         );
 
         open("/favicon.ico");

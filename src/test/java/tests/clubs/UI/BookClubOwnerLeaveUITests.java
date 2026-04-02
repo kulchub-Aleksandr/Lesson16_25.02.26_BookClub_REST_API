@@ -6,10 +6,7 @@ import models.clubs.localStorage.LocalStorageAuthRequestBody;
 import models.clubs.localStorage.UserData;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import tests.TestBase;
 import tests.TestData;
 
@@ -17,7 +14,7 @@ import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.*;
 
-public class BookClubOwnerLeaveTests extends TestBase {
+public class BookClubOwnerLeaveUITests extends TestBase {
 
     private final TestData testData = new TestData();
     private String username;
@@ -43,6 +40,7 @@ public class BookClubOwnerLeaveTests extends TestBase {
     }
 
     @Test
+    @Tag("UI")
     @DisplayName("UI + API Пользователь не может покинуть клуб, если он его владелец")
     public void cantLeaveClubAsOwnerTest() {
         // register user

@@ -66,5 +66,10 @@ public class TestData {
         return faker.internet().url();
     }
 
+    public int assessment = faker.number().numberBetween(1, 5);
+    public int newAssessment = faker.number().numberBetween(1, 5);
+    public int readPages = faker.number().numberBetween(1, 360);
+    public int newReadPages = faker.number().numberBetween(1, 360);
+
 }
 

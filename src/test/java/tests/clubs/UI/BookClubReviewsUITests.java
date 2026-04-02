@@ -1,5 +1,9 @@
 package tests.clubs.UI;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import models.clubs.localStorage.LocalStorageAuthRequestBody;
+import models.clubs.localStorage.UserData;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
 import models.clubs.reviewsBookClub.SuccessfulReviewsGetBookClubResponseModel;
@@ -10,10 +14,15 @@ import models.users.registration.RegistrationBodyModel;
 import models.users.registration.SuccessfulRegistrationResponseModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import tests.TestBase;
 import tests.TestData;
 
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selenide.*;
+import static com.codeborne.selenide.Selenide.$;
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,6 +38,12 @@ public class BookClubReviewsUITests extends TestBase {
     private Integer publicationYear;
     private String description;
     private String telegramChatLink;
+
+
+    private int assessment;
+    private int newAssessment;
+    private int readPages;
+    private int newReadPages;
 
     private String newReview;
     private String editedReview;
@@ -47,12 +62,18 @@ public class BookClubReviewsUITests extends TestBase {
         description = testData.getBookDescription();
         telegramChatLink = testData.getTelegramChatLink();
 
+        newAssessment = testData.newAssessment;
+        assessment = testData.assessment;
+        newReadPages = testData.newReadPages;
+        readPages = testData.readPages;
+
         newReview = "Пробный отзыв";
         editedReview = newReview + "Редактирование отзыва";
     }
 
     @Test
-    @DisplayName("Тест на оставление отзыва на книгу, с авторизованным пользователем, не создателем клуба," +
+    @Tag("API+UI")
+    @DisplayName("[UI] Тест на оставление отзыва на книгу, с авторизованным пользователем, не создателем клуба," +
             "с созданием нового клуба и новых пользователей")
     public void bookClubReviewsPostWithAnAuthorizedUserCreatingClubTest() {
 
@@ -78,6 +99,8 @@ public class BookClubReviewsUITests extends TestBase {
             assertThat(registrationResponseBookClub.bookAuthors()).isEqualTo(bookAuthors);
         });
 
+        String clubId = registrationResponseBookClub.id().toString();
+
         SuccessfulRegistrationResponseModel registrationUserResponse_1
                 = api.users.registration(new RegistrationBodyModel(username_1, password_1));
 
@@ -86,6 +109,7 @@ public class BookClubReviewsUITests extends TestBase {
         });
 
         String actualAccessToken_1 = api.auth.loginAndGetAccessToken(new LoginBodyModel(username_1, password_1));
+        String actualRefreshToken_1 = api.auth.loginAndGetRefreshToken(new LoginBodyModel(username_1, password_1));
 
         api.clubs.bookClubMemberRegistration(actualAccessToken_1, registrationResponseBookClub.id());
 
@@ -97,21 +121,43 @@ public class BookClubReviewsUITests extends TestBase {
             assertThat(getClubByIdResponse.members()).contains(registrationUserResponse_1.id());
         });
 
-        SuccessfulReviewsPostBookClubResponseModel reviewsResponse
-                = api.clubs.bookClubReviewsPost(actualAccessToken_1,
-                new SuccessfulReviewsPostBookClubBodyModel(
-                        getClubByIdResponse.id(),
-                        newReview,
-                        5,
-                        22));
+        UserData userData = new UserData(
+                registrationResponse.id(),
+                registrationResponse.username(),
+                registrationResponse.firstName(),
+                registrationResponse.lastName(),
+                registrationResponse.email(),
+                registrationResponse.remoteAddr());
 
-        step("Проверка что отзыв второго пользователя добавился ", () -> {
-            assertThat(reviewsResponse.id()).isGreaterThan(0);
-            assertThat(reviewsResponse.club()).isGreaterThan(0);
-            assertThat(reviewsResponse.user().id()).isEqualTo(registrationUserResponse_1.id());
-            assertThat(reviewsResponse.user().username()).isEqualTo(registrationUserResponse_1.username());
-            assertThat(reviewsResponse.review()).isEqualTo(newReview);
-        });
+        LocalStorageAuthRequestBody localStorageAuthBody = new LocalStorageAuthRequestBody(
+                userData,
+                actualAccessToken_1,
+                actualRefreshToken_1,
+                true);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String localStorageAuthJson;
+        try {
+            localStorageAuthJson = objectMapper.writeValueAsString(localStorageAuthBody);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize LocalStorageAuthRequestBody to JSON", e);
+        }
+
+        open("/favicon.ico");
+        localStorage().setItem("book_club_auth", localStorageAuthJson);
+        open("/clubs/" + clubId);
+
+        $(".club-content").shouldBe(visible);
+        $(".add-review-btn").click();
+        $("#assessment").setValue(String.valueOf(assessment));
+        $("#readPages").setValue(String.valueOf(readPages));
+        $("#review").setValue(String.valueOf(newReview));
+        $(".save-btn").click();
+
+        $(".reviewer-name").shouldHave(text(username_1));
+        $(".review-content").shouldHave(text(newReview));
+        $(".read-pages").shouldHave(text(String.valueOf(readPages)));
+
 
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
         api.users.deleteUserAuthorized(actualAccessToken);
@@ -119,9 +165,82 @@ public class BookClubReviewsUITests extends TestBase {
 
     }
 
+    @Test
+    @Tag("API+UI")
+    @DisplayName("[UI] Тест на оставление отзыва на книгу, с авторизованным пользователем,  Создателем клуба," +
+            "с созданием нового клуба и новых пользователей")
+    public void bookClubReviewsPostWithAnAuthorizedUserClubOwnerCreatingClubTest() {
+
+        SuccessfulRegistrationResponseModel registrationResponse
+                = api.users.registration(new RegistrationBodyModel(username, password));
+
+        step("Проверка соответствия отправленных данных с данными в ответе", () -> {
+            assertThat(registrationResponse.username()).isEqualTo(username);
+        });
+
+        String actualAccessToken = api.auth.loginAndGetAccessToken(new LoginBodyModel(username, password));
+        String actualRefreshToken = api.auth.loginAndGetRefreshToken(new LoginBodyModel(username, password));
+
+        SuccessfulBookClubRegistrationResponseModel registrationResponseBookClub
+                = api.clubs.bookClubsRegistration(actualAccessToken, new SuccessfulBookClubRegistrationBodyModel(
+                bookTitle,
+                bookAuthors,
+                publicationYear,
+                description,
+                telegramChatLink));
+
+        step("Проверка соответствия полученных данных в ответе", () -> {
+            assertThat(registrationResponseBookClub.bookTitle()).isEqualTo(bookTitle);
+            assertThat(registrationResponseBookClub.bookAuthors()).isEqualTo(bookAuthors);
+        });
+        String clubId = registrationResponseBookClub.id().toString();
+
+        UserData userData = new UserData(
+                registrationResponse.id(),
+                registrationResponse.username(),
+                registrationResponse.firstName(),
+                registrationResponse.lastName(),
+                registrationResponse.email(),
+                registrationResponse.remoteAddr());
+
+        LocalStorageAuthRequestBody localStorageAuthBody = new LocalStorageAuthRequestBody(
+                userData,
+                actualAccessToken,
+                actualRefreshToken,
+                true);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String localStorageAuthJson;
+        try {
+            localStorageAuthJson = objectMapper.writeValueAsString(localStorageAuthBody);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize LocalStorageAuthRequestBody to JSON", e);
+        }
+
+        open("/favicon.ico");
+        localStorage().setItem("book_club_auth", localStorageAuthJson);
+        open("/clubs/" + clubId);
+
+        $(".club-content").shouldBe(visible);
+        $(".add-review-btn").click();
+        $("#assessment").setValue(String.valueOf(assessment));
+        $("#readPages").setValue(String.valueOf(readPages));
+        $("#review").setValue(String.valueOf(newReview));
+        $(".save-btn").click();
+
+        $(".reviewer-name").shouldHave(text(username));
+        $(".review-content").shouldHave(text(newReview));
+        $(".read-pages").shouldHave(text(String.valueOf(readPages)));
+
+
+        api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
+        api.users.deleteUserAuthorized(actualAccessToken);
+
+    }
 
     @Test
-    @DisplayName("Тест на редактирование отзыва на книгу, с авторизованным пользователем, не создателем клуба, " +
+    @Tag("API+UI")
+    @DisplayName("[UI] Тест на редактирование отзыва на книгу, с авторизованным пользователем, не создателем клуба, " +
             "с созданием нового клуба и новых пользователей")
     public void bookClubReviewsPatchWithAnAuthorizedUserCreatingClubTest() {
 
@@ -147,6 +266,8 @@ public class BookClubReviewsUITests extends TestBase {
             assertThat(registrationResponseBookClub.bookAuthors()).isEqualTo(bookAuthors);
         });
 
+        String clubId = registrationResponseBookClub.id().toString();
+
         SuccessfulRegistrationResponseModel registrationUserResponse_1
                 = api.users.registration(new RegistrationBodyModel(username_1, password_1));
 
@@ -155,6 +276,8 @@ public class BookClubReviewsUITests extends TestBase {
         });
 
         String actualAccessToken_1 = api.auth.loginAndGetAccessToken(new LoginBodyModel(username_1, password_1));
+        String actualRefreshToken_1 = api.auth.loginAndGetRefreshToken(new LoginBodyModel(username_1, password_1));
+
 
         api.clubs.bookClubMemberRegistration(actualAccessToken_1, registrationResponseBookClub.id());
 
@@ -171,8 +294,8 @@ public class BookClubReviewsUITests extends TestBase {
                 new SuccessfulReviewsPostBookClubBodyModel(
                         getClubByIdResponse.id(),
                         newReview,
-                        5,
-                        22));
+                        assessment,
+                        readPages));
 
         step("Проверка что отзыв второго пользователя добавился ", () -> {
             assertThat(reviewsResponse.id()).isGreaterThan(0);
@@ -182,24 +305,43 @@ public class BookClubReviewsUITests extends TestBase {
             assertThat(reviewsResponse.review()).isEqualTo(newReview);
         });
 
-        SuccessfulReviewsPostBookClubResponseModel reviewsPatchResponse
-                = api.clubs.bookClubReviewsPatch(actualAccessToken_1,
-                new SuccessfulReviewsPostBookClubBodyModel(
-                        getClubByIdResponse.id(),
-                        editedReview,
-                        3,
-                        55),
-                reviewsResponse.id());
+        UserData userData = new UserData(
+                registrationResponse.id(),
+                registrationResponse.username(),
+                registrationResponse.firstName(),
+                registrationResponse.lastName(),
+                registrationResponse.email(),
+                registrationResponse.remoteAddr());
 
-        step("Проверка что отзыв второго пользователя изменился ", () -> {
-            assertThat(reviewsPatchResponse.id()).isGreaterThan(0);
-            assertThat(reviewsPatchResponse.club()).isGreaterThan(0);
-            assertThat(reviewsPatchResponse.user().id()).isEqualTo(registrationUserResponse_1.id());
-            assertThat(reviewsPatchResponse.user().username()).isEqualTo(registrationUserResponse_1.username());
-            assertThat(reviewsPatchResponse.review()).isEqualTo(editedReview);
-            assertThat(reviewsPatchResponse.assessment()).isEqualTo(3);
-            assertThat(reviewsPatchResponse.readPages()).isEqualTo(55);
-        });
+        LocalStorageAuthRequestBody localStorageAuthBody = new LocalStorageAuthRequestBody(
+                userData,
+                actualAccessToken_1,
+                actualRefreshToken_1,
+                true);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String localStorageAuthJson;
+        try {
+            localStorageAuthJson = objectMapper.writeValueAsString(localStorageAuthBody);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize LocalStorageAuthRequestBody to JSON", e);
+        }
+
+        open("/favicon.ico");
+        localStorage().setItem("book_club_auth", localStorageAuthJson);
+        open("/clubs/" + clubId);
+
+        $(".club-content").shouldBe(visible);
+        $(".edit-review-btn").click();
+        $("#assessment").setValue(String.valueOf(newAssessment));
+        $("#readPages").setValue(String.valueOf(newReadPages));
+        $("#review").setValue(String.valueOf(editedReview));
+        $(".save-btn").click();
+
+        $(".reviewer-name").shouldHave(text(username_1));
+        $(".review-content").shouldHave(text(newReview));
+        $(".read-pages").shouldHave(text(String.valueOf(readPages)));
+
 
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
         api.users.deleteUserAuthorized(actualAccessToken);
@@ -207,8 +349,8 @@ public class BookClubReviewsUITests extends TestBase {
 
     }
 
-
     @Test
+    @Tag("API")
     @DisplayName("Тест на вызов отзывов на книгу, с авторизованным пользователем, не создателем клуба," +
             "с созданием нового клуба и новых пользователей")
     public void getReviewsBookClubWithAnAuthorizedUserCreatingClubTest() {
@@ -258,8 +400,8 @@ public class BookClubReviewsUITests extends TestBase {
                 new SuccessfulReviewsPostBookClubBodyModel(
                         getClubByIdResponse.id(),
                         newReview,
-                        5,
-                        22));
+                        assessment,
+                        readPages));
 
         step("Проверка что отзыв второго пользователя добавился ", () -> {
             assertThat(reviewsResponse.id()).isGreaterThan(0);
@@ -276,7 +418,7 @@ public class BookClubReviewsUITests extends TestBase {
             assertThat(reviewsListResponse.count()).isGreaterThan(0);
             assertThat(reviewsListResponse.results().getFirst().user().id()).isEqualTo(registrationUserResponse_1.id());
             assertThat(reviewsListResponse.results().getFirst().user().username()).isEqualTo(registrationUserResponse_1.username());
-            assertThat(reviewsListResponse.results().getFirst().review()).isEqualTo(newReview);//
+            assertThat(reviewsListResponse.results().getFirst().review()).isEqualTo(newReview);
         });
 
         api.clubs.bookClubDelete(actualAccessToken, registrationBookClubResponse.id());
@@ -285,9 +427,8 @@ public class BookClubReviewsUITests extends TestBase {
 
     }
 
-
-
     @Test
+    @Tag("API")
     @DisplayName("Тест на оставление отзыва не членом клуба на книгу, с авторизованным пользователем," +
             " с созданием нового клуба и новых пользователей")
     public void getReviewsBookClubWithAnAuthorizedUserNotMemberClubCreatingClubTest() {
@@ -322,23 +463,13 @@ public class BookClubReviewsUITests extends TestBase {
 
         String actualAccessToken_1 = api.auth.loginAndGetAccessToken(new LoginBodyModel(username_1, password_1));
 
-//        api.clubs.bookClubMemberRegistration(actualAccessToken_1, registrationResponseBookClub.id());
-
-//        SuccessfulBookClubRegistrationResponseModel response
-//                = api.clubs.getClubById(actualAccessToken_1, registrationResponseBookClub.id());
-//
-//        step("Проверка что в члены клуба добавился второй пользователь", () -> {
-//            assertThat(response.members()).contains(response.owner());
-//            assertThat(response.members()).contains(registrationUserResponse_1.id());
-//        });
-
         SuccessfulReviewsPostBookClubResponseModel reviewsResponse
                 = api.clubs.bookClubReviewsPost(actualAccessToken_1,
                 new SuccessfulReviewsPostBookClubBodyModel(
                         registrationResponseBookClub.id(),
                         newReview,
-                        5,
-                        22));
+                        assessment,
+                        readPages));
 
         step("Проверка что отзыв второго пользователя добавился ", () -> {
             assertThat(reviewsResponse.id()).isGreaterThan(0);
@@ -365,7 +496,8 @@ public class BookClubReviewsUITests extends TestBase {
     }
 
     @Test
-    @DisplayName("Тест на удаление отзыва на книгу, с авторизованным пользователем," +
+    @Tag("API+UI")
+    @DisplayName("[UI] Тест на удаление отзыва на книгу, с авторизованным пользователем," +
             " с созданием нового клуба и новых пользователей")
     public void deleteReviewsBookClubWithAnAuthorizedUserCreatingClubTest() {
 
@@ -391,6 +523,8 @@ public class BookClubReviewsUITests extends TestBase {
             assertThat(registrationResponseBookClub.bookAuthors()).isEqualTo(bookAuthors);
         });
 
+        String clubId = registrationResponseBookClub.id().toString();
+
         SuccessfulRegistrationResponseModel registrationUserResponse_1
                 = api.users.registration(new RegistrationBodyModel(username_1, password_1));
 
@@ -399,6 +533,8 @@ public class BookClubReviewsUITests extends TestBase {
         });
 
         String actualAccessToken_1 = api.auth.loginAndGetAccessToken(new LoginBodyModel(username_1, password_1));
+        String actualRefreshToken_1 = api.auth.loginAndGetRefreshToken(new LoginBodyModel(username_1, password_1));
+
 
 
         step("Регистрация нового члена клуба", () -> {
@@ -419,7 +555,11 @@ public class BookClubReviewsUITests extends TestBase {
         SuccessfulReviewsPostBookClubResponseModel reviewsResponse =
                 step("Публикация отзыва на книгу", () -> {
                     SuccessfulReviewsPostBookClubBodyModel reviewsData =
-                            new SuccessfulReviewsPostBookClubBodyModel(response.id(), newReview, 5, 22);
+                            new SuccessfulReviewsPostBookClubBodyModel(
+                                    response.id(),
+                                    newReview,
+                                    assessment,
+                                    readPages);
                     return api.clubs.bookClubReviewsPost(actualAccessToken_1, reviewsData);
                 });
 
@@ -436,15 +576,46 @@ public class BookClubReviewsUITests extends TestBase {
             assertThat(reviewsListResponse.results().getFirst().user().id()).isEqualTo(registrationUserResponse_1.id());
         });
 
-        api.clubs.bookClubReviewsDelete(actualAccessToken_1, reviewsResponse.id());
+        UserData userData = new UserData(
+                registrationUserResponse.id(),
+                registrationUserResponse.username(),
+                registrationUserResponse.firstName(),
+                registrationUserResponse.lastName(),
+                registrationUserResponse.email(),
+                registrationUserResponse.remoteAddr());
 
-        SuccessfulReviewsGetBookClubResponseModel reviewsListResponse_1
-                = api.clubs.getReviewsBookClub(registrationResponseBookClub.id(), 1, 100);
+        LocalStorageAuthRequestBody localStorageAuthBody = new LocalStorageAuthRequestBody(
+                userData,
+                actualAccessToken_1,
+                actualRefreshToken_1,
+                true);
 
-        step("Проверка что отзыв удалился", () -> {
-            assertThat(reviewsListResponse_1.count()).isEqualTo(0);
-            assertThat(reviewsListResponse_1.results().isEmpty()).isTrue();
-        });
+        ObjectMapper objectMapper = new ObjectMapper();
+        String localStorageAuthJson;
+        try {
+            localStorageAuthJson = objectMapper.writeValueAsString(localStorageAuthBody);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize LocalStorageAuthRequestBody to JSON", e);
+        }
+
+        open("/favicon.ico");
+        localStorage().setItem("book_club_auth", localStorageAuthJson);
+        open("/clubs/" + clubId);
+
+        $(".delete-review-btn").click();
+        $(".review-card.user-review").shouldNotBe(visible);
+
+
+//
+//        api.clubs.bookClubReviewsDelete(actualAccessToken_1, reviewsResponse.id());
+//
+//        SuccessfulReviewsGetBookClubResponseModel reviewsListResponse_1
+//                = api.clubs.getReviewsBookClub(registrationResponseBookClub.id(), 1, 100);
+//
+//        step("Проверка что отзыв удалился", () -> {
+//            assertThat(reviewsListResponse_1.count()).isEqualTo(0);
+//            assertThat(reviewsListResponse_1.results().isEmpty()).isTrue();
+//        });
 
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
         api.users.deleteUserAuthorized(actualAccessToken);

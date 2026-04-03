@@ -109,7 +109,7 @@ public class ClubPage {
         deleteReviewButton.click();
         return this;
     }
-    @Step("Нажатие кнопки 'Удалить' отзыв")
+    @Step("Проверка что отзыв удалился")
     public ClubPage deleteCheckReview() {
         review.shouldNotBe(visible);
         return this;

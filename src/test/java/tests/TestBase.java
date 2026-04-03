@@ -38,7 +38,7 @@ public class TestBase {
         Configuration.browser = browser;
         Configuration.browserVersion = browserVersion;
         Configuration.pageLoadStrategy = "eager";
-        //        Configuration.holdBrowserOpen = true;
+                Configuration.holdBrowserOpen = true;
         Configuration.timeout = 10000; // default 4000
 
 

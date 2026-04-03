@@ -162,25 +162,6 @@ public class BookClubReviewsAPITests extends TestBase {
             assertThat(registrationResponseBookClub.bookAuthors()).isEqualTo(bookAuthors);
         });
 
-//        SuccessfulRegistrationResponseModel registrationUserResponse_1
-//                = api.users.registration(new RegistrationBodyModel(username_1, password_1));
-//
-//        step("Проверка соответствия отправленных данных с данными в ответе", () -> {
-//            assertThat(registrationUserResponse_1.username()).isEqualTo(username_1);
-//        });
-//
-//        String actualAccessToken_1 = api.auth.loginAndGetAccessToken(new LoginBodyModel(username_1, password_1));
-//
-//        api.clubs.bookClubMemberRegistration(actualAccessToken_1, registrationResponseBookClub.id());
-//
-//        SuccessfulBookClubRegistrationResponseModel getClubByIdResponse
-//                = api.clubs.getClubById(actualAccessToken_1, registrationResponseBookClub.id());
-//
-//        step("Проверка что в члены клуба добавился второй пользователь", () -> {
-//            assertThat(getClubByIdResponse.members()).contains(getClubByIdResponse.owner());
-//            assertThat(getClubByIdResponse.members()).contains(registrationUserResponse_1.id());
-//        });
-
         SuccessfulReviewsPostBookClubResponseModel reviewsResponse
                 = api.clubs.bookClubReviewsPost(actualAccessToken,
                 new SuccessfulReviewsPostBookClubBodyModel(
@@ -201,7 +182,6 @@ public class BookClubReviewsAPITests extends TestBase {
 
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
         api.users.deleteUserAuthorized(actualAccessToken);
-        //api.users.deleteUserAuthorized(actualAccessToken_1);
 
     }
 

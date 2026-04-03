@@ -16,17 +16,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import pages.ClubPage;
 import tests.TestBase;
 import tests.TestData;
 
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selenide.*;
-import static com.codeborne.selenide.Selenide.$;
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class BookClubReviewsUITests extends TestBase {
+
+    ClubPage clubPage = new ClubPage();
     private final TestData testData = new TestData();
     private String username;
     private String username_1;
@@ -68,7 +67,7 @@ public class BookClubReviewsUITests extends TestBase {
         readPages = testData.readPages;
 
         newReview = "Пробный отзыв";
-        editedReview = newReview + "Редактирование отзыва";
+        editedReview = newReview + " Редактирование отзыва";
     }
 
     @Test
@@ -143,21 +142,17 @@ public class BookClubReviewsUITests extends TestBase {
             throw new RuntimeException("Failed to serialize LocalStorageAuthRequestBody to JSON", e);
         }
 
-        open("/favicon.ico");
-        localStorage().setItem("book_club_auth", localStorageAuthJson);
-        open("/clubs/" + clubId);
-
-        $(".club-content").shouldBe(visible);
-        $(".add-review-btn").click();
-        $("#assessment").setValue(String.valueOf(assessment));
-        $("#readPages").setValue(String.valueOf(readPages));
-        $("#review").setValue(String.valueOf(newReview));
-        $(".save-btn").click();
-
-        $(".reviewer-name").shouldHave(text(username_1));
-        $(".review-content").shouldHave(text(newReview));
-        $(".read-pages").shouldHave(text(String.valueOf(readPages)));
-
+        clubPage.openPage(localStorageAuthJson)
+                .openClubPage(registrationResponseBookClub.id())
+                .clubContentCheck()
+                .pressReviewButton()
+                .setAssessment(assessment)
+                .setReadPages(readPages)
+                .setReview(newReview)
+                .saveReviewButton()
+                .checkResult(clubPage.getReviewerName(), username_1)
+                .checkResult(clubPage.getReview(), newReview)
+                .checkResult(clubPage.getReadPages(), String.valueOf(readPages));
 
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
         api.users.deleteUserAuthorized(actualAccessToken);
@@ -217,21 +212,17 @@ public class BookClubReviewsUITests extends TestBase {
             throw new RuntimeException("Failed to serialize LocalStorageAuthRequestBody to JSON", e);
         }
 
-        open("/favicon.ico");
-        localStorage().setItem("book_club_auth", localStorageAuthJson);
-        open("/clubs/" + clubId);
-
-        $(".club-content").shouldBe(visible);
-        $(".add-review-btn").click();
-        $("#assessment").setValue(String.valueOf(assessment));
-        $("#readPages").setValue(String.valueOf(readPages));
-        $("#review").setValue(String.valueOf(newReview));
-        $(".save-btn").click();
-
-        $(".reviewer-name").shouldHave(text(username));
-        $(".review-content").shouldHave(text(newReview));
-        $(".read-pages").shouldHave(text(String.valueOf(readPages)));
-
+        clubPage.openPage(localStorageAuthJson)
+                .openClubPage(registrationResponseBookClub.id())
+                .clubContentCheck()
+                .pressReviewButton()
+                .setAssessment(assessment)
+                .setReadPages(readPages)
+                .setReview(newReview)
+                .saveReviewButton()
+                .checkResult(clubPage.getReviewerName(), username)
+                .checkResult(clubPage.getReview(), newReview)
+                .checkResult(clubPage.getReadPages(), String.valueOf(readPages));
 
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
         api.users.deleteUserAuthorized(actualAccessToken);
@@ -266,7 +257,6 @@ public class BookClubReviewsUITests extends TestBase {
             assertThat(registrationResponseBookClub.bookAuthors()).isEqualTo(bookAuthors);
         });
 
-        String clubId = registrationResponseBookClub.id().toString();
 
         SuccessfulRegistrationResponseModel registrationUserResponse_1
                 = api.users.registration(new RegistrationBodyModel(username_1, password_1));
@@ -306,12 +296,12 @@ public class BookClubReviewsUITests extends TestBase {
         });
 
         UserData userData = new UserData(
-                registrationResponse.id(),
-                registrationResponse.username(),
-                registrationResponse.firstName(),
-                registrationResponse.lastName(),
-                registrationResponse.email(),
-                registrationResponse.remoteAddr());
+                registrationUserResponse_1.id(),
+                registrationUserResponse_1.username(),
+                registrationUserResponse_1.firstName(),
+                registrationUserResponse_1.lastName(),
+                registrationUserResponse_1.email(),
+                registrationUserResponse_1.remoteAddr());
 
         LocalStorageAuthRequestBody localStorageAuthBody = new LocalStorageAuthRequestBody(
                 userData,
@@ -327,21 +317,17 @@ public class BookClubReviewsUITests extends TestBase {
             throw new RuntimeException("Failed to serialize LocalStorageAuthRequestBody to JSON", e);
         }
 
-        open("/favicon.ico");
-        localStorage().setItem("book_club_auth", localStorageAuthJson);
-        open("/clubs/" + clubId);
-
-        $(".club-content").shouldBe(visible);
-        $(".edit-review-btn").click();
-        $("#assessment").setValue(String.valueOf(newAssessment));
-        $("#readPages").setValue(String.valueOf(newReadPages));
-        $("#review").setValue(String.valueOf(editedReview));
-        $(".save-btn").click();
-
-        $(".reviewer-name").shouldHave(text(username_1));
-        $(".review-content").shouldHave(text(newReview));
-        $(".read-pages").shouldHave(text(String.valueOf(readPages)));
-
+        clubPage.openPage(localStorageAuthJson)
+                .openClubPage(registrationResponseBookClub.id())
+                .clubContentCheck()
+                .pressEditReviewButton()
+                .setAssessment(newAssessment)
+                .setReadPages(newReadPages)
+                .setReview(editedReview)
+                .saveReviewButton()
+                .checkResult(clubPage.getReviewerName(), username_1)
+                .checkResult(clubPage.getReview(), editedReview)
+                .checkResult(clubPage.getReadPages(), String.valueOf(newReadPages));
 
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
         api.users.deleteUserAuthorized(actualAccessToken);
@@ -536,7 +522,6 @@ public class BookClubReviewsUITests extends TestBase {
         String actualRefreshToken_1 = api.auth.loginAndGetRefreshToken(new LoginBodyModel(username_1, password_1));
 
 
-
         step("Регистрация нового члена клуба", () -> {
             api.clubs.bookClubMemberRegistration(actualAccessToken_1, registrationResponseBookClub.id());
         });
@@ -598,24 +583,11 @@ public class BookClubReviewsUITests extends TestBase {
             throw new RuntimeException("Failed to serialize LocalStorageAuthRequestBody to JSON", e);
         }
 
-        open("/favicon.ico");
-        localStorage().setItem("book_club_auth", localStorageAuthJson);
-        open("/clubs/" + clubId);
-
-        $(".delete-review-btn").click();
-        $(".review-card.user-review").shouldNotBe(visible);
-
-
-//
-//        api.clubs.bookClubReviewsDelete(actualAccessToken_1, reviewsResponse.id());
-//
-//        SuccessfulReviewsGetBookClubResponseModel reviewsListResponse_1
-//                = api.clubs.getReviewsBookClub(registrationResponseBookClub.id(), 1, 100);
-//
-//        step("Проверка что отзыв удалился", () -> {
-//            assertThat(reviewsListResponse_1.count()).isEqualTo(0);
-//            assertThat(reviewsListResponse_1.results().isEmpty()).isTrue();
-//        });
+        clubPage.openPage(localStorageAuthJson)
+                .openClubPage(registrationResponseBookClub.id())
+                .clubContentCheck()
+                .deleteReview()
+                .deleteCheckReview();
 
         api.clubs.bookClubDelete(actualAccessToken, registrationResponseBookClub.id());
         api.users.deleteUserAuthorized(actualAccessToken);

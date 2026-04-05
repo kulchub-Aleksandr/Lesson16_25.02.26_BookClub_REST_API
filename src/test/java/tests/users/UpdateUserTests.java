@@ -54,10 +54,10 @@ public class UpdateUserTests extends TestBase {
 
         SuccessfulUpdateUserResponseModel updateResponse
                 = api.users.updateUser(actualAccessToken, new UpdateBodyModel(
-                            username,
-                            firstName,
-                            lastName,
-                            email));
+                username,
+                firstName,
+                lastName,
+                email));
 
         step("Проверка корректности зарегистрированных данных", () -> {
             assertThat(updateResponse.username()).isEqualTo(username);
@@ -90,18 +90,16 @@ public class UpdateUserTests extends TestBase {
 
         NotProvidedAuthenticationCredentialsResponseModel updateResponse
                 = api.users.updateNotProvidedAuthenticationCredentials(new UpdateBodyModel(
-                            username,
-                            firstName,
-                            lastName,
-                            email));
+                username,
+                firstName,
+                lastName,
+                email));
 
         step("Проверка текста ошибки в ответе", () -> {
             String actualDetail = updateResponse.detail();
             String expectedDetail = "Authentication credentials were not provided.";
             assertThat(actualDetail).isEqualTo(expectedDetail);
         });
-
-
     }
 
     @Test
@@ -119,8 +117,8 @@ public class UpdateUserTests extends TestBase {
 
         SuccessfulUpdateUserResponseModel updateResponse
                 = api.users.updateWithPatch(accessToken, new PartialUpdateBodyModel(
-                            firstName,
-                            lastName));
+                firstName,
+                lastName));
 
         step("Проверка корректности полученных данных", () -> {
             assertThat(updateResponse.id()).isEqualTo(registrationResponse.id());
@@ -160,7 +158,7 @@ public class UpdateUserTests extends TestBase {
 
         PartialWithPutMethodUpdateUserResponseModel updateResponse
                 = api.users.updatePartialWithPut(actualAccessToken, new PartialUpdateBodyModel(
-                            firstName, lastName));
+                firstName, lastName));
 
         step("Проверка текста ошибки в ответе", () -> {
             String actualUsername = updateResponse.username().getFirst();

@@ -1,4 +1,4 @@
-package tests.clubs.UI;
+package tests.clubs.ui_tests;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -22,23 +22,16 @@ public class TestBase {
 
     @BeforeAll
     public static void setUp() {
-
-        String browser = System.getProperty("browser", "chrome");
-        String browserVersion = System.getProperty("browserVersion");
-        String baseUrl = System.getProperty("baseUrl", "https://book-club.qa.guru");
-        String remoteUrl = System.getProperty("remoteUrl");
-        String browserSize = System.getProperty("browserSize");
-
-        Configuration.browserSize = browserSize;
+        Configuration.browserSize = System.getProperty("browserSize");
 
         RestAssured.baseURI = "https://book-club.qa.guru";
         RestAssured.basePath = "/api/v1";
 
-        Configuration.baseUrl = baseUrl;
-        Configuration.browser = browser;
-        Configuration.browserVersion = browserVersion;
+        Configuration.baseUrl = System.getProperty("baseUrl", "https://book-club.qa.guru");
+        Configuration.browser = System.getProperty("browser", "chrome");
+        Configuration.browserVersion = System.getProperty("browserVersion");
         Configuration.pageLoadStrategy = "eager";
-                Configuration.holdBrowserOpen = true;
+        //Configuration.holdBrowserOpen = true;
         Configuration.timeout = 10000; // default 4000
 
 
@@ -48,7 +41,7 @@ public class TestBase {
                 "enableVideo", true
         ));
         Configuration.browserCapabilities = capabilities;
-        Configuration.remote = remoteUrl;
+        Configuration.remote = System.getProperty("remoteUrl");
     }
 
     @BeforeEach

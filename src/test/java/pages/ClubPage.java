@@ -16,13 +16,9 @@ public class ClubPage {
             reviewInput = $("#review"),
             saveReviewButton = $(".save-btn"),
             reviewerName = $(".reviewer-name"),
-            reviewRating = $(".review-rating"),
             readPages = $(".read-pages"),
-            reviewContent = $(".review-content"),
-            reviewDate = $(".review-content"),
             editReviewButton = $(".edit-review-btn"),
             deleteReviewButton = $(".delete-review-btn"),
-            //review = $(".review-card.user-review");
             review = $(".user-review");
 
     CheckReviewsComponent checkReviews = new CheckReviewsComponent();
@@ -109,13 +105,12 @@ public class ClubPage {
         deleteReviewButton.click();
         return this;
     }
+
     @Step("Проверка что отзыв удалился")
     public ClubPage deleteCheckReview() {
         review.shouldNotBe(visible);
         return this;
     }
-
-
 
 
 }

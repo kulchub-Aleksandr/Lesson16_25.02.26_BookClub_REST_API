@@ -1,14 +1,21 @@
-package tests.clubs.UI;
+package tests.clubs.ui_tests;
 
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.clubs.localStorage.LocalStorageAuthRequestBody;
 import models.clubs.localStorage.UserData;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import tests.TestBase;
 import tests.TestData;
+
+import java.time.Duration;
 
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.byText;
@@ -51,7 +58,6 @@ public class BookClubOwnerLeaveUITests extends TestBase {
 
         String actualAccessToken = api.auth.loginAndGetAccessToken(new models.users.login.LoginBodyModel(username, password));
         String actualRefreshToken = api.auth.loginAndGetRefreshToken(new models.users.login.LoginBodyModel(username, password));
-
 
 
         UserData userData = new UserData(
@@ -104,10 +110,8 @@ public class BookClubOwnerLeaveUITests extends TestBase {
     }
 
 
-
-
     @Test
-    @Disabled
+    //@Disabled
     public void cantLeaveClubAsAdminTest_with_login_by_api() {
         // register user
         models.users.registration.SuccessfulRegistrationResponseModel registrationResponse
@@ -149,7 +153,7 @@ public class BookClubOwnerLeaveUITests extends TestBase {
 
         // create club
         // todo create test for navigation from Main page to Create club page
-        open("https://book-club.qa.guru/clubs/create");
+        open("/clubs/create");
         $("[data-testid=create-club-link]").click();
         $("#bookTitle").setValue(username);
         $("#bookAuthors").setValue(username);
@@ -158,24 +162,48 @@ public class BookClubOwnerLeaveUITests extends TestBase {
         $("#telegramChatLink").setValue("https://t.me/qa_guru" + username).pressEnter();
 
         // open club
-        $(".clubs-list").$(byText(username))
-                .parent().parent().$(".open-btn").click();
+
+        ElementsCollection paginationButtons = $(".pagination-buttons").shouldBe(visible).$$("button.pagination-button");
+
+        SelenideElement targetButton = null;
+        for (int i = 0; i < paginationButtons.size(); i++) {
+            SelenideElement currentButton = paginationButtons.get(i);
+            if (currentButton.getText().trim().equals("Вперед")) {
+                if (i > 0) {
+                    targetButton = paginationButtons.get(i - 1);
+                    break;
+                }
+            }
+        }
+
+        if (targetButton != null) {
+            targetButton
+                    .shouldBe(visible, Duration.ofSeconds(5))
+                    .should(matchText("\\d+"))
+                    .click();
+            System.out.println("Кликаем на страницу: " + targetButton.getText());
+        } else {
+            throw new RuntimeException("Кнопка перед 'Вперед' не найдена");
+        }
 
         $(".clubs-list").$(byText(username))
                 .parent().parent().$(".open-btn").click();
+
 
         // wrong leave club
         $(".club-content").shouldBe(visible);
         $(".leave-btn").click();
         confirm();
         $(".error").shouldHave(text("Не удалось покинуть клуб"));
+
     }
 
+
     @Test
-    @Disabled
+    //@Disabled
     public void cantLeaveClubAsAdminTest_without_api() {
         // register user
-        open("https://book-club.qa.guru/signup");
+        open("/signup");
         $("[data-testid=username-input]").setValue(username);
         $("[data-testid=password-input]").setValue(password);
         $("[data-testid=confirm-password-input]").setValue(password).pressEnter();
@@ -196,7 +224,30 @@ public class BookClubOwnerLeaveUITests extends TestBase {
         $("#description").setValue(username);
         $("#telegramChatLink").setValue("https://t.me/qa_guru" + username).pressEnter();
 
-        // open club
+
+        ElementsCollection paginationButtons = $(".pagination-buttons").shouldBe(visible).$$("button.pagination-button");
+
+        SelenideElement targetButton = null;
+        for (int i = 0; i < paginationButtons.size(); i++) {
+            SelenideElement currentButton = paginationButtons.get(i);
+            if (currentButton.getText().trim().equals("Вперед")) {
+                if (i > 0) {
+                    targetButton = paginationButtons.get(i - 1);
+                    break;
+                }
+            }
+        }
+
+        if (targetButton != null) {
+            targetButton
+                    .shouldBe(visible, Duration.ofSeconds(5))
+                    .should(matchText("\\d+"))
+                    .click();
+            System.out.println("Кликаем на страницу: " + targetButton.getText());
+        } else {
+            throw new RuntimeException("Кнопка перед 'Вперед' не найдена");
+        }
+
         $(".clubs-list").$(byText(username))
                 .parent().parent().$(".open-btn").click();
 

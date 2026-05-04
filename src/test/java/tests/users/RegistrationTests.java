@@ -1,5 +1,6 @@
 package tests.users;
 
+import allure.Layer;
 import models.users.login.LoginBodyModel;
 import models.users.registration.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,7 @@ import tests.TestData;
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Layer("User")
 public class RegistrationTests extends TestBase {
     private final TestData testData = new TestData();
     private String username;

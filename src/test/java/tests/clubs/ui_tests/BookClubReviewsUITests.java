@@ -1,5 +1,6 @@
 package tests.clubs.ui_tests;
 
+import allure.Layer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.clubs.localStorage.LocalStorageAuthRequestBody;
@@ -22,7 +23,7 @@ import tests.TestData;
 
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
-
+@Layer("Club")
 public class BookClubReviewsUITests extends TestBase {
 
     ClubPage clubPage = new ClubPage();

@@ -1,5 +1,6 @@
 package tests.clubs;
 
+import allure.Layer;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
 import models.clubs.updateBookClub.SuccessfulBookClubUpdateBodyModel;
@@ -15,6 +16,7 @@ import tests.TestData;
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Layer("Club")
 public class BookClubUpdateTests extends TestBase {
     private final TestData testData = new TestData();
     private String username;

@@ -1,5 +1,6 @@
 package tests.clubs.ui_tests;
 
+import allure.Layer;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -47,7 +48,8 @@ public class BookClubOwnerLeaveUITests extends TestBase {
     }
 
     @Test
-    @Tag("UI")
+    @Layer("Club")
+    @Tag("API+UI")
     @DisplayName("UI + API Пользователь не может покинуть клуб, если он его владелец")
     public void cantLeaveClubAsOwnerTest() {
         // register user
@@ -58,7 +60,6 @@ public class BookClubOwnerLeaveUITests extends TestBase {
 
         String actualAccessToken = api.auth.loginAndGetAccessToken(new models.users.login.LoginBodyModel(username, password));
         String actualRefreshToken = api.auth.loginAndGetRefreshToken(new models.users.login.LoginBodyModel(username, password));
-
 
         UserData userData = new UserData(
                 registrationResponse.id(),
@@ -111,6 +112,7 @@ public class BookClubOwnerLeaveUITests extends TestBase {
 
 
     @Test
+    @DisplayName("UI + API Пользователь не может покинуть клуб, если он его владелец, вариант без LocalStorageAuthRequestBody")
     //@Disabled
     public void cantLeaveClubAsAdminTest_with_login_by_api() {
         // register user
@@ -120,7 +122,6 @@ public class BookClubOwnerLeaveUITests extends TestBase {
         // login user
         String actualAccessToken = api.auth.loginAndGetAccessToken(new models.users.login.LoginBodyModel(username, password));
         String actualRefreshToken = api.auth.loginAndGetRefreshToken(new models.users.login.LoginBodyModel(username, password));
-
 
         String localStorageAuthBody = """
                 {
@@ -200,6 +201,8 @@ public class BookClubOwnerLeaveUITests extends TestBase {
 
 
     @Test
+    @Tag("UI")
+    @DisplayName("[UI] Пользователь не может покинуть клуб, если он его владелец")
     //@Disabled
     public void cantLeaveClubAsAdminTest_without_api() {
         // register user

@@ -1,5 +1,6 @@
 package tests.users;
 
+import allure.Layer;
 import io.restassured.response.Response;
 import models.users.login.LoginBodyModel;
 import models.users.logout.EmptyRequestBodyLogoutResponseModel;
@@ -17,6 +18,7 @@ import tests.TestData;
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Layer("User")
 public class LogoutTests extends TestBase {
     private final TestData testData = new TestData();
     private String username;

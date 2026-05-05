@@ -1,6 +1,7 @@
 package tests.users;
 
 import allure.Layer;
+import io.qameta.allure.Story;
 import io.restassured.response.Response;
 import models.users.login.LoginBodyModel;
 import models.users.logout.EmptyRequestBodyLogoutResponseModel;
@@ -11,6 +12,7 @@ import models.users.registration.RegistrationBodyModel;
 import models.users.registration.SuccessfulRegistrationResponseModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import tests.TestBase;
 import tests.TestData;
@@ -18,7 +20,7 @@ import tests.TestData;
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Layer("User")
+
 public class LogoutTests extends TestBase {
     private final TestData testData = new TestData();
     private String username;
@@ -33,6 +35,8 @@ public class LogoutTests extends TestBase {
     }
 
     @Test
+    @Story("Выход пользователя из системы")
+    @Tag("API")
     @DisplayName("Тест на проверку выхода из системы зарегистрированного пользователя")
     public void successfulLogoutTest() {
 
@@ -55,6 +59,8 @@ public class LogoutTests extends TestBase {
     }
 
     @Test
+    @Story("Выход пользователя из системы")
+    @Tag("API")
     @DisplayName("Тест на проверку выхода из системы не зарегистрированного пользователя")
     public void unauthorizedUserLogoutNegativeTest() {
 
@@ -73,6 +79,8 @@ public class LogoutTests extends TestBase {
     }
 
     @Test
+    @Story("Выход пользователя из системы")
+    @Tag("API")
     @DisplayName("Тест на проверку выхода из системы с пустым refresh-токеном")
     public void emptyTokenLogoutNegativeTest() {
 
@@ -87,6 +95,8 @@ public class LogoutTests extends TestBase {
     }
 
     @Test
+    @Story("Выход пользователя из системы")
+    @Tag("API")
     @DisplayName("Тест на проверку выхода из системы с пустым телом запроса")
     public void emptyRequestBodyLogoutNegativeTest() {
 

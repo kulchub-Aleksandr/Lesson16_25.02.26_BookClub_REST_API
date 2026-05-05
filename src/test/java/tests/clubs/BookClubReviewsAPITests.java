@@ -19,7 +19,7 @@ import tests.TestData;
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Layer("Club")
+
 public class BookClubReviewsAPITests extends TestBase {
     private final TestData testData = new TestData();
     private String username;

@@ -6,6 +6,7 @@ import models.users.login.LoginBodyModel;
 import models.users.registration.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import tests.TestBase;
 import tests.TestData;
@@ -13,7 +14,7 @@ import tests.TestData;
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Layer("User")
+
 public class RegistrationTests extends TestBase {
     private final TestData testData = new TestData();
     private String username;
@@ -28,7 +29,8 @@ public class RegistrationTests extends TestBase {
     }
 
     @Test
-    @Story("RegistrationTests")
+    @Story("Регистрация нового пользователя")
+    @Tag("API")
     @DisplayName("Тест на проверку регистрации нового пользователя")
     public void successfulRegistrationTest() {
 
@@ -52,7 +54,8 @@ public class RegistrationTests extends TestBase {
     }
 
     @Test
-    @Story("RegistrationTests")
+    @Story("Регистрация нового пользователя")
+    @Tag("API")
     @DisplayName("Тест на проверку регистрации пользователя с уже существующими регистрационными данными")
     public void existingUserRegistrationNegativeTest() {
 
@@ -76,7 +79,8 @@ public class RegistrationTests extends TestBase {
     }
 
     @Test
-    @Story("RegistrationTests")
+    @Story("Регистрация нового пользователя")
+    @Tag("API")
     @DisplayName("Тест на проверку регистрации пользователя с невалидными регистрационными данными")
     public void invalidUserNameRegistrationNegativeTest() {
 
@@ -91,7 +95,8 @@ public class RegistrationTests extends TestBase {
     }
 
     @Test
-    @Story("RegistrationTests")
+    @Story("Регистрация нового пользователя")
+    @Tag("API")
     @DisplayName("Тест на проверку регистрации пользователя с неподдерживаемым типом передаваемых данных")
     public void unsupportedMediaTypeRegistrationNegativeTest() {
 

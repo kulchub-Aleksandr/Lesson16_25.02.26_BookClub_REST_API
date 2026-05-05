@@ -1,20 +1,18 @@
 package tests.users;
 
 import allure.Layer;
+import io.qameta.allure.Story;
 import models.users.login.*;
 import models.users.registration.RegistrationBodyModel;
 import models.users.registration.SuccessfulRegistrationResponseModel;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import tests.TestBase;
 import tests.TestData;
 
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Layer("User")
+
 public class LoginTests extends TestBase {
     private final TestData testData = new TestData();
     private String username;
@@ -45,6 +43,8 @@ public class LoginTests extends TestBase {
     }
 
     @Test
+    @Story("Авторизация пользователя в системе")
+    @Tag("API")
     @DisplayName("Тест на проверку авторизации существующего пользователя")
     public void successfulLoginTest() {
 
@@ -67,11 +67,11 @@ public class LoginTests extends TestBase {
             assertThat(actualRefresh).startsWith(expectedTokenPath);
             assertThat(actualAccess).isNotEqualTo(actualRefresh);
         });
-
-
     }
 
     @Test
+    @Story("Авторизация пользователя в системе")
+    @Tag("API")
     @DisplayName("Тест на проверку авторизации пользователя с применением не правильного пароля")
     public void wrongPasswordLoginNegativeTest() {
 
@@ -93,6 +93,8 @@ public class LoginTests extends TestBase {
     }
 
     @Test
+    @Story("Авторизация пользователя в системе")
+    @Tag("API")
     @DisplayName("Тест на проверку авторизации пользователя с применением пустого поля для пароля")
     public void emptyPasswordLoginNegativeTest() {
         SuccessfulRegistrationResponseModel registrationResponse
@@ -114,6 +116,8 @@ public class LoginTests extends TestBase {
     }
 
     @Test
+    @Story("Авторизация пользователя в системе")
+    @Tag("API")
     @DisplayName("Тест на проверку авторизации пользователя с применением не правильного логина")
     public void wrongUserNameLoginNegativeTest() {
         SuccessfulRegistrationResponseModel registrationResponse
@@ -134,6 +138,8 @@ public class LoginTests extends TestBase {
     }
 
     @Test
+    @Story("Авторизация пользователя в системе")
+    @Tag("API")
     @DisplayName("Тест на проверку авторизации пользователя с применением пустого поля для логина")
     public void emptyUserNameLoginNegativeTest() {
         SuccessfulRegistrationResponseModel registrationResponse
@@ -155,6 +161,8 @@ public class LoginTests extends TestBase {
     }
 
     @Test
+    @Story("Авторизация пользователя в системе")
+    @Tag("API")
     @DisplayName("Тест на проверку авторизации пользователя с применением пустого поля для логина и пустого поля для пароля")
     public void emptyUserNameEmptyPasswordLoginNegativeTest() {
         SuccessfulRegistrationResponseModel registrationResponse

@@ -1,21 +1,19 @@
 package tests.users;
 
 import allure.Layer;
+import io.qameta.allure.Story;
 import models.users.login.LoginBodyModel;
 import models.users.registration.RegistrationBodyModel;
 import models.users.registration.SuccessfulRegistrationResponseModel;
 import models.users.update.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import tests.TestBase;
 import tests.TestData;
 
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Layer("User")
+
 public class UpdateUserTests extends TestBase {
 
     private final TestData testData = new TestData();
@@ -43,6 +41,8 @@ public class UpdateUserTests extends TestBase {
     }
 
     @Test
+    @Story("Изменение данных пользователя")
+    @Tag("API")
     @DisplayName("Тест на проверку изменения всех данных пользователя методом PUT")
     public void successfulUpdateUserTest() {
 
@@ -81,6 +81,8 @@ public class UpdateUserTests extends TestBase {
     }
 
     @Test
+    @Story("Изменение данных пользователя")
+    @Tag("API")
     @DisplayName("Тест на проверку изменения всех данных пользователя методом PUT без предварительной аутентификации")
     public void notProvidedAuthenticationCredentialsUpdateUserNegativeTest() {
 
@@ -105,6 +107,8 @@ public class UpdateUserTests extends TestBase {
     }
 
     @Test
+    @Story("Изменение данных пользователя")
+    @Tag("API")
     @DisplayName("Тест на проверку изменения выборочных данных пользователя методом PATCH")
     public void partialUpdateUserTest() {
 
@@ -146,6 +150,8 @@ public class UpdateUserTests extends TestBase {
     }
 
     @Test
+    @Story("Изменение данных пользователя")
+    @Tag("API")
     @DisplayName("Тест на проверку изменения выборочных данных пользователя методом PUT")
     public void partialUpdateUserWithPutMethodNegativeTest() {
 

@@ -1,21 +1,19 @@
 package tests.users;
 
 import allure.Layer;
+import io.qameta.allure.Story;
 import models.users.login.LoginBodyModel;
 import models.users.registration.RegistrationBodyModel;
 import models.users.registration.SuccessfulRegistrationResponseModel;
 import models.users.update.NotProvidedAuthenticationCredentialsResponseModel;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import tests.TestBase;
 import tests.TestData;
 
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Layer("User")
+
 public class DeleteUserTests extends TestBase {
     private final TestData testData = new TestData();
     private String username;
@@ -36,6 +34,8 @@ public class DeleteUserTests extends TestBase {
     }
 
     @Test
+    @Story("Удаление пользователя из системы")
+    @Tag("API")
     @DisplayName("Тест на проверку удаления существующего пользователя")
     public void successfulDeleteUserTest() {
         SuccessfulRegistrationResponseModel registrationResponse
@@ -47,6 +47,8 @@ public class DeleteUserTests extends TestBase {
     }
 
     @Test
+    @Story("Удаление пользователя из системы")
+    @Tag("API")
     @DisplayName("Тест на проверку удаления не авторизованного пользователя")
     public void notProvidedAuthenticationCredentialsDeleteUserNegativeTest() {
         SuccessfulRegistrationResponseModel registrationResponse

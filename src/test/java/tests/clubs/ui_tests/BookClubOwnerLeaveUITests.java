@@ -48,7 +48,7 @@ public class BookClubOwnerLeaveUITests extends TestBase {
     }
 
     @Test
-    @Layer("Club")
+
     @Tag("API+UI")
     @DisplayName("UI + API Пользователь не может покинуть клуб, если он его владелец")
     public void cantLeaveClubAsOwnerTest() {

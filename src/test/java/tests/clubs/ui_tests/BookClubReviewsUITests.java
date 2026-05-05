@@ -23,7 +23,7 @@ import tests.TestData;
 
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
-@Layer("Club")
+
 public class BookClubReviewsUITests extends TestBase {
 
     ClubPage clubPage = new ClubPage();

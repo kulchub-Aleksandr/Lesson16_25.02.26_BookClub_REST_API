@@ -76,11 +76,13 @@ flowchart LR;
 ```bash
 clean
 test
--DremoteUrl=${SELENOID_URL}
--DbaseUrl=${BASE_URL}
--DbrowserSize=${BROWSER_SIZE}
--Dbrowser=${BROWSER_NAME}
+-DremoteUrl="${SELENOID_URL}"
+-DbaseUrl="${BASE_URL}"
+-DbrowserSize="${BROWSER_SIZE}"
+-Dbrowser="${BROWSER_NAME}"
 -Dbrowser_version="${BROWSER_VERSION}"
+-DbaseUri="$BASE_URI"
+-DbasePath="$BASE_PATH"
 ```
 
 ### Параметры сборки
@@ -89,6 +91,9 @@ test
 - <code>BROWSER_VERSION</code> – версия браузера, в которой будут выполняться тесты.
 - <code>BROWSER_SIZE</code> – размер окна браузера, в котором будут выполняться тесты.
 - <code>BASE_URL</code> – Url, по которому будет открываться тестируемое приложение.
+- <code>BASE_URI</code> — базовый URI API.
+
+- <code>BASE_PATH</code>— базовый путь .
 - <code>REMOTE_BROWSER_URL</code> – адрес удаленного сервера, на котором будут запускаться тесты.
 
 ## <img src="images/logo/Jenkins.svg" title="Jenkins" width="5%"/> Сборка в [Jenkins](https://jenkins.autotests.cloud/view/java_students/job/C39_AleksKulch_lesson14_29.01.26_Test_Task/)

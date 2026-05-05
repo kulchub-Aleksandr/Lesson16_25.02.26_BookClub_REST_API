@@ -155,16 +155,16 @@ src="images/screen/Jenkins_2.png">
 <img title="Allure TestOps Tests" src="images/screen/Allure_Test_Ops_2.png">
 </p>
 
-## <img src="images/logo/Jira.svg" title="Allure TestOps" width="6%"/> Интеграция с [Jira](https://jira.autotests.cloud/browse/HOMEWORK-1574)
+## <img src="images/logo/Jira.svg" title="Allure TestOps" width="6%"/> Интеграция с [Jira](https://jira.autotests.cloud/browse/HOMEWORK-1600)
 
 Реализована интеграция <code>Allure TestOps</code> с <code>Jira</code>, в тикете отображается информация, какие тест-кейсы были написаны в рамках задачи и результат их прогона.
 
 <p align="center">
-<img title="Jira Task" src="images/screen/jira_0.png">
+<img title="Jira Task" src="images/screen/jira_1.png">
 </p>
 
 <p align="center">
-<img title="Jira Task" src="images/screen/jira_1.png">
+<img title="Jira Task" src="images/screen/jira_2.png">
 </p>
 
 ## <img src="images/logo/Telegram.svg" title="Allure TestOps" width="7%"/> Уведомления в Telegram

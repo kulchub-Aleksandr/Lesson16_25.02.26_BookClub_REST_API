@@ -179,6 +179,6 @@ src="images/screen/Jenkins_2.png">
 
 К каждому тесту в отчете прилагается видео прогона.
 <p align="center">
-  <img title="Selenoid Video" src="images/video/Video_MD.gif">
+  <img title="Selenoid Video" src="images/video/UI.gif">
 </p>
 

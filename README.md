@@ -8,7 +8,7 @@
 - [Интеграция с Allure TestOps](#-интеграция-с-allure-testops)  
 - [Интеграция с Jira](#-интеграция-с-jira)
 - [Уведомления в Telegram](#-уведомления-в-telegram)
-- [Видео примера запуска тестов в Selenoid](#-видео-примера-запуска-тестов-в-selenoid)
+- [Видео примера запуска UI части тестов в Selenoid](#-видео-примера-запуска-тестов-в-selenoid)
 
 ## <span id="tech-stack"> :computer: Использованный стек технологий и инструментов
 
@@ -92,24 +92,23 @@ test
 - <code>BROWSER_SIZE</code> – размер окна браузера, в котором будут выполняться тесты.
 - <code>BASE_URL</code> – Url, по которому будет открываться тестируемое приложение.
 - <code>BASE_URI</code> — базовый URI API.
-
-- <code>BASE_PATH</code>— базовый путь .
+- <code>BASE_PATH</code>— базовый путь к API.
 - <code>REMOTE_BROWSER_URL</code> – адрес удаленного сервера, на котором будут запускаться тесты.
 
-## <img src="images/logo/Jenkins.svg" title="Jenkins" width="5%"/> Сборка в [Jenkins](https://jenkins.autotests.cloud/view/java_students/job/C39_AleksKulch_lesson14_29.01.26_Test_Task/)
+## <img src="images/logo/Jenkins.svg" title="Jenkins" width="5%"/> Сборка в [Jenkins](https://jenkins.autotests.cloud/view/java_students/job/C39_AleksKulch_lesson18_Book_Club_Reviews/)
 ### Главная страница
 <p align="center">
 <img title="Jenkins Build" 
-src="images/screen/JenkinsBuild_0.png">
+src="images/screen/Jenkins_1.png">
 </p>
 
 ### Страница запуска с возможностью изменить параметры
 <p align="center">
 <img title="Jenkins Build" 
-src="images/screen/JenkinsBuild_1.png">
+src="images/screen/Jenkins_2.png">
 </p>
 
-## <img src="images/logo/Allure_Report.svg" title="Allure Report" width="5%"/> Allure [Report](https://jenkins.autotests.cloud/view/java_students/job/C39_AleksKulch_lesson14_29.01.26_Test_Task/allure/)
+## <img src="images/logo/Allure_Report.svg" title="Allure Report" width="5%"/> Allure [Report](https://jenkins.autotests.cloud/job/C39_AleksKulch_lesson18_Book_Club_Reviews/14/allure/)
 
 Содержание Allure-отчета:
 
@@ -122,25 +121,25 @@ src="images/screen/JenkinsBuild_1.png">
 ### Overview
 
 <p align="center">
-<img title="Allure Overview" src="images/screen/Allure_0.png">
+<img title="Allure Overview" src="images/screen/Allure_1.png">
 </p>
 
 ### Результат выполнения теста / Тест-кейсы
 
 <p align="center">
-<img title="Test Results in Alure" src="images/screen/Allure_1.png">
+<img title="Test Results in Alure" src="images/screen/Allure_2.png">
 </p>
 
-### Графики
-
   <p align="center">  
-<img title="Allure Graphics" src="images/screen/Allure_2.png">
+<img title="Allure Graphics" src="images/screen/Allure_4.png">
+
+### Графики
 
 <p align="center">
 <img title="Allure Graphics" src="images/screen/Allure_3.png">  
 </p>
 
-## <img src="images/logo/AllureTestOps.svg" title="Allure TestOps" width="5%"/> Интеграция с [Allure TestOps](https://allure.autotests.cloud/project/5108/dashboards)
+## <img src="images/logo/AllureTestOps.svg" title="Allure TestOps" width="5%"/> Интеграция с [Allure TestOps](https://allure.autotests.cloud/project/5160/dashboards)
 
 Результаты выполнения автотестов в сборке <code>Jenkins</code> передаются в <code>Allure TestOps</code>
 
@@ -148,12 +147,12 @@ src="images/screen/JenkinsBuild_1.png">
 
 ### Dashboard
 <p align="center">
-<img title="Allure TestOps DashBoard" src="images/screen/allureTestOpsDashBoard.png">
+<img title="Allure TestOps DashBoard" src="images/screen/Allure_Test_Ops_1.png">
 </p>
 
 ### Результат выполнения автотеста
 <p align="center">
-<img title="Allure TestOps Tests" src="images/screen/allureTestOpsTest.png">
+<img title="Allure TestOps Tests" src="images/screen/Allure_Test_Ops_2.png">
 </p>
 
 ## <img src="images/logo/Jira.svg" title="Allure TestOps" width="6%"/> Интеграция с [Jira](https://jira.autotests.cloud/browse/HOMEWORK-1574)

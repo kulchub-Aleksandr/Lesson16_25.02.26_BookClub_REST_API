@@ -1,6 +1,7 @@
 package tests.clubs;
 
 import allure.Layer;
+import io.qameta.allure.Story;
 import models.clubs.listBookClub.BookClubsListResponseModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
@@ -9,6 +10,7 @@ import models.users.registration.RegistrationBodyModel;
 import models.users.registration.SuccessfulRegistrationResponseModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import tests.TestBase;
 import tests.TestData;
@@ -45,6 +47,8 @@ public class BookClubListTests extends TestBase {
     }
 
     @Test
+    @Story("Работа со списком клубов")
+    @Tag("API")
     @DisplayName("Тест на получение списка клубов")
     public void getClubsListReturns200AndValidStructureTest() {
 
@@ -58,6 +62,8 @@ public class BookClubListTests extends TestBase {
     }
 
     @Test
+    @Story("Работа со списком клубов")
+    @Tag("API")
     @DisplayName("Тест на получение клуба по названию клуба")
     public void getClubsListBookTitleTest() {
         SuccessfulRegistrationResponseModel registrationResponse
@@ -97,6 +103,8 @@ public class BookClubListTests extends TestBase {
     }
 
     @Test
+    @Story("Работа со списком клубов")
+    @Tag("API")
     @DisplayName("Тест фильтрации списка клубов: поиск по названию и членству, без авторизации юзера")
     public void getClubsListBookTitleMembershipTest() {
 
@@ -111,6 +119,8 @@ public class BookClubListTests extends TestBase {
     }
 
     @Test
+    @Story("Работа со списком клубов")
+    @Tag("API")
     @DisplayName("Тест фильтрации списка клубов: поиск по членству, без авторизации юзера")
     public void getClubsListMembershipTest() {
 
@@ -126,6 +136,8 @@ public class BookClubListTests extends TestBase {
     }
 
     @Test
+    @Story("Работа со списком клубов")
+    @Tag("API")
     @DisplayName("Тест фильтрации списка клубов: поиск по членству, с авторизованным пользователем, без создания клуба")
     public void getClubsListMembershipWithAnAuthorizedUserTest() {
 
@@ -151,6 +163,8 @@ public class BookClubListTests extends TestBase {
     }
 
     @Test
+    @Story("Работа со списком клубов")
+    @Tag("API")
     @DisplayName("Тест фильтрации списка клубов: поиск по членству Owner, с авторизованным пользователем, с созданием клуба")
     public void getClubsListMembershipOwnerWithAnAuthorizedUserCreatingClubTest() {
 
@@ -200,6 +214,8 @@ public class BookClubListTests extends TestBase {
     }
 
     @Test
+    @Story("Работа со списком клубов")
+    @Tag("API")
     @DisplayName("Тест фильтрации списка клубов: поиск по членству Member, с авторизованным пользователем, с созданием клуба")
     public void getClubsListMembershipMemberWithAnAuthorizedUserCreatingClubTest() {
 
@@ -250,6 +266,8 @@ public class BookClubListTests extends TestBase {
     }
 
     @Test
+    @Story("Работа со списком клубов")
+    @Tag("API")
     @DisplayName("Тест на получение клуба по ID , с авторизованным пользователем, с созданием клуба")
     public void getClubsListByIdWithAnAuthorizedUserCreatingClubTest() {
 

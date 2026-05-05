@@ -1,6 +1,7 @@
 package tests.clubs;
 
 import allure.Layer;
+import io.qameta.allure.Story;
 import models.clubs.deleteBookClub.PermissionUnsuccessfulBookClubDeleteResponseModel;
 import models.clubs.listBookClub.NonExistentBookClubsListResponseModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
@@ -10,6 +11,7 @@ import models.users.registration.RegistrationBodyModel;
 import models.users.registration.SuccessfulRegistrationResponseModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import tests.TestBase;
 import tests.TestData;
@@ -48,6 +50,8 @@ public class BookClubDeleteTests extends TestBase {
     }
 
     @Test
+    @Story("Удаление клуба")
+    @Tag("API")
     @DisplayName("Тест на проверку удаления клуба")
     public void successfulBookClubDeleteTest() {
 
@@ -89,6 +93,8 @@ public class BookClubDeleteTests extends TestBase {
     }
 
     @Test
+    @Story("Удаление клуба")
+    @Tag("API")
     @DisplayName("Тест на проверку удаления клуба с аккаунта не создателя клуба")
     public void permissionUnsuccessfulBookClubDeleteTest() {
 

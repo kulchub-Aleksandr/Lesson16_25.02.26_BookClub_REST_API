@@ -3,6 +3,7 @@ package tests.clubs.ui_tests;
 import allure.Layer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.qameta.allure.Story;
 import models.clubs.localStorage.LocalStorageAuthRequestBody;
 import models.clubs.localStorage.UserData;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
@@ -72,8 +73,9 @@ public class BookClubReviewsUITests extends TestBase {
     }
 
     @Test
+    @Story("Оставление отзыва на книгу")
     @Tag("API+UI")
-    @DisplayName("[UI] Тест на оставление отзыва на книгу, с авторизованным пользователем, не создателем клуба," +
+    @DisplayName("Тест на оставление отзыва на книгу, с авторизованным пользователем, не создателем клуба," +
             "с созданием нового клуба и новых пользователей")
     public void bookClubReviewsPostWithAnAuthorizedUserCreatingClubTest() {
 
@@ -162,8 +164,9 @@ public class BookClubReviewsUITests extends TestBase {
     }
 
     @Test
+    @Story("Оставление отзыва на книгу")
     @Tag("API+UI")
-    @DisplayName("[UI] Тест на оставление отзыва на книгу, с авторизованным пользователем,  Создателем клуба," +
+    @DisplayName("Тест на оставление отзыва на книгу, с авторизованным пользователем,  Создателем клуба," +
             "с созданием нового клуба и новых пользователей")
     public void bookClubReviewsPostWithAnAuthorizedUserClubOwnerCreatingClubTest() {
 
@@ -231,8 +234,9 @@ public class BookClubReviewsUITests extends TestBase {
     }
 
     @Test
+    @Story("Оставление отзыва на книгу")
     @Tag("API+UI")
-    @DisplayName("[UI] Тест на редактирование отзыва на книгу, с авторизованным пользователем, не создателем клуба, " +
+    @DisplayName("Тест на редактирование отзыва на книгу, с авторизованным пользователем, не создателем клуба, " +
             "с созданием нового клуба и новых пользователей")
     public void bookClubReviewsPatchWithAnAuthorizedUserCreatingClubTest() {
 
@@ -337,8 +341,9 @@ public class BookClubReviewsUITests extends TestBase {
     }
 
     @Test
+    @Story("Оставление отзыва на книгу")
     @Tag("API+UI")
-    @DisplayName("[UI] Тест на удаление отзыва на книгу, с авторизованным пользователем," +
+    @DisplayName("Тест на удаление отзыва на книгу, с авторизованным пользователем," +
             " с созданием нового клуба и новых пользователей")
     public void deleteReviewsBookClubWithAnAuthorizedUserCreatingClubTest() {
 

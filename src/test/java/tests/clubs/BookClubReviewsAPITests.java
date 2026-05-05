@@ -1,6 +1,7 @@
 package tests.clubs;
 
 import allure.Layer;
+import io.qameta.allure.Story;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
 import models.clubs.reviewsBookClub.SuccessfulReviewsGetBookClubResponseModel;
@@ -66,6 +67,7 @@ public class BookClubReviewsAPITests extends TestBase {
     }
 
     @Test
+    @Story("Оставление отзыва на книгу")
     @Tag("API")
     @DisplayName("Тест на оставление отзыва на книгу, с авторизованным пользователем, не создателем клуба," +
             "с созданием нового клуба и новых пользователей")
@@ -137,6 +139,7 @@ public class BookClubReviewsAPITests extends TestBase {
     }
 
     @Test
+    @Story("Оставление отзыва на книгу")
     @Tag("API")
     @DisplayName("Тест на оставление отзыва на книгу, с авторизованным пользователем,  Создателем клуба," +
             "с созданием нового клуба и новых пользователей")
@@ -188,6 +191,7 @@ public class BookClubReviewsAPITests extends TestBase {
     }
 
     @Test
+    @Story("Оставление отзыва на книгу")
     @Tag("API")
     @DisplayName("Тест на редактирование отзыва на книгу, с авторизованным пользователем, не создателем клуба, " +
             "с созданием нового клуба и новых пользователей")
@@ -276,6 +280,7 @@ public class BookClubReviewsAPITests extends TestBase {
     }
 
     @Test
+    @Story("Оставление отзыва на книгу")
     @Tag("API")
     @DisplayName("Тест на вызов отзывов на книгу, с авторизованным пользователем, не создателем клуба," +
             "с созданием нового клуба и новых пользователей")
@@ -354,6 +359,7 @@ public class BookClubReviewsAPITests extends TestBase {
     }
 
     @Test
+    @Story("Оставление отзыва на книгу")
     @Tag("API")
     @DisplayName("Тест на оставление отзыва не членом клуба на книгу, с авторизованным пользователем," +
             " с созданием нового клуба и новых пользователей")
@@ -422,6 +428,7 @@ public class BookClubReviewsAPITests extends TestBase {
     }
 
     @Test
+    @Story("Оставление отзыва на книгу")
     @Tag("API")
     @DisplayName("Тест на удаление отзыва на книгу, с авторизованным пользователем," +
             " с созданием нового клуба и новых пользователей")

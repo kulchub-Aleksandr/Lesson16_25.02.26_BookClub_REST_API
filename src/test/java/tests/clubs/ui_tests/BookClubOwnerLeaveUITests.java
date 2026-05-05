@@ -5,6 +5,7 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.qameta.allure.Story;
 import models.clubs.localStorage.LocalStorageAuthRequestBody;
 import models.clubs.localStorage.UserData;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
@@ -48,9 +49,9 @@ public class BookClubOwnerLeaveUITests extends TestBase {
     }
 
     @Test
-
+    @Story("Выход из членства клуба")
     @Tag("API+UI")
-    @DisplayName("UI + API Пользователь не может покинуть клуб, если он его владелец")
+    @DisplayName("Пользователь не может покинуть клуб, если он его владелец")
     public void cantLeaveClubAsOwnerTest() {
         // register user
         models.users.registration.SuccessfulRegistrationResponseModel registrationResponse
@@ -112,6 +113,8 @@ public class BookClubOwnerLeaveUITests extends TestBase {
 
 
     @Test
+    @Story("Выход из членства клуба")
+    @Tag("API+UI")
     @DisplayName("UI + API Пользователь не может покинуть клуб, если он его владелец, вариант без LocalStorageAuthRequestBody")
     //@Disabled
     public void cantLeaveClubAsAdminTest_with_login_by_api() {
@@ -201,8 +204,9 @@ public class BookClubOwnerLeaveUITests extends TestBase {
 
 
     @Test
+    @Story("Выход из членства клуба")
     @Tag("UI")
-    @DisplayName("[UI] Пользователь не может покинуть клуб, если он его владелец")
+    @DisplayName("Пользователь не может покинуть клуб, если он его владелец")
     //@Disabled
     public void cantLeaveClubAsAdminTest_without_api() {
         // register user

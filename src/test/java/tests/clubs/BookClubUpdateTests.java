@@ -1,6 +1,7 @@
 package tests.clubs;
 
 import allure.Layer;
+import io.qameta.allure.Story;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationResponseModel;
 import models.clubs.updateBookClub.SuccessfulBookClubUpdateBodyModel;
@@ -9,6 +10,7 @@ import models.users.registration.RegistrationBodyModel;
 import models.users.registration.SuccessfulRegistrationResponseModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import tests.TestBase;
 import tests.TestData;
@@ -54,6 +56,8 @@ public class BookClubUpdateTests extends TestBase {
     }
 
     @Test
+    @Story("Изменение данных клуба")
+    @Tag("API")
     @DisplayName("Тест на изменение всех данных клуба методом PUT, с авторизованным пользователем, с созданием клуба")
     public void updateClubWithAnAuthorizedUserCreatingClubTest() {
 
@@ -116,6 +120,8 @@ public class BookClubUpdateTests extends TestBase {
     }
 
     @Test
+    @Story("Изменение данных клуба")
+    @Tag("API")
     @DisplayName("Тест на изменение частичных данных клуба методом PATCH, с авторизованным пользователем, с созданием клуба")
     public void partialUpdateClubWithAnAuthorizedUserCreatingClubTest() {
 

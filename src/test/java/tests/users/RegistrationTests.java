@@ -1,6 +1,7 @@
 package tests.users;
 
 import allure.Layer;
+import io.qameta.allure.Story;
 import models.users.login.LoginBodyModel;
 import models.users.registration.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,7 @@ public class RegistrationTests extends TestBase {
     }
 
     @Test
+    @Story("RegistrationTests")
     @DisplayName("Тест на проверку регистрации нового пользователя")
     public void successfulRegistrationTest() {
 
@@ -50,6 +52,7 @@ public class RegistrationTests extends TestBase {
     }
 
     @Test
+    @Story("RegistrationTests")
     @DisplayName("Тест на проверку регистрации пользователя с уже существующими регистрационными данными")
     public void existingUserRegistrationNegativeTest() {
 
@@ -73,6 +76,7 @@ public class RegistrationTests extends TestBase {
     }
 
     @Test
+    @Story("RegistrationTests")
     @DisplayName("Тест на проверку регистрации пользователя с невалидными регистрационными данными")
     public void invalidUserNameRegistrationNegativeTest() {
 
@@ -87,6 +91,7 @@ public class RegistrationTests extends TestBase {
     }
 
     @Test
+    @Story("RegistrationTests")
     @DisplayName("Тест на проверку регистрации пользователя с неподдерживаемым типом передаваемых данных")
     public void unsupportedMediaTypeRegistrationNegativeTest() {
 

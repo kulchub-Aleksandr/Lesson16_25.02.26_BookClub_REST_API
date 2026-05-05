@@ -1,6 +1,5 @@
 package tests.clubs;
 
-import allure.Layer;
 import io.qameta.allure.Story;
 import models.clubs.deleteBookClub.PermissionUnsuccessfulBookClubDeleteResponseModel;
 import models.clubs.listBookClub.NonExistentBookClubsListResponseModel;

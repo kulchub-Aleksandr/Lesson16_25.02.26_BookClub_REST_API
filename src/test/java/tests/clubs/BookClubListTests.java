@@ -1,6 +1,5 @@
 package tests.clubs;
 
-import allure.Layer;
 import io.qameta.allure.Story;
 import models.clubs.listBookClub.BookClubsListResponseModel;
 import models.clubs.registrationBookClub.SuccessfulBookClubRegistrationBodyModel;

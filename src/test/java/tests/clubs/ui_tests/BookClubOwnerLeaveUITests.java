@@ -1,6 +1,5 @@
 package tests.clubs.ui_tests;
 
-import allure.Layer;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import com.fasterxml.jackson.core.JsonProcessingException;

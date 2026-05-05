@@ -177,8 +177,7 @@ src="images/screen/Jenkins_2.png">
 
 ## <img src="images/logo/Selenoid.svg" title="Allure TestOps" width="5%"/> Видео примера запуска тестов в Selenoid
 
-К каждому тесту в отчете прилагается видео прогона.
+К тестам, в которых есть часть, которая запускается на удаленном браузере [Selenoid](https://aerokube.com/selenoid/), прилагается видео прогона.
 <p align="center">
   <img title="Selenoid Video" src="images/video/UI.gif">
 </p>
-

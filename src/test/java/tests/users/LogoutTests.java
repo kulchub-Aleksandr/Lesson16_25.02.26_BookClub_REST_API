@@ -1,6 +1,5 @@
 package tests.users;
 
-import allure.Layer;
 import io.qameta.allure.Story;
 import io.restassured.response.Response;
 import models.users.login.LoginBodyModel;

@@ -13,19 +13,46 @@
 ## <span id="tech-stack"> :computer: Использованный стек технологий и инструментов
 
 <p align="center">
-<img width="6%" title="IntelliJ IDEA" src="images/logo/Intelij_IDEA.svg">
-<img width="6%" title="GitHub" src="images/logo/GitHub.svg">
-<img width="6%" title="Java" src="images/logo/Java.svg">
-<img width="6%" title="Selenide" src="images/logo/Selenide.svg">
-<img width="6%" title="Gradle" src="images/logo/Gradle.svg">
-<img width="6%" title="JUnit5" src="images/logo/JUnit5.svg">
+
+ <a href="https://www.jetbrains.com/idea/" target="_blank">
+  <img width="6%" title="IntelliJ IDEA" src="images/logo/Intelij_IDEA.svg">
+</a>
+<a href="https://github.com" target="_blank">
+  <img width="6%" title="GitHub" src="images/logo/GitHub.svg">
+</a>
+<a href="https://www.java.com" target="_blank">
+  <img width="6%" title="Java" src="images/logo/Java.svg">
+</a>
+<a href="https://selenide.org" target="_blank">
+    <img width="6%" title="Selenide" src="images/logo/Selenide.svg">
+  </a>
+<a href="https://gradle.org" target="_blank">
+    <img width="6%" title="Gradle" src="images/logo/Gradle.svg">
+  </a>
+<a href="https://junit.org/junit5/" target="_blank">
+    <img width="6%" title="JUnit5" src="images/logo/JUnit5.svg">
+  </a>
+  <a href="https://rest-assured.io/" target="_blank">
 <img width="5%" title="Rest_assured" src="images/logo/rest_assured.png">
+</a>
+<a href="https://aerokube.com/selenoid/latest/" target="_blank">
 <img width="6%" title="Selenoid" src="images/logo/Selenoid.svg">
-<img width="6%" title="Jenkins" src="images/logo/Jenkins.svg">
-<img width="6%" title="Allure Report" src="images/logo/Allure_Report.svg">
-<img width="6%" title="Telegram" src="images/logo/Telegram.svg">
-<img width="5%" title="Allure TestOps" src="images/logo/AllureTestOps.svg">
+</a>
+<a href="https://jenkins.io" target="_blank">
+    <img width="6%" title="Jenkins" src="images/logo/Jenkins.svg">
+  </a>
+<a href="https://allurereport.org/" target="_blank">
+    <img width="6%" title="Allure Report" src="images/logo/Allure_Report.svg">
+  </a>
+<a href="https://telegram.org" target="_blank">
+    <img width="6%" title="Telegram" src="images/logo/Telegram.svg">
+  </a>
+  <a href="https://qameta.io/allure-testops/" target="_blank">
+    <img width="5%" title="Allure TestOps" src="images/logo/AllureTestOps.svg">
+  </a>
+<a href="https://www.atlassian.com/software/jira" target="_blank">
 <img width="5%" title="Jira" src="images/logo/Jira.svg">
+</a>
 </p>
 
 - В данном проекте реализованны смешанные автотесты на API и UI: комбинация API‑запросов и UI‑действий в рамках одного сценария.

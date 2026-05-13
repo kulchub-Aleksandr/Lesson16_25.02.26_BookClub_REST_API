@@ -44,7 +44,10 @@ public class TestBase {
                 "enableVideo", true
         ));
         Configuration.browserCapabilities = capabilities;
-        Configuration.remote = webConfig.remoteUrl();
+
+        if (webConfig.isRemote()) {
+            Configuration.remote = webConfig.remoteUrl();
+        }
     }
 
     @BeforeEach

@@ -103,13 +103,13 @@ flowchart LR;
 ```bash
 clean
 test
--DremoteUrl="${SELENOID_URL}"
--DbaseUrl="${BASE_URL}"
--DbrowserSize="${BROWSER_SIZE}"
--Dbrowser="${BROWSER_NAME}"
--Dbrowser_version="${BROWSER_VERSION}"
--DbaseUri="$BASE_URI"
--DbasePath="$BASE_PATH"
+-DremoteUrl=${SELENOID_URL}
+-DbaseUrl=${BASE_URL}
+-DbrowserSize=${BROWSER_SIZE}
+-Dbrowser=${BROWSER_NAME}
+-Dbrowser_version=${BROWSER_VERSION}
+-DbaseUri=${BASE_URI}
+-DbasePath=${BASE_PATH}
 ```
 
 ### Параметры сборки
